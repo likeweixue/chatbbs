@@ -1,0 +1,18 @@
+# 数据目录：禁止目录列表、禁止执行 PHP
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "(?i)\.(php|php3|php4|php5|php7|phtml|pht)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(?i)\.(php|php3|php4|php5|php7|phtml|pht)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>

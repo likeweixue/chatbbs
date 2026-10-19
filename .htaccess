@@ -1,0 +1,40 @@
+# ChatBBS Apache 伪静态与目录保护
+# -------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 后台域名绑定 / 强制 HTTPS（按需开启）
+    # RewriteCond %{HTTPS} !=on
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # 后台入口：/admin 或 /admin/xxx
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^admin(/.*)?$ /admin/index.php [L,QSA]
+
+    # 前台入口
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.php [L,QSA]
+</IfModule>
+
+# -------------------------------
+# 目录保护
+# -------------------------------
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(sql|log|ini|conf)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 24M
+    php_value max_execution_time 120
+</IfModule>
+
+# 目录列表
+Options -Indexes
+
+# 默认首页
+DirectoryIndex index.php index.html

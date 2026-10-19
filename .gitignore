@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+._*
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+
+# 安装/运行时生成（含数据库密码，绝不入库）
+/config/database.php
+/config/installed.lock
+
+# 运行时数据
+/data/cache/*
+/data/logs/*
+/data/backups/*
+/data/uploads/*
+!/data/cache/.gitkeep
+!/data/logs/.gitkeep
+!/data/backups/.gitkeep
+!/data/uploads/.gitkeep
+
+# 临时/日志
+*.log
+*.tmp
+*.swp

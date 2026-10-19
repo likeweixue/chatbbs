@@ -1,0 +1,231 @@
+<?php
+$currentUser = $current_user ?? null;
+$siteName = $site_name ?? config('site_name', 'ChatBBS');
+$unread = $unread_notifications ?? 0;
+$unreadMsg = $unread_messages ?? 0;
+$menus = $menus ?? [];
+$sidebarOn = ($sidebar_enable ?? 1) && (!isset($hide_sidebar) || !$hide_sidebar);
+$side = $sidebar_side ?? 'right';
+$theme = \App\Core\View::theme();
+
+$logoType = (string)config('logo_type', 'text');
+$logoImg = (string)config('site_logo', '');
+$logoText = trim((string)config('logo_text', ''));
+if ($logoText === '') {
+    $logoText = $siteName;
+}
+$favicon = (string)config('site_favicon', '');
+?>
+<!DOCTYPE html>
+<html lang="<?= h(\App\Core\Lang::current()) ?>" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?= h(($title ?? '') !== '' ? $title . ' - ' . $siteName : $siteName) ?></title>
+<meta name="description" content="<?= h(config('site_description', '')) ?>">
+<meta name="keywords" content="<?= h(config('site_keywords', '')) ?>">
+<link rel="icon" href="<?= h($favicon !== '' ? $favicon : asset('images/retro/favicon.svg')) ?>">
+<link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
+<?php
+// 外观微调：圆角大小 / 主题主色（后台「扩展管理 → 主题 → 外观微调」设置）
+$radius = (int)config('theme_radius', 8);
+$radius = max(0, min(24, $radius));
+$radiusSm = (int)round($radius * 0.5);
+$radiusLg = (int)round($radius * 1.5);
+$primary = (string)config('theme_primary', '#0b87fd');
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $primary)) {
+    $primary = '#0b87fd';
+}
+$vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}px;"
+    . "--color-primary:{$primary};--color-link:{$primary}";
+?>
+<style>:root{<?= $vars ?>}html[data-theme="dark"]{<?= $vars ?>}</style>
+<script>
+  window.CB_SITE_URL = '<?= h(site_base() . '/') ?>';
+  window.CB_URL_MODE = '<?= h(cb_url_mode()) ?>';
+  /* 接口 / 页面地址前缀：兼容模式下为 /?r= ，伪静态模式下为 / */
+  window.CB_API_BASE = '<?= h(cb_url_mode() === 'query' ? site_base() . '/?r=' : site_base() . '/') ?>';
+  window.CB_PAGE_BASE = window.CB_API_BASE;
+  window.CB_CSRF = '<?= h(csrf_token()) ?>';
+  window.CB_REPLY_PREVIEW = <?= (int)config('reply_preview_count', 5) ?>;
+  /* 界面文案字典：中文为空对象（直接返回原文），其它语言才有内容。
+     只翻译界面名词，用户产生的内容不走这里。 */
+  window.CB_LANG = <?= json_encode(\App\Core\Lang::jsMap(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+  window.cbT = function (s) {
+    var m = window.CB_LANG;
+    return (m && Object.prototype.hasOwnProperty.call(m, s)) ? m[s] : s;
+  };
+</script>
+</head>
+<body class="cb-body">
+
+<header class="cb-header" id="cb-header">
+  <div class="cb-header__inner">
+    <button class="cb-burger" id="cb-burger" type="button" aria-label="<?= L('展开菜单') ?>" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <a class="cb-logo" href="<?= h(url('')) ?>">
+      <?php if ($logoType === 'image' && $logoImg !== ''): ?>
+        <img src="<?= h($logoImg) ?>" alt="<?= h($siteName) ?>">
+      <?php else: ?>
+        <span class="cb-logo__mark"><?= cb_icon('quill') ?></span>
+        <span class="cb-logo__text"><?= h($logoText) ?></span>
+      <?php endif; ?>
+    </a>
+
+    <div class="cb-header__main" id="cb-drawer">
+      <div class="cb-drawer__head">
+        <span class="cb-drawer__title"><?= h($siteName) ?></span>
+        <button class="cb-drawer__close" id="cb-drawer-close" type="button" aria-label="<?= L('关闭菜单') ?>"><?= cb_icon('close') ?></button>
+      </div>
+
+      <nav class="cb-nav">
+        <?php foreach ($menus as $m): ?>
+          <a href="<?= h(str_starts_with((string)$m['url'], 'http') ? $m['url'] : url(ltrim((string)$m['url'], '/'))) ?>"
+             target="<?= h($m['target']) ?>"><?= h($m['title']) ?></a>
+        <?php endforeach; ?>
+        <?php if (is_admin()): ?>
+          <a href="<?= h(url('admin')) ?>"><?= L('管理后台') ?></a>
+        <?php endif; ?>
+      </nav>
+
+      <div class="cb-header__right">
+        <form class="cb-search" action="<?= h(url('search')) ?>" method="get">
+          <input type="text" name="q" placeholder="<?= L('搜索…') ?>" autocomplete="off"
+                 value="<?= h(\App\Core\Request::get('q', '')) ?>">
+        </form>
+
+        <button class="cb-icon-btn" data-theme-toggle title="<?= L('切换暗色模式') ?>">
+          <span class="ico-light"><?= cb_icon('sun') ?></span>
+          <span class="ico-dark"><?= cb_icon('moon') ?></span>
+        </button>
+
+        <?php
+        // 语言切换：下拉列出可用语言，切换后回到当前页
+        $langList = \App\Core\Lang::available();
+        $curLang  = \App\Core\Lang::current();
+        $langOn   = count($langList) > 1 && (int)config('lang_switch', 1) === 1;
+        $reqUri   = (string)($_SERVER['REQUEST_URI'] ?? '');
+        $backPath = trim((string)parse_url($reqUri, PHP_URL_PATH), '/');
+        $backQry  = (string)parse_url($reqUri, PHP_URL_QUERY);
+        if ($backQry !== '') {
+            $backPath .= '?' . $backQry;
+        }
+        if (strlen($backPath) > 300) {
+            $backPath = '';
+        }
+        ?>
+        <?php if ($langOn): ?>
+        <div class="cb-dropdown">
+          <button class="cb-icon-btn" id="btn-lang" title="Language / <?= L('语言') ?>" aria-haspopup="true"><?= cb_icon('globe') ?></button>
+          <div class="cb-dropdown__menu cb-lang-menu" id="menu-lang">
+            <div class="head"><span>🌐 <?= L('语言') ?> / Language</span></div>
+            <div class="list">
+              <?php foreach ($langList as $code => $name): ?>
+                <a class="item <?= $curLang === $code ? 'on' : '' ?>"
+                   href="<?= h(url('lang/' . rawurlencode((string)$code)) . ($backPath !== '' ? '?back=' . rawurlencode($backPath) : '')) ?>">
+                  <span class="cb-lang-menu__code"><?= h(strtoupper(substr((string)$code, 0, 2))) ?></span>
+                  <span style="flex:1"><?= h($name) ?></span>
+                  <?php if ($curLang === $code): ?><span class="cb-lang-menu__tick">✓</span><?php endif; ?>
+                </a>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($currentUser): ?>
+          <div class="cb-dropdown">
+            <button class="cb-icon-btn" id="btn-notifications" title="<?= L('通知') ?>">
+              <?= cb_icon('bell') ?>
+              <?php if ($unread > 0): ?><span class="cb-badge"><?= (int)$unread ?></span><?php endif; ?>
+            </button>
+            <div class="cb-dropdown__menu" id="menu-notifications">
+              <div class="head"><span><?= L('通知') ?></span><a href="<?= h(url('notifications')) ?>" class="text-sm"><?= L('全部') ?></a></div>
+              <div class="list"><div class="cb-empty" style="padding:24px"><?= L('加载中…') ?></div></div>
+              <div class="foot">
+                <form method="post" action="<?= h(url('notifications/read-all')) ?>" style="margin:0">
+                  <?= csrf_field() ?>
+                  <button class="cb-btn sm" type="submit"><?= L('全部标记为已读') ?></button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <a class="cb-icon-btn" id="btn-messages" href="<?= h(url('chat')) ?>" title="<?= L('聊天') ?>">
+            <?= cb_icon('mail') ?>
+            <?php if ($unreadMsg > 0): ?><span class="cb-badge"><?= (int)$unreadMsg ?></span><?php endif; ?>
+          </a>
+
+          <a href="<?= h(url('user/' . $currentUser['id'])) ?>" title="<?= L('我的主页') ?>">
+            <img class="cb-avatar cb-avatar-sm" src="<?= h(avatar_url($currentUser)) ?>" alt="">
+          </a>
+        <?php else: ?>
+          <a class="cb-btn sm" href="<?= h(url('login')) ?>"><?= L('登录') ?></a>
+          <a class="cb-btn sm primary" href="<?= h(url('register')) ?>"><?= L('注册') ?></a>
+        <?php endif; ?>
+
+        <?php if ($sidebarOn): ?>
+          <button class="cb-icon-btn cb-sidebar-toggle-btn" id="btn-sidebar-toggle" title="<?= L('显示 / 隐藏侧边栏') ?>">
+            <?= cb_icon('panel-right') ?>
+          </button>
+          <button class="cb-icon-btn" id="btn-sidebar-side" title="<?= L('切换侧边栏到左侧 / 右侧') ?>">
+            <?= cb_icon('panel-left') ?>
+          </button>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="cb-drawer-mask" id="cb-drawer-mask"></div>
+
+<?php $flashSuccess = flash('success'); $flashError = flash('error'); $flashErrors = flash('errors'); ?>
+<div class="container">
+  <?php if ($flashSuccess): ?><div class="cb-alert success" style="margin-top:16px"><?= h((string)$flashSuccess) ?></div><?php endif; ?>
+  <?php if ($flashError): ?><div class="cb-alert error" style="margin-top:16px"><?= h((string)$flashError) ?></div><?php endif; ?>
+  <?php if (is_array($flashErrors) && $flashErrors): ?>
+    <div class="cb-alert error" style="margin-top:16px">
+      <?php foreach ($flashErrors as $f => $m): ?><div><?= h((string)$m) ?></div><?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+</div>
+
+<main class="container cb-main <?= $side === 'left' ? 'sidebar-left' : '' ?><?= $sidebarOn ? '' : ' sidebar-hidden' ?>">
+  <div class="cb-content">
+    <?= $content ?? '' ?>
+  </div>
+
+  <?php if ($sidebarOn): ?>
+    <?= \App\Core\View::partial('partials/sidebar', get_defined_vars()) ?>
+  <?php endif; ?>
+</main>
+
+<footer class="cb-footer">
+  <div class="cb-footer__inner">
+    <div>
+      <div><?= h($siteName) ?> · ChatBBS v<?= CB_VERSION ?></div>
+      <div class="text-xs" style="margin-top:4px"><?= h(config('site_footer', '')) ?></div>
+    </div>
+    <div class="cb-footer__meta">
+      <?php if (config('site_icp')): ?><span><?= h(config('site_icp')) ?></span><?php endif; ?>
+      <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= cb_icon('quill') ?>授权</a>
+      <span>页面耗时 <?= number_format((microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1) ?> ms</span>
+    </div>
+  </div>
+</footer>
+
+<script src="<?= h(theme_asset('js/app.js') . '?v=' . CB_VERSION) ?>"></script>
+<?php
+// 编辑器脚本：页面内容里出现 data-editor 即加载（模板内定义的 $load_editor 不会回传到这里）
+$needEditor = !empty($load_editor) || str_contains((string)($content ?? ''), 'data-editor');
+?>
+<?php if ($needEditor): ?>
+<?php cb_icon_preload(cb_editor_icons()); ?>
+<script src="<?= h(theme_asset('js/editor.js') . '?v=' . CB_VERSION) ?>"></script>
+<?php endif; ?>
+<?= config('footer_code', '') ?>
+<!-- 图标 sprite：按需输出本页用到的 symbol（放在最后，此时所有图标已登记） -->
+<?= cb_sprite() ?>
+</body>
+</html>
