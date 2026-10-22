@@ -2,6 +2,18 @@
 
 > 本文件随源码一起发布，位于站点根目录 `CHANGELOG.md`，升级后可直接查看。
 
+## v1.0.0beta21（2026-10-23）
+
+**界面：登录 / 注册改为 Flarum 风格弹窗**
+
+- 登录、注册、找回密码、重置密码四个页面统一为 Flarum 的 Modal 弹窗形态：居中卡片、圆角 10px、柔和投影、右上角关闭按钮返回首页、背景主色光斑。
+- 表单结构对齐 Flarum 的 `LogInModal` / `SignUpModal`：`Modal-header`（标题）→ `Modal-body`（`Form-group` + `FormControl` 输入框）→ `Modal-footer`（忘记密码 / 立即注册 / 返回登录）。
+- 登录页：用户名或邮箱、密码（可切换明文）、记住我的登录状态、整宽主色按钮、底部"忘记密码？"与"还没有账号？立即注册"。
+- 注册页：用户名（带规则提示）、昵称、邮箱、密码、确认密码、验证码（点击刷新）、用户协议勾选（可展开全文）、注册按钮；内容较高时弹窗主体内部滚动，不撑破屏幕。
+- 视觉跟随主题主色（后台「外观微调 → 主题主色」），支持暗色模式、移动端全宽、`prefers-reduced-motion` 关闭动画。
+- 独立样式文件 `assets/css/auth-flarum.css`（约 377 行）只在认证页加载，**不增加其它页面体积**；`default` 与 `nexus` 两个主题均已包含。
+- 新增 `THIRD-PARTY-NOTICES.md`：注明登录/注册界面在视觉上参考 Flarum（MIT License，Copyright (c) Flarum Foundation），未复制其源码，并附 MIT 全文；同时补充 NexusPHP 主题的致敬说明。
+
 ## v1.0.0beta20（2026-10-21）
 
 **新增：NexusPHP 经典主题（`themes/nexus`）**
@@ -22,13 +34,13 @@
 
 **Bug 修复（重要）**
 
-- 修复「发帖 / 编辑直接 500，日志 `Maximum execution time of 30 seconds exceeded @ Markdown.php:169`」：
-  `renderList()` 遇到「缩进但并非列表项」的续行时会既不消费当前行也不退出循环 —— 无限空转直到 PHP 超时。
-  典型触发场景就是本站的更新日志写法：编号列表下一行用 3 个空格缩进继续说明。
+- 修复「发帖 / 编辑直接 500，日志 `Maximum execution time of 30 seconds exceeded @ Markdown.php:169`」：  
+  `renderList()` 遇到「缩进但并非列表项」的续行时会既不消费当前行也不退出循环 —— 无限空转直到 PHP 超时。  
+  典型触发场景就是本站的更新日志写法：编号列表下一行用 3 个空格缩进继续说明。  
   现在缩进续行会正确并入上一个 `<li>`；同时加了递归深度上限（6 层）与步数兜底，任何异常都不会再拖垮请求。
-- 顺带修掉两处同源隐患：分割线正则 `(\*\s*){3,}` 是典型的灾难性回溯写法（长行会指数级回溯），
+- 顺带修掉两处同源隐患：分割线正则 `(\*\s*){3,}` 是典型的灾难性回溯写法（长行会指数级回溯），  
   改为线性的 `\*{3,}\s*$`；主循环加总步数上限。
-- （修复过程中实测出）有序列表分支的捕获组取错：`\d+[.)]` 未加括号时正文是第 1 组，
+- （修复过程中实测出）有序列表分支的捕获组取错：`\d+[.)]` 未加括号时正文是第 1 组，  
   原写法取 `$m2[2]` 会拿到空串，导致有序列表正文丢失。
 
 **性能**
@@ -37,100 +49,100 @@
 - 侧栏统计不再重复计算：未传全站统计时会把 `Stats::forum()` 跑两遍。
 - 整页输出统一补 `loading="lazy" decoding="async"`：一屏几十个头像不再同步解码，首屏更快。
 - 输出压缩兜底：Web 服务器没开 gzip 时由 PHP 压缩（下载 / 验证码等二进制响应自动跳过）。
-- 自动补齐 6 个复合索引（老站升级自动加）：`threads(status,forum_id,last_reply_at)`、
-  `threads(status,created_at)`、`threads(user_id,status)`、`posts(thread_id,status,id)`、
+- 自动补齐 6 个复合索引（老站升级自动加）：`threads(status,forum_id,last_reply_at)`、  
+  `threads(status,created_at)`、`threads(user_id,status)`、`posts(thread_id,status,id)`、  
   `posts(user_id,status)`、`attachments(user_id,is_image)`——列表页与帖子页不再退化成 filesort。
 
 **界面**
 
-- 图标全部换成现代线性风格（24×24 网格、圆角端点、描边跟随 `currentColor`）：
+- 图标全部换成现代线性风格（24×24 网格、圆角端点、描边跟随 `currentColor`）：  
   43 个前台图标重绘，暗色模式与主题主色自动适配；图标文件体积 17.9KB → 10.2KB。
-- 后台侧栏分组图标改为内联 SVG（沿用你给的那套风格：概览 / 用户 / 用户组 / 设置 / 扩展 / 工具），
+- 后台侧栏分组图标改为内联 SVG（沿用你给的那套风格：概览 / 用户 / 用户组 / 设置 / 扩展 / 工具），  
   颜色跟随侧栏文字、亮暗色模式自动适配，同时省掉 6 个图片请求。
 - 站点默认 favicon 换成圆角方块 + 对话气泡的现代样式（后台可上传替换）。
 - 你原先提供的像素 / GIF 资源（`static/images/forum/` 下的板块与帖子图标）原样保留，未改动。
 
 **代码体检**
 
-- 新增静态体检脚本（不随包发布）：全量扫描类引用解析 —— 已确认除本次修复的 `Logger` 外没有同类漏 `use` 的隐患；
+- 新增静态体检脚本（不随包发布）：全量扫描类引用解析 —— 已确认除本次修复的 `Logger` 外没有同类漏 `use` 的隐患；  
   路由 → 控制器方法、模板文件存在性、重复函数 / 方法定义全部通过。
 
 ## v1.0.0beta18（2026-10-09）
 
 **Bug 修复**
 
-- 修复后台「安全设置 → 设置超级密码」保存时报错 `Class "App\Admin\Controllers\Logger" not found`：
-  `SettingController` 使用了 `Logger::admin()` 但没有 `use App\Core\Logger;`（命中即 fatal）。已补导入，
+- 修复后台「安全设置 → 设置超级密码」保存时报错 `Class "App\Admin\Controllers\Logger" not found`：  
+  `SettingController` 使用了 `Logger::admin()` 但没有 `use App\Core\Logger;`（命中即 fatal）。已补导入，  
   并排查确认其余使用 `Logger` 的文件均为同命名空间或已写全限定名，无同类隐患。
-- 修复发帖 / 编辑页侧栏「目录」面板始终空白：编辑器目录那段脚本被误嵌进了「阅读页目录」的 IIFE 内部，
-  而阅读页逻辑检测到页面上没有 `.cb-post .cb-content-html` 时会提前 `return`，导致发帖页的目录与
-  帖子页「分享」按钮逻辑根本没有机会执行（阅读页不受影响，所以看起来只有发帖页没目录）。
+- 修复发帖 / 编辑页侧栏「目录」面板始终空白：编辑器目录那段脚本被误嵌进了「阅读页目录」的 IIFE 内部，  
+  而阅读页逻辑检测到页面上没有 `.cb-post .cb-content-html` 时会提前 `return`，导致发帖页的目录与  
+  帖子页「分享」按钮逻辑根本没有机会执行（阅读页不受影响，所以看起来只有发帖页没目录）。  
   已将两段逻辑拆为各自独立的作用域。
 
 **交互修正**
 
-- 发帖 / 编辑页侧栏的「发布主题」按钮不再跳转到新建页（会丢掉正在写的内容）：
+- 发帖 / 编辑页侧栏的「发布主题」按钮不再跳转到新建页（会丢掉正在写的内容）：  
   现在它直接提交当前表单 —— 新建页点击即发布，编辑页按钮文案变为「保存修改」，点击即保存。
 
 ## v1.0.0beta17（2026-10-09）
 
 **Bug 修复**
 
-1. **修复发帖相关报错链**：`Content::highlight()` 的正则使用 `#` 作分隔符，但字符类
-   `[a-zA-Z0-9+#-]` 中又出现了未转义的 `#`，导致每次发帖 / 编辑都触发
+1. **修复发帖相关报错链**：`Content::highlight()` 的正则使用 `#` 作分隔符，但字符类  
+   `[a-zA-Z0-9+#-]` 中又出现了未转义的 `#`，导致每次发帖 / 编辑都触发  
    `preg_replace_callback(): Unknown modifier '-'`，代码块高亮失效。已改用 `~` 分隔符。
-2. **致命错误兜底**：新增 `register_shutdown_function` 兜底，内存耗尽等真正 fatal
-   不再产生「空白 HTTP ERROR 500」，会写入 `data/logs` 日志（含文件与行号）并输出可读提示页，
+2. **致命错误兜底**：新增 `register_shutdown_function` 兜底，内存耗尽等真正 fatal  
+   不再产生「空白 HTTP ERROR 500」，会写入 `data/logs` 日志（含文件与行号）并输出可读提示页，  
    方便日后定位问题。
-3. 修复保存设置时偶发 `admin log failed: Data too long for column 'target'`
+3. 修复保存设置时偶发 `admin log failed: Data too long for column 'target'`  
    （操作日志 target 超长被截断后再写入）。
 4. 修复个人主页侧边栏 `Undefined array key "users"` 警告（侧栏统计卡片改用全站统计）。
 5. 修复附件下载 `Undefined array key 2` 警告（`Attachment::canDownload()` 统一返回三元组）。
 
 **访问控制**
 
-6. **「访问模式」真正生效**：之前 `site_access` 设置只保存不执行。现在
-   「仅登录用户可访问」会自动把游客跳转到登录页；「仅管理员可访问」对非管理员返回 403；
+1. **「访问模式」真正生效**：之前 `site_access` 设置只保存不执行。现在  
+   「仅登录用户可访问」会自动把游客跳转到登录页；「仅管理员可访问」对非管理员返回 403；  
    登录 / 注册等认证页始终放行，不会出现重定向死循环。
 
 **后台增强**
 
-7. **安全设置独立菜单**：从「站点设置」页面拆出，位于「论坛设置 → 安全设置」。
-   集中管理：后台登录验证码、**超级密码**（进后台二次验证，可设置 / 修改 / 关闭）、
-   **后台无操作自动退出**（默认 10 分钟，超时后需重新输入超级密码，不影响前台登录态；0 关闭）、
+1. **安全设置独立菜单**：从「站点设置」页面拆出，位于「论坛设置 → 安全设置」。  
+   集中管理：后台登录验证码、**超级密码**（进后台二次验证，可设置 / 修改 / 关闭）、  
+   **后台无操作自动退出**（默认 10 分钟，超时后需重新输入超级密码，不影响前台登录态；0 关闭）、  
    注册 / 邮箱 / 上传等安全相关选项。
-8. **后台顶栏搜索框**：输入关键词（如 `smtp`、`密码`、`附件`）即时列出匹配的后台菜单
+2. **后台顶栏搜索框**：输入关键词（如 `smtp`、`密码`、`附件`）即时列出匹配的后台菜单  
    （含中文别名与常见英文关键词），回车或点击直达对应页面。
-9. **修复后台开关胶囊被拉宽**：`.adm-form-item > label` 的 150px 规则误伤了开关组件，
+3. **修复后台开关胶囊被拉宽**：`.adm-form-item > label` 的 150px 规则误伤了开关组件，  
    开关恢复 38px 紧凑尺寸。
 
 **新功能**
 
-10. **帖子版权许可证**：发帖 / 编辑时可选版权协议（CC0 / CC BY / CC BY-SA / CC BY-ND /
-    CC BY-NC / CC BY-NC-SA / 禁止转载 / 自定义），自定义内容自由填写；帖子页标题下方展示
-    「© 版权：协议名：说明」。老站点升级自动补字段（Schema 自愈）。
-11. **帖子页「分享」按钮**：一键复制「标题 / 链接 / 出自@站点名」三行格式到剪贴板。
-12. **发帖页侧栏目录**：发帖 / 编辑页侧边栏改为「目录」面板，从编辑器内容实时提取
-    H1–H4 标题（富文本与 Markdown 均支持），点击定位到对应标题；阅读页目录逻辑不变。
+1. **帖子版权许可证**：发帖 / 编辑时可选版权协议（CC0 / CC BY / CC BY-SA / CC BY-ND /  
+   CC BY-NC / CC BY-NC-SA / 禁止转载 / 自定义），自定义内容自由填写；帖子页标题下方展示  
+   「© 版权：协议名：说明」。老站点升级自动补字段（Schema 自愈）。
+2. **帖子页「分享」按钮**：一键复制「标题 / 链接 / 出自@站点名」三行格式到剪贴板。
+3. **发帖页侧栏目录**：发帖 / 编辑页侧边栏改为「目录」面板，从编辑器内容实时提取  
+   H1–H4 标题（富文本与 Markdown 均支持），点击定位到对应标题；阅读页目录逻辑不变。
 
 ## v1.0.0beta16（2026-10-09）
 
 **界面多语言（中 / 英语言切换）**
 
-1. 顶栏「明暗切换」按钮右侧新增 🌐 **语言切换下拉**（自绘复古地球图标 `i-globe`），
+1. 顶栏「明暗切换」按钮右侧新增 🌐 **语言切换下拉**（自绘复古地球图标 `i-globe`），  
    默认提供 **简体中文 / English**，切换后立即生效并自动回到当前所在页面。
 2. 实现 `App\Core\Lang` 多语言内核：
-   - 语言优先级：**Cookie（用户在顶栏的选择）> 登录用户个人设置 > 站点默认配置 > zh-CN**；
+   - 语言优先级：**Cookie（用户在顶栏的选择）> 登录用户个人设置 > 站点默认配置 > zh-CN**；  
      登录状态下切换会同步写入 `users.language`，下次登录自动沿用；游客也能切换（Cookie 保存一年）。
-   - 词条采用「**简体中文原文作为键**」的设计：中文环境零字典、零开销直接返回原文，
+   - 词条采用「**简体中文原文作为键**」的设计：中文环境零字典、零开销直接返回原文，  
      切到英文时查表翻译；**未收录的词条优雅降级为中文原文**，界面永远不会出现空白。
-   - 已完整覆盖前台界面文案：模板 351 处（34 个模板文件）+ 前端脚本 160 余处
+   - 已完整覆盖前台界面文案：模板 351 处（34 个模板文件）+ 前端脚本 160 余处  
      （编辑器工具栏、弹窗、提示、下拉、拖拽区文案等）。
-3. 前端同步支持：页面注入 `window.CB_LANG` 字典与 `cbT()` 函数（中文环境为空字典，不增加体积），
+3. 前端同步支持：页面注入 `window.CB_LANG` 字典与 `cbT()` 函数（中文环境为空字典，不增加体积），  
    `app.js` / `editor.js` 全部界面文案接入。
-4. 新增语言包 `config/lang/en-US.php`（460+ 词条）；新增路由 `/lang/{code}`
+4. 新增语言包 `config/lang/en-US.php`（460+ 词条）；新增路由 `/lang/{code}`  
    （严格校验回跳地址，仅允许站内相对路径，防止开放重定向）。
-5. 后台「论坛设置 → 站点设置」的语言下拉新增 **English** 选项；
+5. 后台「论坛设置 → 站点设置」的语言下拉新增 **English** 选项；  
    「功能开关」新增 **顶栏语言切换** 开关（默认开启，关闭后全站固定为设定语言）。
 6. `<html lang>` 属性跟随当前语言变化（利于 SEO 与无障碍）。
 
@@ -162,6 +174,7 @@
 3. **版本自检**：新增 `app/Core/Schema.php`，引导阶段比对 `schema_version` 与当前版本号，不一致就自动补齐新增表与字段（群聊三表、违禁词表、`users.lan_discover`、`threads/posts.content_md`、`content_format`、`edited_*` 等），成功后写入版本号，不会每次请求都跑。
 
 其他：
+
 - 后台「检查并修复表结构」改为复用 `Schema::ensure()` 这一份定义，避免两处建表语句不一致。
 - 自动建表的 SQL 里原本用双引号做字符串常量（`DEFAULT ""`），在开启 `ANSI_QUOTES` 的 MySQL 上会被当标识符而报错，已统一改成单引号。
 
@@ -170,6 +183,7 @@
 本版重点：**聊天子系统（方案 A：按 IP 网段判定「附近的人」+ 建群 + 轮询）**，并修复面板宽度飘忽、目录面板不显示、发帖页偏窄等 7 处 UI 问题。
 
 ### 新增：聊天（单聊 / 群聊 / 附近的人）
+
 - 原「私信」升级为「聊天」页 `/chat`，左窄右宽（QQ / 微信布局）：左侧会话 / 群聊 / 附近三个面板，右侧消息区
 - **建群**：群名、群公告、公开 / 私有；群主 / 管理员 / 成员三级；成员列表、退群、邀请
 - **公开群**：附近的人可直接加入，群列表下方展示「可加入的公开群」
@@ -180,6 +194,7 @@
 - 后台「内容管理 → 群聊管理」可查看 / 解散群
 
 ### 修复：面板宽度飘忽不定（根因）
+
 `.cb-main` 原来用 `flex` + `.cb-content{flex:1}`。flex 项的最终宽度会被子元素的**固有最小宽度**顶开或压缩（长标题、表格、编辑器工具栏），所以不同页面内容区宽度不一致，`flex:1` 并不是"固定比例"。
 
 改为 **CSS Grid**：
@@ -192,38 +207,43 @@
 `minmax(0, 1fr)` 的列宽完全由容器决定，与内容无关，各页宽度从此一致。
 
 ### 修复：其余 6 处 UI 问题
-| 问题 | 原因 | 处理 |
-|---|---|---|
-| 帖子页没有「文章目录」 | 侧栏目录卡片有 `if (!empty($show_toc))` 判断，但控制器**从没传过** `show_toc`，等于永远不渲染 | `ThreadController::view()` 传 `show_toc`；目录升级为 Halo 风格：支持 h1 - h4、层级缩进、滚动高亮、点击偏移顶栏高度 |
-| 帖子页侧栏模块太多 | 用户希望只留「发布主题 + 目录」 | 帖子页跳过其余侧栏模块 |
-| 发帖页偏窄 | 默认落在简洁模式 | 默认改为**高级模式**（宽度与工具条更稳）；编辑器初始化失败时自动退回简洁模式 |
-| 版块折叠按钮左右留白不一致 | `.cb-forum-toggle` 是 `position:absolute; right:12px`，而 `.more`（「N 个板块」）被 `space-between` 顶到最右，**两者重叠** | header 右侧预留 48px、标题 `flex:1` + 省略号；折叠状态写入 localStorage，刷新后不跳变 |
-| 浮动工具条「格式 / 字号」点了没反应 | 浮动条上 `mousedown` 统一 `preventDefault()`，**把原生 `<select>` 的下拉也拦掉了** | 对 `<select>` 放行默认行为；同时在构建浮动条时就保存选区（点 select 会让编辑区失焦，等 change 再取选区已经丢了） |
-| 顶部「发布主题」按钮多余 | — | 已移除（侧栏 / 板块页入口保留） |
+
+| 问题                  | 原因                                                                                                     | 处理                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| 帖子页没有「文章目录」         | 侧栏目录卡片有 `if (!empty($show_toc))` 判断，但控制器**从没传过** `show_toc`，等于永远不渲染                                    | `ThreadController::view()` 传 `show_toc`；目录升级为 Halo 风格：支持 h1 - h4、层级缩进、滚动高亮、点击偏移顶栏高度 |
+| 帖子页侧栏模块太多           | 用户希望只留「发布主题 + 目录」                                                                                      | 帖子页跳过其余侧栏模块                                                                         |
+| 发帖页偏窄               | 默认落在简洁模式                                                                                               | 默认改为**高级模式**（宽度与工具条更稳）；编辑器初始化失败时自动退回简洁模式                                            |
+| 版块折叠按钮左右留白不一致       | `.cb-forum-toggle` 是 `position:absolute; right:12px`，而 `.more`（「N 个板块」）被 `space-between` 顶到最右，**两者重叠** | header 右侧预留 48px、标题 `flex:1` + 省略号；折叠状态写入 localStorage，刷新后不跳变                       |
+| 浮动工具条「格式 / 字号」点了没反应 | 浮动条上 `mousedown` 统一 `preventDefault()`，**把原生 `<select>` 的下拉也拦掉了**                                      | 对 `<select>` 放行默认行为；同时在构建浮动条时就保存选区（点 select 会让编辑区失焦，等 change 再取选区已经丢了）              |
+| 顶部「发布主题」按钮多余        | —                                                                                                      | 已移除（侧栏 / 板块页入口保留）                                                                   |
 
 ### 修复：上一版埋的两个坑
+
 1. **`databaseFix()` 把表名写死成 `threads`** —— `ALTER TABLE ' . Database::table('threads')` 用了常量而非循环变量 `$table`，导致 `posts.content_md / content_format` 被加到 **threads** 表上（posts 的 Markdown 源码实际没保存）。已改为 `$table`。
 2. `install/schema.sql` 未同步 `threads/posts.content_md`、`posts.idx_reply_to` —— 已补齐（新装站点直接可用）。
 
 ### 新增配置项
-| 配置 | 默认 | 说明 |
-|---|---|---|
-| `chat_enable` | 1 | 群聊总开关 |
-| `chat_poll_interval` | 5000 | 轮询间隔(ms)，下限 2000 |
-| `chat_group_max` | 30 | 每人最多加入群数 |
-| `lan_enable` | 1 | 「附近的人」总开关 |
-| `lan_discover_default` | 0 | 新用户默认可被发现 |
+
+| 配置                     | 默认   | 说明               |
+| ---------------------- | ---- | ---------------- |
+| `chat_enable`          | 1    | 群聊总开关            |
+| `chat_poll_interval`   | 5000 | 轮询间隔(ms)，下限 2000 |
+| `chat_group_max`       | 30   | 每人最多加入群数         |
+| `lan_enable`           | 1    | 「附近的人」总开关        |
+| `lan_discover_default` | 0    | 新用户默认可被发现        |
 
 ### 新增文件
-| 文件 | 说明 |
-|---|---|
-| `app/Controllers/ChatController.php` | 聊天页 / 建群 / 加群 / 退群 / 邀请 / 开关 / 轮询 |
-| `app/Models/ChatGroup.php` | 群、成员、群消息 |
-| `app/Models/Lan.php` | 网段判定与「附近的人」 |
-| `app/Admin/Controllers/ChatGroupController.php` | 后台群聊管理 |
-| `themes/default/templates/chat/index.php` | 聊天页（含轮询 JS） |
+
+| 文件                                              | 说明                                |
+| ----------------------------------------------- | --------------------------------- |
+| `app/Controllers/ChatController.php`            | 聊天页 / 建群 / 加群 / 退群 / 邀请 / 开关 / 轮询 |
+| `app/Models/ChatGroup.php`                      | 群、成员、群消息                          |
+| `app/Models/Lan.php`                            | 网段判定与「附近的人」                       |
+| `app/Admin/Controllers/ChatGroupController.php` | 后台群聊管理                            |
+| `themes/default/templates/chat/index.php`       | 聊天页（含轮询 JS）                       |
 
 ### 变更文件
+
 `app/routes.php`（聊天路由）、`app/admin_routes.php`、`app/Admin/BaseAdmin.php`（菜单）、`app/Core/Settings.php`、`app/Controllers/BaseController.php`（角标含群聊）、`app/Controllers/UserController.php`、`app/Controllers/AuthController.php`、`app/Admin/Controllers/SettingController.php`、`app/Admin/Controllers/SystemController.php`、`install/schema.sql`、`themes/default/templates/layouts/main.php`、`themes/default/templates/partials/sidebar.php`、`themes/default/templates/thread/edit.php`、`themes/default/templates/forum/index.php`、`themes/default/templates/user/settings.php`、`themes/default/assets/js/app.js`、`themes/default/assets/js/editor.js`、`themes/default/assets/css/style.css`
 
 ---
@@ -233,7 +253,9 @@
 本版重点：**修复 beta12 的体积 / 查询回流（页面「变卡」根因）**，并新增授权证书、注册协议、违禁词库、帖子目录四项功能。
 
 ### 修复：beta12 页面变卡（实测数据）
+
 定位方式：直接拉取线上页面量化。**根因是我上一版把 42 个图标的 sprite 全量内联进每个页面，而每页实际只用到 7 - 8 个。**
+
 
 | 页面 | 总 HTML | 内联 sprite | 占比 | 实际使用图标 |
 | --- | --- | --- | --- | --- |
@@ -451,6 +473,7 @@
 升级完成后，请到后台 **「系统工具 → 数据库管理 → 检查并修复表结构」** 点一次：
 1. 补齐 `threads.content_md` / `posts.content_md` / `content_format` 四个字段（不点也不会报错，只是 Markdown 模式无法保留源码，再次编辑会退化为富文本）
 2. 自动补齐上传后缀白名单（老站点默认不含 `gz / tgz / tar / xz` 等压缩包）
+
 
 ### 校验
 - 103 个 PHP 文件 `php -l`：0 语法错误
@@ -707,6 +730,7 @@
    - 原因：`Database::update()` 的 SET 部分使用命名参数（`:set_xxx`），而**全站 20 多处调用**的 WHERE 条件写的是位置参数 `?`（如 `Forum::syncStats()` 的 `'id = ?'`），PDO 不允许两者混用 → 只要触发"保存 / 更新"类操作就会 500（发帖后同步板块统计、保存设置、关注、签到等均受影响）
    - 处理（治本）：`Database::update()` 与 `Database::delete()` 现在会**自动把 WHERE 中的 `?` 按顺序转换为命名参数**，同时兼容 `['id' => $x]` 关联数组写法。所有调用无需修改，一次修复
    - 附带修复：此前"保存站点设置"等后台操作同样会触发该 500
+
 
 2. **后台样式丢失（显示为无 CSS 的纯文字页面）**
    - 原因：`admin_asset()` 走了 `admin_url()`，在兼容模式（`?r=`）下 CSS 地址被错误生成为 `/admin/index.php?r=assets/css/admin.css` —— 返回的是 HTML 页面而非样式表，浏览器直接忽略

@@ -1,15 +1,51 @@
-<h1><?= L('重置密码') ?></h1>
-<form method="post" action="<?= h(url('reset')) ?>">
+<?php
+/**
+ * 重置密码 —— 与登录 / 注册共用 Flarum 风格弹窗（UI 参考 Flarum，MIT License）
+ */
+?>
+<form class="Form Form--centered" method="post" action="<?= h(url('reset')) ?>">
   <?= csrf_field() ?>
   <input type="hidden" name="token" value="<?= h((string)($token ?? '')) ?>">
-  <div class="cb-form-item">
-    <label for="password"><?= L('新密码') ?></label>
-    <input class="cb-input" id="password" name="password" type="password" required minlength="6" autofocus>
+
+  <div class="Modal-header">
+    <h3 class="App-titleControl App-titleControl--text" id="modal-title"><?= L('重置密码') ?></h3>
   </div>
-  <div class="cb-form-item">
-    <label for="confirm_password"><?= L('确认新密码') ?></label>
-    <input class="cb-input" id="confirm_password" name="confirm_password" type="password" required minlength="6">
+
+  <div class="Modal-body">
+    <div class="Form-group">
+      <label class="label" for="password"><?= L('新密码') ?></label>
+      <div class="fl-pwd">
+        <input class="FormControl" id="password" name="password" type="password"
+               placeholder="<?= L('新密码') ?>" aria-label="<?= L('新密码') ?>"
+               required minlength="6" autofocus autocomplete="new-password">
+        <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="password"
+                aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
+      </div>
+    </div>
+
+    <div class="Form-group">
+      <label class="label" for="confirm_password"><?= L('确认新密码') ?></label>
+      <div class="fl-pwd">
+        <input class="FormControl" id="confirm_password" name="confirm_password" type="password"
+               placeholder="<?= L('确认新密码') ?>" aria-label="<?= L('确认新密码') ?>"
+               required minlength="6" autocomplete="new-password">
+        <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="confirm_password"
+                aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
+      </div>
+    </div>
+
+    <div class="Form-group">
+      <button class="Button Button--primary Button--block" type="submit">
+        <span class="Button-label"><span class="Button-labelText"><?= L('重置密码') ?></span></span>
+      </button>
+    </div>
   </div>
-  <button class="cb-btn primary lg block" type="submit"><?= L('重置密码') ?></button>
-  <div class="gateway-extra"><a href="<?= h(url('login')) ?>"><?= L('返回登录') ?></a></div>
+
+  <div class="Modal-footer">
+    <p>
+      <a class="Button Button--text Button--link" href="<?= h(url('login')) ?>">
+        <span class="Button-label"><span class="Button-labelText"><?= L('返回登录') ?></span></span>
+      </a>
+    </p>
+  </div>
 </form>
