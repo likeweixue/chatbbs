@@ -1,9 +1,9 @@
 /* ChatBBS 默认主题 —— 白色 + 浅灰，右侧边栏，支持暗色模式 */
 
 :root {
-  --color-primary: #0b87fd;
-  --color-primary-dark: #0050b5;
-  --color-primary-light: #e6f4ff;
+  --color-primary: #4D698E;
+  --color-primary-dark: #3C536F;
+  --color-primary-light: #EEF2F7;
   --color-bg: #f5f6f8;
   --color-surface: #ffffff;
   --color-surface-alt: #fafbfc;
@@ -15,7 +15,7 @@
   --color-success: #52c41a;
   --color-warning: #fa8c16;
   --color-danger: #d93026;
-  --color-link: #0b87fd;
+  --color-link: #4D698E;
   --radius-sm: 4px;
   --radius: 8px;
   --radius-lg: 12px;
@@ -34,7 +34,7 @@ html[data-theme="dark"] {
   --color-text: #e5e6eb;
   --color-text-sub: #a9aeb8;
   --color-text-muted: #7a8089;
-  --color-primary-light: #12263a;
+  --color-primary-light: #23303F;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
   --shadow: 0 4px 16px rgba(0, 0, 0, .4);
 }
@@ -180,6 +180,7 @@ html[data-theme="dark"] [data-theme-toggle] .ico-dark { display: inline-flex; }
 }
 .cb-btn-newthread:hover { color: #fff; background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
 .cb-btn-newthread:active { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+.cb-newthread-ico { display: none; }
 
 /* ---------- 布局 ---------- */
 /* 主布局用 grid：列宽完全由容器决定。
@@ -1001,16 +1002,67 @@ body.gateway-body { background: var(--color-bg); min-height: 100vh; }
   .cb-card__header--tabs { padding: 0 6px; }
   .cb-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
   .cb-tab { white-space: nowrap; }
-  .cb-thread__stat { min-width: 42px; }
+
+  /* 移动端帖子列表：固定高度，标题 / 预览各一行，长内容不会把列表撑高 */
+  .cb-thread { height: 100px; overflow: hidden; align-items: center; }
+  .cb-thread__main { min-width: 0; }
+  .cb-thread__title { flex-wrap: nowrap; overflow: hidden; margin-bottom: 2px; }
+  .cb-thread__title a {
+    flex: 0 1 auto; min-width: 0; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cb-thread__tags { display: none; }
+  .cb-thread__excerpt {
+    margin-top: 2px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cb-thread__meta { flex-wrap: nowrap; overflow: hidden; white-space: nowrap; gap: 8px; }
+  .cb-thread__last { display: none; }
+  .cb-thread__stat { min-width: 34px; }
+
+  /* 移动端板块表：隐藏最后回复列，保留帖子数，标题和简介横向铺开 */
+  .cb-forum-table .fl_by { display: none; }
+  .cb-forum-table .fl_i { width: 64px; text-align: right; font-size: 11px; }
+  .cb-forum-table td { padding: 10px 8px; }
+  .cb-forum-table .fl_icn { width: 44px; }
+  .cb-forum-table .fl_icn img { width: 24px; height: 25px; }
+  .cb-forum-table .fl_ct { width: auto; }
+  .cb-forum-table .fl_ct h2 { font-size: 14px; margin-bottom: 2px; }
+  .cb-forum-table .fl_desc { font-size: 12px; }
+
+  /* 移动端个人页数据：固定四列，避免竖排 */
+  .cb-profile-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+
+  /* 移动端发布按钮：只留一支笔，透明背景，放在筛选栏右上角 */
+  .cb-card__header--tabs { position: relative; padding-right: 50px; }
+  .cb-card__header--tabs .cb-header-actions {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%); margin: 0;
+  }
+  .cb-newthread--action {
+    flex: none; width: 36px; height: 36px; padding: 0; justify-content: center;
+    background: transparent; border: 0; box-shadow: none; color: var(--color-text-sub);
+  }
+  .cb-newthread--action:hover { background: var(--color-surface-alt); color: var(--color-primary); }
+  .cb-newthread--action .cb-newthread-label { display: none; }
+  .cb-newthread--action .cb-newthread-ico { display: inline-flex; }
+
   .cb-footer__inner { flex-direction: column; gap: 8px; text-align: center; }
 }
 
 @media (max-width: 480px) {
   .container { padding: 0 10px; }
-  .cb-thread-list { border-radius: var(--radius-sm); }
-  .cb-thread { padding: 12px 12px; gap: 10px; }
+  .cb-main { padding: 12px 0 24px; }
+  .cb-content > .cb-card { border-left: 0; border-right: 0; border-radius: 0; }
+  .cb-thread-list { border-radius: 0; }
+  .cb-thread { padding: 12px; gap: 10px; }
   .cb-avatar-md { width: 34px; height: 34px; }
   .cb-thread__title { font-size: 14px; }
+  .cb-forum-table .fl_icn { width: 36px; }
+  .cb-forum-table .fl_icn img { width: 22px; height: 23px; }
+  .cb-profile-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .cb-profile-stats .cb-stat-item { padding: 8px 2px; }
+  .cb-profile-stats .cb-stat-item b { font-size: 16px; }
+  .cb-profile-stats .cb-stat-item span { font-size: 11px; }
   .cb-pagination { justify-content: center; }
 }
 

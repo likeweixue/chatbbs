@@ -82,7 +82,7 @@ class ContentMoreController extends BaseAdmin
                 'fields' => [
                     ['name' => 'name', 'label' => '标签名', 'placeholder' => '多个可用逗号分隔批量新增'],
                     ['name' => 'alias', 'label' => '别名', 'tip' => '多个别名用逗号分隔'],
-                    ['name' => 'color', 'label' => '颜色', 'type' => 'color', 'value' => '#0b87fd'],
+                    ['name' => 'color', 'label' => '颜色', 'type' => 'color', 'value' => '#4D698E'],
                     ['name' => 'description', 'label' => '描述', 'type' => 'textarea'],
                     ['name' => 'status', 'label' => '状态', 'type' => 'select', 'options' => [1 => '通过', 0 => '待审']],
                 ],

@@ -153,7 +153,7 @@ class ExtController extends BaseAdmin
                 'action' => admin_url('themes/appearance'),
                 'data' => [
                     'theme_radius' => (string)Settings::get('theme_radius', '8'),
-                    'theme_primary' => (string)Settings::get('theme_primary', '#0b87fd'),
+                    'theme_primary' => (string)Settings::get('theme_primary', '#4D698E'),
                 ],
                 'submit' => '保存外观设置',
                 'fields' => [
@@ -184,9 +184,9 @@ class ExtController extends BaseAdmin
     {
         $radius = Request::int('theme_radius', 8);
         $radius = max(0, min(24, $radius));
-        $primary = trim((string)Request::post('theme_primary', '#0b87fd'));
+        $primary = trim((string)Request::post('theme_primary', '#4D698E'));
         if (!preg_match('/^#[0-9a-fA-F]{6}$/i', $primary)) {
-            $primary = '#0b87fd';
+            $primary = '#4D698E';
         }
         Settings::setMany([
             'theme_radius' => (string)$radius,

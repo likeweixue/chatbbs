@@ -38,7 +38,9 @@
       <?php endforeach; ?>
     </div>
     <div class="cb-header-actions">
-      <a class="cb-btn cb-btn-newthread" href="<?= h(url('thread/create')) ?>"><?= L('发布主题') ?></a>
+      <a class="cb-btn cb-btn-newthread cb-newthread--action" href="<?= h(url('thread/create')) ?>">
+        <span class="cb-newthread-ico"><?= cb_icon('edit') ?></span><span class="cb-newthread-label"><?= L('发布主题') ?></span>
+      </a>
     </div>
   </div>
   <?= \App\Core\View::partial('partials/thread_list', ['threads' => $threads, 'marks' => $marks, 'boxed' => false]) ?>

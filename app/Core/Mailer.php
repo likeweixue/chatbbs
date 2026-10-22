@@ -167,14 +167,14 @@ class Mailer
         return <<<HTML
 <div style="background:#f5f6f8;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'PingFang SC','Microsoft YaHei',sans-serif">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #eceff3">
-    <div style="background:linear-gradient(90deg,#0050b5,#0b87fd);padding:20px 24px;color:#fff;font-size:18px;font-weight:600">{$siteName}</div>
+    <div style="background:linear-gradient(90deg,#3C536F,#4D698E);padding:20px 24px;color:#fff;font-size:18px;font-weight:600">{$siteName}</div>
     <div style="padding:24px">
       <h2 style="margin:0 0 16px;font-size:18px;color:#1f2329">{$title}</h2>
       <div style="font-size:14px;line-height:1.8;color:#4e5969">{$contentHtml}</div>
     </div>
     <div style="padding:16px 24px;background:#fafbfc;color:#8a919f;font-size:12px;border-top:1px solid #eceff3">
       本邮件由系统自动发送，请勿直接回复。<br>
-      <a href="{$siteUrl}" style="color:#0b87fd;text-decoration:none">{$siteName}</a>
+      <a href="{$siteUrl}" style="color:#4D698E;text-decoration:none">{$siteName}</a>
     </div>
   </div>
 </div>

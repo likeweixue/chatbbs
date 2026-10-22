@@ -16,7 +16,7 @@ $favicon = (string)config('site_favicon', '');
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= h(($title ?? '') !== '' ? $title . ' - ' . $siteName : $siteName) ?></title>
-<meta name="theme-color" content="#2d6ee5">
+<meta name="theme-color" content="#4D698E">
 <link rel="icon" href="<?= h($favicon !== '' ? $favicon : asset('images/retro/favicon.svg')) ?>">
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
 <link rel="stylesheet" href="<?= h(theme_asset('css/auth-flarum.css') . '?v=' . CB_VERSION) ?>">
@@ -33,9 +33,9 @@ $favicon = (string)config('site_favicon', '');
 </script>
 <?php
 // 认证弹窗主色：跟随后台「外观微调 → 主题主色」，未设置时用 Flarum 蓝
-$flPrimary = (string)config('theme_primary', '#2d6ee5');
+$flPrimary = (string)config('theme_primary', '#4D698E');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $flPrimary)) {
-    $flPrimary = '#2d6ee5';
+    $flPrimary = '#4D698E';
 }
 ?>
 <style>:root{--color-primary:<?= $flPrimary ?>;--color-link:<?= $flPrimary ?>}</style>

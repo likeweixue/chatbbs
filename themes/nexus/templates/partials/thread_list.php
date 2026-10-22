@@ -96,7 +96,7 @@ $threadIcon = function (array $t) use ($imgBase, $hotLine): string {
           </h3>
 
           <?php if (!empty($t['tags'])): ?>
-            <div style="margin-bottom:4px">
+            <div class="cb-thread__tags" style="margin-bottom:4px">
               <?php foreach ($t['tags'] as $tag): ?>
                 <a class="cb-tag" href="<?= h(url('tag/' . $tag['id'])) ?>"
                    style="background:<?= h($tag['color'] . '1a') ?>;color:<?= h($tag['color']) ?>"><?= h($tag['name']) ?></a>
@@ -115,7 +115,7 @@ $threadIcon = function (array $t) use ($imgBase, $hotLine): string {
             <?php endif; ?>
             <span><?= h(time_ago($t['created_at'])) ?></span>
             <?php if (!empty($t['last_reply_user'])): ?>
-              <span>最后回复 <?= h($t['last_reply_user']) ?> · <?= h(time_ago($t['last_reply_at'])) ?></span>
+              <span class="cb-thread__last">最后回复 <?= h($t['last_reply_user']) ?> · <?= h(time_ago($t['last_reply_at'])) ?></span>
             <?php endif; ?>
           </div>
         </div>

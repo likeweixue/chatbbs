@@ -42,34 +42,42 @@ class Schema
      * 版本升级时的一次性设置迁移
      *
      * beta23：推荐 / 避雷页面合并为首页筛选标签，把两个标签追加到已有「列表筛选」配置里。
+     * beta24：默认主题主色由 #0b87fd 调整为 #4D698E（仅替换仍是旧默认值的站点）。
      */
     private static function upgradeSettings(): void
     {
-        if ((int)Settings::get('migration_beta23_tabs', 0) === 1) {
-            return;
-        }
-        $items = json_decode((string)Settings::get('thread_tabs', ''), true);
-        if (is_array($items)) {
-            $has = [];
-            foreach ($items as $it) {
-                if (is_array($it)) {
-                    $has[(string)($it['t'] ?? '')] = true;
+        if ((int)Settings::get('migration_beta23_tabs', 0) !== 1) {
+            $items = json_decode((string)Settings::get('thread_tabs', ''), true);
+            if (is_array($items)) {
+                $has = [];
+                foreach ($items as $it) {
+                    if (is_array($it)) {
+                        $has[(string)($it['t'] ?? '')] = true;
+                    }
+                }
+                $changed = false;
+                if (!isset($has['recommend'])) {
+                    $items[] = ['t' => 'recommend', 'title' => '推荐', 'url' => '', 'on' => 1];
+                    $changed = true;
+                }
+                if (!isset($has['avoid'])) {
+                    $items[] = ['t' => 'avoid', 'title' => '避雷', 'url' => '', 'on' => 1];
+                    $changed = true;
+                }
+                if ($changed) {
+                    Settings::set('thread_tabs', json_encode(array_values($items), JSON_UNESCAPED_UNICODE));
                 }
             }
-            $changed = false;
-            if (!isset($has['recommend'])) {
-                $items[] = ['t' => 'recommend', 'title' => '推荐', 'url' => '', 'on' => 1];
-                $changed = true;
-            }
-            if (!isset($has['avoid'])) {
-                $items[] = ['t' => 'avoid', 'title' => '避雷', 'url' => '', 'on' => 1];
-                $changed = true;
-            }
-            if ($changed) {
-                Settings::set('thread_tabs', json_encode(array_values($items), JSON_UNESCAPED_UNICODE));
-            }
+            Settings::set('migration_beta23_tabs', 1);
         }
-        Settings::set('migration_beta23_tabs', 1);
+
+        if ((int)Settings::get('migration_beta24_primary', 0) !== 1) {
+            $primary = strtoupper(trim((string)Settings::get('theme_primary', '')));
+            if ($primary === '' || $primary === '#0B87FD') {
+                Settings::set('theme_primary', '#4D698E');
+            }
+            Settings::set('migration_beta24_primary', 1);
+        }
     }
 
     /**

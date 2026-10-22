@@ -174,7 +174,7 @@ class AdminUI
             case 'number':
                 return '<input class="adm-input" type="number" step="' . h((string)($f['step'] ?? '1')) . '" id="' . $id . '" name="' . h($name) . '" value="' . h((string)$value) . '"' . $ph . ' style="width:160px;max-width:100%">';
             case 'color':
-                return '<input class="adm-input" type="color" id="' . $id . '" name="' . h($name) . '" value="' . h((string)($value ?: '#0b87fd')) . '" style="width:64px">';
+                return '<input class="adm-input" type="color" id="' . $id . '" name="' . h($name) . '" value="' . h((string)($value ?: '#4D698E')) . '" style="width:64px">';
             case 'password':
                 return '<input class="adm-input" type="password" id="' . $id . '" name="' . h($name) . '"' . $ph . ' autocomplete="new-password">';
             case 'checkboxes':

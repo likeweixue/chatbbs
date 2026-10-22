@@ -320,7 +320,7 @@ function render_install_page(string $title, string $body, int $step = 0, array $
         $errHtml = '<div class="notice notice-error"><ul><li>' . implode('</li><li>', array_map('htmlspecialchars', $errors)) . '</li></ul></div>';
     }
     $logo = '<svg width="180" height="48" viewBox="0 0 200 48" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0" y="6" width="36" height="36" rx="10" fill="#0b87fd"/>
+      <rect x="0" y="6" width="36" height="36" rx="10" fill="#4D698E"/>
       <path d="M11 17h16M11 24h16M11 31h10" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
       <text x="46" y="32" font-size="22" font-weight="700" fill="#1f2329" font-family="sans-serif">ChatBBS</text>
     </svg>';
@@ -347,7 +347,7 @@ function install_css(): string
 {
     return <<<'CSS'
 :root{
-  --color-primary:#0b87fd; --color-text:#1f2329; --color-text-sub:#4e5969;
+  --color-primary:#4D698E; --color-text:#1f2329; --color-text-sub:#4e5969;
   --color-border:#e5e6eb; --color-bg:#f7f8fa; --rounded-lg:8px;
 }
 *{box-sizing:border-box}

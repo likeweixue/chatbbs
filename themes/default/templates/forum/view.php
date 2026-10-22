@@ -8,7 +8,9 @@
       </div>
       <div class="flex gap-8">
         <?php if ($can_post ?? false): ?>
-          <a class="cb-btn cb-btn-newthread" href="<?= h(url('thread/create?forum=' . $forum['id'])) ?>"><?= L('发布主题') ?></a>
+          <a class="cb-btn cb-btn-newthread cb-newthread--action" href="<?= h(url('thread/create?forum=' . $forum['id'])) ?>">
+            <span class="cb-newthread-ico"><?= cb_icon('edit') ?></span><span class="cb-newthread-label"><?= L('发布主题') ?></span>
+          </a>
         <?php else: ?>
           <span class="text-sm text-muted"><?= L('本板块暂无发帖权限') ?></span>
         <?php endif; ?>

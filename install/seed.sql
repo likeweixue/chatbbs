@@ -5,7 +5,7 @@ INSERT INTO `__PREFIX__user_groups` (`id`,`name`,`slug`,`description`,`color`,`p
 (1,'管理员','admin','站点最高管理员，拥有全部权限','#d93026','["*"]',1,1),
 (2,'超级版主','super_moderator','管理全站内容与用户','#fa8c16','["thread.view","thread.create","thread.reply","thread.edit","thread.delete","thread.top","thread.essence","thread.close","thread.move","post.delete","attachment.upload","attachment.download","pm.send","tag.create","checkin.do","say.create"]',1,2),
 (3,'版主','moderator','管理指定板块内容','#52c41a','["thread.view","thread.create","thread.reply","thread.edit","thread.delete","thread.top","thread.essence","thread.close","post.delete","attachment.upload","attachment.download","pm.send","checkin.do","say.create"]',1,3),
-(4,'普通用户','member','注册用户，可发帖回帖','#0b87fd','["thread.view","thread.create","thread.reply","thread.edit","attachment.upload","attachment.download","pm.send","tag.create","checkin.do","say.create"]',1,4),
+(4,'普通用户','member','注册用户，可发帖回帖','#4D698E','["thread.view","thread.create","thread.reply","thread.edit","attachment.upload","attachment.download","pm.send","tag.create","checkin.do","say.create"]',1,4),
 (5,'游客','guest','未登录访客，仅可浏览','#8a919f','["thread.view"]',1,5),
 (6,'禁言用户','muted','被禁言，仅可浏览','#8a919f','["thread.view"]',1,6);
 
@@ -20,14 +20,14 @@ INSERT INTO `__PREFIX__user_levels` (`id`,`name`,`icon`,`min_exp`,`need_threads`
 
 -- 认证
 INSERT INTO `__PREFIX__user_certifications` (`id`,`name`,`icon`,`color`,`description`,`sort_order`) VALUES
-(1,'官方认证','','#0b87fd','官方团队成员',1),
+(1,'官方认证','','#4D698E','官方团队成员',1),
 (2,'优质作者','','#52c41a','内容优质创作者',2),
 (3,'活跃用户','','#fa8c16','社区活跃贡献者',3);
 
 -- 帖子标记
 INSERT INTO `__PREFIX__thread_marks` (`id`,`name`,`color`,`icon`,`groups`,`sort_order`) VALUES
 (1,'已解决','#52c41a','✓','1,2,3,4',1),
-(2,'已完成','#0b87fd','✔','1,2,3,4',2),
+(2,'已完成','#4D698E','✔','1,2,3,4',2),
 (3,'已结束','#8a919f','✖','1,2,3',3),
 (4,'待解决','#fa8c16','?','1,2,3,4',4);
 
@@ -44,9 +44,9 @@ INSERT INTO `__PREFIX__menus` (`id`,`title`,`url`,`icon`,`target`,`parent_id`,`v
 
 -- 默认板块
 INSERT INTO `__PREFIX__forums` (`id`,`parent_id`,`name`,`slug`,`description`,`icon`,`color`,`type`,`sort_order`,`visible`) VALUES
-(1,0,'综合社区','general','','','#0b87fd',1,1,1),
+(1,0,'综合社区','general','','','#4D698E',1,1,1),
 (2,1,'新手报到','hello','新人自我介绍，欢迎每一位新朋友','','#52c41a',2,1,1),
-(3,1,'闲聊灌水','chat','随便聊聊，分享生活','','#0b87fd',2,2,1),
+(3,1,'闲聊灌水','chat','随便聊聊，分享生活','','#4D698E',2,2,1),
 (4,1,'站点公告','notice','官方公告与版本更新','','#d93026',2,3,1),
 (5,0,'资源分享','resource','','','#722ed1',1,2,1),
 (6,5,'软件资源','software','实用软件与工具分享','','#722ed1',2,1,1),
@@ -54,7 +54,7 @@ INSERT INTO `__PREFIX__forums` (`id`,`parent_id`,`name`,`slug`,`description`,`ic
 
 -- 默认标签
 INSERT INTO `__PREFIX__tags` (`id`,`name`,`slug`,`color`,`description`,`status`) VALUES
-(1,'讨论','discussion','#0b87fd','',1),
+(1,'讨论','discussion','#4D698E','',1),
 (2,'求助','help','#fa8c16','',1),
 (3,'分享','share','#52c41a','',1),
 (4,'公告','notice','#d93026','',1),

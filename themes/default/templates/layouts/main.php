@@ -35,9 +35,9 @@ $radius = (int)config('theme_radius', 8);
 $radius = max(0, min(24, $radius));
 $radiusSm = (int)round($radius * 0.5);
 $radiusLg = (int)round($radius * 1.5);
-$primary = (string)config('theme_primary', '#0b87fd');
+$primary = (string)config('theme_primary', '#4D698E');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $primary)) {
-    $primary = '#0b87fd';
+    $primary = '#4D698E';
 }
 $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}px;"
     . "--color-primary:{$primary};--color-link:{$primary}";
