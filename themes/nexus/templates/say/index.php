@@ -75,14 +75,14 @@
                 data-guest="<?= $current_user ? 0 : 1 ?>"
                 class="<?= in_array((int)$s['id'], ($liked ?? []), true) ? 'on' : '' ?>"
                 style="border:none;background:none;cursor:pointer;color:inherit">
-          👍 <span class="count"><?= (int)$s['likes'] ?></span>
+          <?= cb_icon('thumbs-up') ?> <span class="count"><?= (int)$s['likes'] ?></span>
         </button>
       <?php endif; ?>
-      <span>💬 <?= (int)$s['comments'] ?></span>
+      <span><?= cb_icon('comment') ?> <?= (int)$s['comments'] ?></span>
       <?php if ($current_user && (int)$s['user_id'] === (int)$current_user['id']): ?>
         <form method="post" action="<?= h(url('say/' . $s['id'] . '/delete')) ?>" style="display:inline">
           <?= csrf_field() ?>
-          <button type="submit" style="border:none;background:none;cursor:pointer;color:inherit"><?= L('🗑 删除') ?></button>
+          <button type="submit" style="border:none;background:none;cursor:pointer;color:inherit"><?= cb_icon('trash') ?> <?= L('删除') ?></button>
         </form>
       <?php endif; ?>
     </div>
@@ -115,5 +115,5 @@
   </div>
 <?php endforeach; ?>
 
-<?php if (!$says): ?><div class="cb-empty"><div class="icon">💭</div><p><?= L('还没有人发说说') ?></p></div><?php endif; ?>
+<?php if (!$says): ?><div class="cb-empty"><div class="icon"><?= cb_icon('comment') ?></div><p><?= L('还没有人发说说') ?></p></div><?php endif; ?>
 <?= $pager ?? '' ?>

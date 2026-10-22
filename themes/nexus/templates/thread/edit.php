@@ -117,6 +117,36 @@ $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !==
         </div>
       </div>
 
+      <?php if (is_admin()): ?>
+        <?php
+        $titleColor = (string)($thread['title_color'] ?? '');
+        $titlePick = preg_match('/^#[0-9a-fA-F]{6}$/', $titleColor) ? $titleColor : '#52c41a';
+        ?>
+        <div class="cb-form-item">
+          <label for="f-title-color">标题颜色</label>
+          <div class="cb-color-field">
+            <input type="color" id="f-title-color-pick" value="<?= h($titlePick) ?>" aria-label="<?= L('选择标题颜色') ?>">
+            <input class="cb-input" id="f-title-color" name="title_color" value="<?= h($titleColor) ?>"
+                   placeholder="<?= L('留空使用默认颜色，如 #52c41a') ?>">
+            <button type="button" class="cb-btn sm" id="f-title-color-reset"><?= L('恢复默认') ?></button>
+          </div>
+          <div class="cb-form-tip"><?= L('仅管理员可设置，显示在首页、板块列表的标题文字上') ?></div>
+        </div>
+        <script>
+          (function () {
+            var pick = document.getElementById('f-title-color-pick');
+            var text = document.getElementById('f-title-color');
+            var reset = document.getElementById('f-title-color-reset');
+            if (!pick || !text || !reset) return;
+            pick.addEventListener('input', function () { text.value = pick.value; });
+            text.addEventListener('input', function () {
+              if (/^#[0-9a-fA-F]{6}$/.test(text.value.trim())) { pick.value = text.value.trim(); }
+            });
+            reset.addEventListener('click', function () { text.value = ''; text.focus(); });
+          })();
+        </script>
+      <?php endif; ?>
+
       <div class="cb-form-item">
         <label class="cb-checkbox">
           <input type="checkbox" name="anonymous" value="1" <?= !empty($thread['anonymous']) ? 'checked' : '' ?>> <?= L('匿名发布') ?>

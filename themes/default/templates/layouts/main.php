@@ -122,7 +122,7 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
         <div class="cb-dropdown">
           <button class="cb-icon-btn" id="btn-lang" title="Language / <?= L('语言') ?>" aria-haspopup="true"><?= cb_icon('globe') ?></button>
           <div class="cb-dropdown__menu cb-lang-menu" id="menu-lang">
-            <div class="head"><span>🌐 <?= L('语言') ?> / Language</span></div>
+            <div class="head"><span><?= cb_icon('globe') ?> <?= L('语言') ?> / Language</span></div>
             <div class="list">
               <?php foreach ($langList as $code => $name): ?>
                 <a class="item <?= $curLang === $code ? 'on' : '' ?>"
@@ -245,6 +245,7 @@ $needEditor = !empty($load_editor) || str_contains((string)($content ?? ''), 'da
 <script src="<?= h(theme_asset('js/editor.js') . '?v=' . CB_VERSION) ?>"></script>
 <?php endif; ?>
 <?= config('footer_code', '') ?>
+<?php if ($currentUser): ?><?php cb_icon_preload(['bell', 'thumbs-up', 'comment', 'reply', 'mail', 'shield', 'star', 'calendar', 'user']); ?><?php endif; ?>
 <!-- 图标 sprite：按需输出本页用到的 symbol（放在最后，此时所有图标已登记） -->
 <?= cb_sprite() ?>
 </body>

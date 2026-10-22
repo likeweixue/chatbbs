@@ -53,6 +53,7 @@ class Thread
         $order = (string)($opt['order'] ?? 'default');
         $essence = (int)($opt['essence'] ?? 0);
         $recommend = (int)($opt['recommend'] ?? 0);
+        $recommendKind = (int)($opt['recommend_kind'] ?? 0);
         $markId = (int)($opt['mark_id'] ?? 0);
         $digest = (int)($opt['digest'] ?? 0);
 
@@ -79,7 +80,10 @@ class Thread
         if ($essence) {
             $where .= ' AND t.is_essence = 1';
         }
-        if ($recommend) {
+        if ($recommendKind === 1 || $recommendKind === -1) {
+            $where .= ' AND EXISTS (SELECT 1 FROM ' . Database::table('recommendations') . ' rec WHERE rec.thread_id = t.id AND rec.kind = ?)';
+            $params[] = $recommendKind;
+        } elseif ($recommend) {
             $where .= ' AND t.recommends > 0';
         }
         if ($markId > 0) {

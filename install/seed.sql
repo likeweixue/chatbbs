@@ -35,7 +35,6 @@ INSERT INTO `__PREFIX__thread_marks` (`id`,`name`,`color`,`icon`,`groups`,`sort_
 INSERT INTO `__PREFIX__menus` (`id`,`title`,`url`,`icon`,`target`,`parent_id`,`visible`,`sort_order`) VALUES
 (1,'首页','/','home','_self',0,1,1),
 (2,'板块','/forums','category','_self',0,1,2),
-(3,'推荐','/recommend','star','_self',0,1,3),
 (4,'说说','/say','comment','_self',0,1,4),
 (5,'标签','/tags','tag','_self',0,1,5),
 (6,'签到','/checkin','calendar','_self',0,1,6),

@@ -57,6 +57,7 @@ class ForumController extends BaseController
             'essence' => $tabRes['essence'],
             'mark_id' => $tabRes['mark_id'],
             'digest' => $tabRes['digest'],
+            'recommend_kind' => $tabRes['recommend_kind'],
         ]);
         $baseUrl = url('forum/' . $id . '?tab=' . rawurlencode($tabRes['tab']));
 

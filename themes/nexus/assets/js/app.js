@@ -89,8 +89,6 @@
       btn.classList.toggle('on', res.data.liked);
       var c = btn.querySelector('.count');
       if (c) c.textContent = res.data.count;
-      var icon = btn.querySelector('.icon');
-      if (icon) icon.textContent = res.data.liked ? '👍' : '👍';
       toast(res.msg, 'success');
     }).catch(function () { btn.disabled = false; toast(cbT('网络异常'), 'error'); });
   });
@@ -186,7 +184,7 @@
         }
         list.innerHTML = items.map(function (n) {
           return '<a class="item" href="' + (n.link || PAGE + 'notifications') + '">' +
-            '<span style="font-size:18px">' + (n.icon || '🔔') + '</span>' +
+            '<span class="cb-notify-ico">' + (n.icon || '') + '</span>' +
             '<span style="flex:1;min-width:0"><div class="t">' + escapeHtml(n.title) + '</div>' +
             '<div class="c">' + escapeHtml(n.content || '') + ' · ' + n.time + '</div></span></a>';
         }).join('');

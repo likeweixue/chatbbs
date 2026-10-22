@@ -239,6 +239,17 @@ img { max-width: 100%; }
 .adm-btn.sm { height: 26px; padding: 0 10px; font-size: 12px; }
 .adm-btn:disabled { opacity: .55; cursor: not-allowed; }
 
+/* 顶栏暗色模式切换：沿用前台线性太阳 / 月亮图标 */
+.adm-theme-toggle { width: 30px; height: 30px; padding: 0; }
+.adm-theme-toggle .ico-light,
+.adm-theme-toggle .ico-dark { display: inline-flex; align-items: center; justify-content: center; }
+.adm-theme-toggle svg {
+    width: 16px; height: 16px; fill: none; stroke: currentColor;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+}
+html:not([data-adm-theme="dark"]) .adm-theme-toggle .ico-dark { display: none; }
+html[data-adm-theme="dark"] .adm-theme-toggle .ico-light { display: none; }
+
 .adm-link {
     color: var(--adm-primary);
     background: none;
@@ -320,14 +331,17 @@ img { max-width: 100%; }
     border-bottom: 1px dashed var(--adm-border);
 }
 .adm-form-item > label {
-    width: 150px;
-    flex: 0 0 150px;
-    text-align: right;
+    width: 140px;
+    flex: 0 0 140px;
+    text-align: left;
     color: var(--adm-text-2);
     font-size: 13px;
-    padding-top: 6px;
+    padding-top: 7px;
 }
-.adm-form-item > .adm-field { flex: 1; min-width: 0; }
+.adm-form-item > .adm-field {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 5px;
+}
 .adm-form-item > *:not(label) { flex: 1; min-width: 0; }
 /* 顶栏设置搜索 */
 .adm-search { position: relative; width: 240px; }
@@ -357,9 +371,9 @@ img { max-width: 100%; }
     flex: 0 0 38px;
     padding-top: 5px;
 }
-.adm-form-tip { font-size: 12px; color: var(--adm-muted); margin-top: 5px; }
+.adm-form-tip { font-size: 12px; color: var(--adm-muted); margin-top: 0; }
 .adm-form-actions {
-    padding: 18px 0 4px 164px;
+    padding: 18px 0 4px 154px;
     display: flex;
     gap: 10px;
 }
@@ -400,6 +414,7 @@ img { max-width: 100%; }
 /* 编辑器 / 多行字段：独占整行（避免挤在右侧变窄） */
 .adm-form-item--block { flex-direction: column; align-items: stretch; gap: 8px; }
 .adm-form-item--block > label { width: auto; text-align: left; flex: none; padding-top: 0; font-weight: 600; }
+.adm-form-item--block > .adm-field { width: 100%; flex: none; }
 .adm-form-item--block .adm-checkboxes { padding-top: 0; }
 .adm-editor-toolbar { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; padding-bottom: 4px; }
 .adm-editor-toolbar button { flex: none; white-space: nowrap; }

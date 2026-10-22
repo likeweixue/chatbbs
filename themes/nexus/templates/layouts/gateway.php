@@ -20,6 +20,17 @@ $favicon = (string)config('site_favicon', '');
 <link rel="icon" href="<?= h($favicon !== '' ? $favicon : asset('images/retro/favicon.svg')) ?>">
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
 <link rel="stylesheet" href="<?= h(theme_asset('css/auth-flarum.css') . '?v=' . CB_VERSION) ?>">
+<script>
+  // 认证页也跟随用户保存的暗色偏好，避免先亮后暗闪烁
+  (function () {
+    try {
+      var m = localStorage.getItem('cb_theme') || 'auto';
+      var dark = m === 'dark' || (m === 'auto' && window.matchMedia
+        && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    } catch (e) {}
+  })();
+</script>
 <?php
 // 认证弹窗主色：跟随后台「外观微调 → 主题主色」，未设置时用 Flarum 蓝
 $flPrimary = (string)config('theme_primary', '#2d6ee5');

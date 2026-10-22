@@ -11,12 +11,9 @@
   </div>
 
   <div class="Modal-body">
-    <p class="Form-tip" style="margin:0 0 14px"><?= L('输入注册时使用的邮箱，我们会发送重置链接。') ?></p>
-
     <div class="Form-group">
-      <label class="label" for="email"><?= L('邮箱') ?></label>
       <input class="FormControl" id="email" name="email" type="email"
-             placeholder="<?= L('邮箱') ?>" aria-label="<?= L('邮箱') ?>"
+             placeholder="<?= L('注册时使用的邮箱') ?>" aria-label="<?= L('注册时使用的邮箱') ?>"
              required autofocus autocomplete="email">
     </div>
 

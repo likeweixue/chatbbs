@@ -124,8 +124,8 @@ class Settings
         // 列表筛选栏（首页 / 板块页顶部标签）：JSON 数组
         // [{t:'类型', title:'标题', url:'链接（仅 link 类型）', on:1|0}]
         // 类型：new(最新发布) default(最新回复) hot(热门) replies(最多回复) essence(精华)
-        //       digest(首页推荐) mark:{id}(按帖子标记筛选) link(自定义链接)
-        'thread_tabs' => '[{"t":"new","title":"最新发布","on":1},{"t":"default","title":"最新回复","on":1},{"t":"hot","title":"热门","on":1},{"t":"replies","title":"最多回复","on":0},{"t":"essence","title":"精华","on":1}]',
+        //       recommend(推荐帖) avoid(避雷帖) digest(首页推荐) mark:{id}(按帖子标记筛选) link(自定义链接)
+        'thread_tabs' => '[{"t":"new","title":"最新发布","on":1},{"t":"default","title":"最新回复","on":1},{"t":"hot","title":"热门","on":1},{"t":"replies","title":"最多回复","on":0},{"t":"essence","title":"精华","on":1},{"t":"recommend","title":"推荐","on":1},{"t":"avoid","title":"避雷","on":1}]',
         // 侧边栏"关于本站"面板（留空则不显示）
         'about_title' => 'ChatBBS',
         'about_text' => '轻量、快速、无依赖的现代化社区论坛系统，让每一次交流都简单自然。',

@@ -19,6 +19,10 @@ abstract class BaseController
     protected function render(string $view, array $data = [], ?string $layout = 'layouts/main'): string
     {
         $data = array_merge($this->globalData(), $data);
+        // 兼容控制器在 $data['layout'] 中指定布局的写法（登录 / 注册页使用独立的认证布局）
+        if (array_key_exists('layout', $data)) {
+            $layout = $data['layout'];
+        }
         if ($layout === null) {
             return View::make($view, $data);
         }
@@ -78,6 +82,8 @@ abstract class BaseController
                 ['t' => 'default', 'title' => '最新回复', 'on' => 1],
                 ['t' => 'hot', 'title' => '热门', 'on' => 1],
                 ['t' => 'essence', 'title' => '精华', 'on' => 1],
+                ['t' => 'recommend', 'title' => '推荐', 'on' => 1],
+                ['t' => 'avoid', 'title' => '避雷', 'on' => 1],
             ];
         }
         $out = [];
@@ -106,7 +112,7 @@ abstract class BaseController
     /**
      * 解析当前筛选参数，返回 Thread::list 所需的查询选项
      *
-     * @return array ['tab' => string, 'order' => string, 'essence' => int, 'mark_id' => int, 'digest' => int]
+     * @return array ['tab' => string, 'order' => string, 'essence' => int, 'mark_id' => int, 'digest' => int, 'recommend_kind' => int]
      */
     protected function resolveTab(): array
     {
@@ -114,10 +120,10 @@ abstract class BaseController
         $tab = (string)Request::get('tab', '');
         $legacy = (string)Request::get('order', '');
 
-        $res = ['tab' => $tab, 'order' => 'default', 'essence' => 0, 'mark_id' => 0, 'digest' => 0];
+        $res = ['tab' => $tab, 'order' => 'default', 'essence' => 0, 'mark_id' => 0, 'digest' => 0, 'recommend_kind' => 0];
 
         // 兼容旧的 ?order=xxx
-        if ($tab === '' && in_array($legacy, ['default', 'new', 'hot', 'replies', 'essence'], true)) {
+        if ($tab === '' && in_array($legacy, ['default', 'new', 'hot', 'replies', 'essence', 'recommend', 'avoid'], true)) {
             $tab = $legacy;
         }
         if ($tab === '' && $tabs) {
@@ -131,6 +137,12 @@ abstract class BaseController
             $res['order'] = 'default';
         } elseif ($tab === 'digest') {
             $res['digest'] = 1;
+            $res['order'] = 'default';
+        } elseif ($tab === 'recommend') {
+            $res['recommend_kind'] = 1;
+            $res['order'] = 'default';
+        } elseif ($tab === 'avoid') {
+            $res['recommend_kind'] = -1;
             $res['order'] = 'default';
         } elseif (in_array($tab, ['new', 'hot', 'replies', 'default'], true)) {
             $res['order'] = $tab;
@@ -152,6 +164,11 @@ abstract class BaseController
         } catch (\Throwable $e) {
             $menus = [];
         }
+        // 「推荐」已合并为首页筛选标签，隐藏菜单表里遗留的旧推荐页入口
+        $menus = array_values(array_filter($menus, static function ($m): bool {
+            $u = (string)($m['url'] ?? '');
+            return !(preg_match('#(^|/)recommend($|[/?])#i', $u) || str_contains($u, 'r=recommend'));
+        }));
         return $menus;
     }
 

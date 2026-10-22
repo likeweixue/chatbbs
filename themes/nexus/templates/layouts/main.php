@@ -268,6 +268,7 @@ $needEditor = !empty($load_editor) || str_contains((string)($content ?? ''), 'da
 <script src="<?= h(theme_asset('js/editor.js') . '?v=' . CB_VERSION) ?>"></script>
 <?php endif; ?>
 <?= config('footer_code', '') ?>
+<?php if ($currentUser): ?><?php cb_icon_preload(['bell', 'thumbs-up', 'comment', 'reply', 'mail', 'shield', 'star', 'calendar', 'user']); ?><?php endif; ?>
 <!-- 图标 sprite：按需输出本页用到的 symbol（放在最后，此时所有图标已登记） -->
 <?= cb_sprite() ?>
 </body>

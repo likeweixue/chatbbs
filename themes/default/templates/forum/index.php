@@ -125,7 +125,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
 <?php endforeach; ?>
 
 <?php if (!$tree): ?>
-  <div class="cb-card"><div class="cb-card__body"><div class="cb-empty"><div class="icon">📭</div><p><?= L('还没有板块') ?></p></div></div></div>
+  <div class="cb-card"><div class="cb-card__body"><div class="cb-empty"><div class="icon"><?= cb_icon('inbox') ?></div><p><?= L('还没有板块') ?></p></div></div></div>
 <?php endif; ?>
 
 <?php if ((int)config('show_latest_card', 1)): ?>

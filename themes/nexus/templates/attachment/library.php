@@ -25,7 +25,7 @@
         </div>
       <?php endforeach; ?>
     </div>
-    <?php if (!$items): ?><div class="cb-empty"><div class="icon">📁</div><p><?= L('暂无文件') ?></p></div><?php endif; ?>
+    <?php if (!$items): ?><div class="cb-empty"><div class="icon"><?= cb_icon('folder') ?></div><p><?= L('暂无文件') ?></p></div><?php endif; ?>
   </div>
 </div>
 <?= $pager ?? '' ?>

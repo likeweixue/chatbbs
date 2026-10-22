@@ -13,16 +13,14 @@
 
   <div class="Modal-body">
     <div class="Form-group">
-      <label class="label" for="password"><?= L('新密码') ?></label>
       <input class="FormControl" id="password" name="password" type="password"
              placeholder="<?= L('新密码') ?>" aria-label="<?= L('新密码') ?>"
              required minlength="6" autofocus autocomplete="new-password">
     </div>
 
     <div class="Form-group">
-      <label class="label" for="confirm_password"><?= L('确认新密码') ?></label>
       <input class="FormControl" id="confirm_password" name="confirm_password" type="password"
-             placeholder="<?= L('确认新密码') ?>" aria-label="<?= L('确认新密码') ?>"
+             placeholder="<?= L('再输入一次新密码') ?>" aria-label="<?= L('再输入一次新密码') ?>"
              required minlength="6" autocomplete="new-password">
     </div>
 

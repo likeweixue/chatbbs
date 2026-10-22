@@ -30,11 +30,46 @@ class Schema
                 return;
             }
             self::ensure();
+            self::upgradeSettings();
             Settings::set(self::KEY, CB_VERSION);
             Cache::forget('settings');
         } catch (\Throwable $e) {
             Logger::error('表结构自检失败：' . $e->getMessage());
         }
+    }
+
+    /**
+     * 版本升级时的一次性设置迁移
+     *
+     * beta23：推荐 / 避雷页面合并为首页筛选标签，把两个标签追加到已有「列表筛选」配置里。
+     */
+    private static function upgradeSettings(): void
+    {
+        if ((int)Settings::get('migration_beta23_tabs', 0) === 1) {
+            return;
+        }
+        $items = json_decode((string)Settings::get('thread_tabs', ''), true);
+        if (is_array($items)) {
+            $has = [];
+            foreach ($items as $it) {
+                if (is_array($it)) {
+                    $has[(string)($it['t'] ?? '')] = true;
+                }
+            }
+            $changed = false;
+            if (!isset($has['recommend'])) {
+                $items[] = ['t' => 'recommend', 'title' => '推荐', 'url' => '', 'on' => 1];
+                $changed = true;
+            }
+            if (!isset($has['avoid'])) {
+                $items[] = ['t' => 'avoid', 'title' => '避雷', 'url' => '', 'on' => 1];
+                $changed = true;
+            }
+            if ($changed) {
+                Settings::set('thread_tabs', json_encode(array_values($items), JSON_UNESCAPED_UNICODE));
+            }
+        }
+        Settings::set('migration_beta23_tabs', 1);
     }
 
     /**
@@ -162,6 +197,9 @@ class Schema
     private static function columns(): array
     {
         return [
+            // 帖子标题颜色 / 加粗（后台与前台管理员编辑页使用）
+            ['threads', 'title_color', 'varchar(20) NOT NULL DEFAULT \'\' COMMENT \'标题颜色\''],
+            ['threads', 'title_bold', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'标题加粗\''],
             ['threads', 'edited_at', 'datetime DEFAULT NULL COMMENT \'最后编辑时间\''],
             ['threads', 'edited_by', 'int unsigned NOT NULL DEFAULT 0 COMMENT \'最后编辑人\''],
             ['threads', 'edited_count', 'int NOT NULL DEFAULT 0 COMMENT \'编辑次数\''],

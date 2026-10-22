@@ -160,6 +160,21 @@ class ThreadController extends BaseController
     }
 
     /**
+     * 标题颜色：仅管理员可设置；表结构未升级时自动忽略
+     */
+    private static function titleFields(string $table): array
+    {
+        if (!\App\Core\Auth::isAdmin() || !self::hasColumn($table, 'title_color')) {
+            return [];
+        }
+        $color = trim((string)Request::post('title_color', ''));
+        if ($color !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+            $color = '';
+        }
+        return ['title_color' => strtolower($color)];
+    }
+
+    /**
      * 版权许可证字段：表结构未升级时自动忽略，避免写入报错
      */
     private static function licenseFields(string $table): array
@@ -297,7 +312,7 @@ class ThreadController extends BaseController
             'attachment_fee' => (float)Request::post('attachment_fee', 0),
             'last_reply_user' => (string)$user['username'],
             'last_reply_user_id' => (int)$user['id'],
-        ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads'));
+        ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads') + self::titleFields('threads'));
         Thread::setTags($id, $tagIds);
         Content::bindAttachments($html, $id, (int)$user['id']);
 
@@ -376,7 +391,7 @@ class ThreadController extends BaseController
             'content' => Content::renderMentions(Content::highlight(Content::lazyImages($html))),
             'content_text' => $text,
             'forum_id' => Request::int('forum_id', (int)$thread['forum_id']),
-        ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads');
+        ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads') + self::titleFields('threads');
         try {
             // 记录编辑痕迹（前台帖子正文上方显示"XX 编辑于 …"）
             Thread::update($id, $base + [

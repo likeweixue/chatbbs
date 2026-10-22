@@ -26,7 +26,7 @@
              autocomplete="current-password" required>
     </div>
 
-    <div class="Form-group">
+    <div class="Form-group Form-group--check">
       <label class="checkbox">
         <input type="checkbox" name="remember" value="1"> <?= L('记住我的登录状态') ?>
       </label>
@@ -48,9 +48,9 @@
       </p>
     <?php endif; ?>
     <?php if ((int)config('open_register', 1)): ?>
-      <p class="LogInModal-signUp"><?= L('还没有账号？') ?>
+      <p class="LogInModal-signUp"><?= L('没有账号？') ?>
         <a class="Button Button--text Button--link" href="<?= h(url('register')) ?>">
-          <span class="Button-label"><span class="Button-labelText"><?= L('立即注册') ?></span></span>
+          <span class="Button-label"><span class="Button-labelText"><?= L('去注册') ?></span></span>
         </a>
       </p>
     <?php endif; ?>

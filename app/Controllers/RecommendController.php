@@ -4,38 +4,21 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Auth;
 use App\Core\Request;
 use App\Core\Settings;
-use App\Core\View;
 use App\Models\Notification;
 use App\Models\Recommend;
-use App\Models\Tag;
 use App\Models\Thread;
-use App\Models\User;
-use App\Services\Stats;
 
 class RecommendController extends BaseController
 {
-    public function index(): string
+    /**
+     * 旧版独立的「推荐 / 避雷」页面已合并到首页筛选标签，这里保留跳转兼容老链接。
+     */
+    public function index(): void
     {
-        if (!(int)Settings::get('recommend_enable', 1)) {
-            return $this->render('errors/notice', ['title' => '功能未开启', 'message' => '推荐功能已关闭。']);
-        }
-        $kind = Request::int('kind', 1) === -1 ? -1 : 1;
-        $page = max(1, Request::int('page', 1));
-        $result = Recommend::list($page, 20, $kind);
-        return $this->render('recommend/index', [
-            'title' => $kind === 1 ? '推荐' : '避雷区',
-            'threads' => $result['items'],
-            'total' => $result['total'],
-            'kind' => $kind,
-            'pager' => View::paginate($result['total'], 20, $page, url('recommend?kind=' . $kind)),
-            'stats_site' => Stats::forum(),
-            'hot_tags' => Tag::hot(15),
-            'new_users' => User::newest(8),
-            'latest_threads' => Thread::latest(8),
-        ]);
+        $kind = Request::int('kind', 1) === -1 ? 'avoid' : 'recommend';
+        \redirect('?tab=' . $kind);
     }
 
     public function toggle(): void

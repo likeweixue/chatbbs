@@ -18,7 +18,7 @@
     </div>
 
     <div class="cb-upload-zone" data-upload-zone style="margin-bottom:16px">
-      <div style="font-size:28px">📤</div>
+      <div class="cb-upload-zone__ico"><?= cb_icon('upload') ?></div>
       <div>点击或拖拽文件到此处上传（最大 <?= h(config('upload_max_size')) ?>MB）</div>
       <form method="post" action="<?= h(url('user/attachments/upload')) ?>" enctype="multipart/form-data" id="att-form" style="display:none">
         <?= csrf_field() ?>
@@ -51,7 +51,7 @@
         </div>
       <?php endforeach; ?>
     </div>
-    <?php if (!$items): ?><div class="cb-empty"><div class="icon">📁</div><p><?= L('暂无文件') ?></p></div><?php endif; ?>
+    <?php if (!$items): ?><div class="cb-empty"><div class="icon"><?= cb_icon('folder') ?></div><p><?= L('暂无文件') ?></p></div><?php endif; ?>
   </div>
 </div>
 

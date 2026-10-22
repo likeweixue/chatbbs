@@ -97,6 +97,8 @@ html[data-theme="dark"] {
 }
 .cb-ico { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; flex: none; }
 .cb-ico-lg { width: 18px; height: 18px; vertical-align: -4px; }
+.cb-ico-xl { width: 36px; height: 36px; vertical-align: -8px; }
+.cb-ico-2xl { width: 48px; height: 48px; vertical-align: -10px; }
 
 .cb-logo { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; color: var(--color-text); }
 .cb-logo img { height: 30px; max-width: 190px; object-fit: contain; }
@@ -406,6 +408,13 @@ html[data-theme="dark"] .cb-code { background: #0f1216; }
   outline: none; transition: border-color .15s; font-size: 14px;
 }
 .cb-input:focus, .cb-textarea:focus, .cb-select:focus { border-color: var(--color-primary); }
+.cb-color-field { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cb-color-field input[type="color"] {
+  width: 44px; height: 38px; padding: 2px; flex: none; cursor: pointer;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+.cb-color-field .cb-input { flex: 1; min-width: 160px; }
 .cb-textarea { min-height: 90px; resize: vertical; }
 .cb-form-tip { font-size: 12px; color: var(--color-text-muted); margin-top: 4px; }
 .cb-form-error { font-size: 12px; color: var(--color-danger); margin-top: 4px; }
@@ -677,6 +686,11 @@ html[data-theme="dark"] .cb-alert { background: var(--color-surface-alt); }
   padding: 30px; text-align: center; color: var(--color-text-muted); cursor: pointer; background: var(--color-surface-alt);
 }
 .cb-upload-zone:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.cb-upload-zone__ico { display: flex; justify-content: center; margin-bottom: 6px; }
+.cb-upload-zone__ico .cb-ico { width: 28px; height: 28px; }
+.cb-empty .icon svg { width: 28px; height: 28px; }
+.cb-notify-ico { display: inline-flex; align-items: center; justify-content: center; margin-top: 2px; color: var(--color-text-muted); }
+.cb-notify-ico svg { width: 18px; height: 18px; }
 
 /* ---------- 通知下拉 ---------- */
 .cb-dropdown { position: relative; }

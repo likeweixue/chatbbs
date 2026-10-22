@@ -12,11 +12,11 @@
   </div>
   <div class="cb-card__body">
     <?php if (!$items): ?>
-      <div class="cb-empty"><div class="icon">🔔</div><p>暂无通知</p></div>
+      <div class="cb-empty"><div class="icon"><?= cb_icon('bell') ?></div><p>暂无通知</p></div>
     <?php else: ?>
       <?php foreach ($items as $n): ?>
         <div class="cb-list-item" style="align-items:flex-start;<?= (int)$n['is_read'] ? '' : 'background:var(--color-primary-light)' ?>">
-          <span style="font-size:18px"><?= \App\Controllers\NotifyController::typeIcon((string)$n['type']) ?></span>
+          <span class="cb-notify-ico"><?= \App\Controllers\NotifyController::typeIcon((string)$n['type']) ?></span>
           <div style="flex:1;min-width:0">
             <a href="<?= h($n['link'] ?: url('notifications')) ?>" style="color:var(--color-text);font-weight:500">
               <?= h($n['title']) ?>

@@ -8,6 +8,6 @@
         </span>
       </a>
     <?php endforeach; ?>
-    <?php if (!$tags): ?><div class="cb-empty"><div class="icon">🏷️</div><p><?= L('暂无标签') ?></p></div><?php endif; ?>
+    <?php if (!$tags): ?><div class="cb-empty"><div class="icon"><?= cb_icon('tag') ?></div><p><?= L('暂无标签') ?></p></div><?php endif; ?>
   </div>
 </div>

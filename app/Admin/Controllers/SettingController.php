@@ -489,6 +489,8 @@ class SettingController extends BaseAdmin
             'hot' => '热门（按浏览量）',
             'replies' => '最多回复',
             'essence' => '精华帖',
+            'recommend' => '推荐帖（被推荐过的帖子）',
+            'avoid' => '避雷帖（被标记避雷的帖子）',
             'digest' => '首页推荐帖',
             'link' => '自定义链接（跳转到任意地址）',
         ];
@@ -508,6 +510,8 @@ class SettingController extends BaseAdmin
                 ['t' => 'default', 'title' => '最新回复', 'on' => 1],
                 ['t' => 'hot', 'title' => '热门', 'on' => 1],
                 ['t' => 'essence', 'title' => '精华', 'on' => 1],
+                ['t' => 'recommend', 'title' => '推荐', 'on' => 1],
+                ['t' => 'avoid', 'title' => '避雷', 'on' => 1],
             ];
         }
         return array_values(array_filter($items, static fn($i) => is_array($i)));
@@ -521,6 +525,7 @@ class SettingController extends BaseAdmin
         $html = '<div class="adm-alert info">'
             . '控制首页与板块页顶部的筛选标签：可勾选显示、用 ↑↓ 调整顺序、修改标题，也可以新增自定义分类。'
             . '<br>「帖子标记」类型请在「内容管理 → 帖子标记」里先创建标记（例如：公告、归档、过时），这里就能把它作为筛选分类。'
+            . '<br>「推荐帖 / 避雷帖」按帖子收到的推荐 / 避雷记录筛选，已替代原来独立的推荐页面。'
             . '</div>';
 
         $html .= '<form method="post" action="' . h(admin_url('list-tabs/save')) . '" id="tabs-form">';

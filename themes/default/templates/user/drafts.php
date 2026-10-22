@@ -2,7 +2,7 @@
   <div class="cb-card__header"><?= L('草稿箱') ?> <span class="more">共 <?= count($drafts) ?> 篇</span></div>
   <div class="cb-card__body">
     <?php if (!$drafts): ?>
-      <div class="cb-empty"><div class="icon">📝</div><p><?= L('暂无草稿') ?></p></div>
+      <div class="cb-empty"><div class="icon"><?= cb_icon('edit') ?></div><p><?= L('暂无草稿') ?></p></div>
     <?php else: ?>
       <?php foreach ($drafts as $d): ?>
         <div class="cb-list-item">

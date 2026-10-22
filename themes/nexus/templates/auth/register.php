@@ -1,7 +1,8 @@
 <?php
 /**
  * 注册表单 —— 视觉参考 Flarum 的 SignUpModal（MIT License）
- * 只保留最必要的三项：用户名 / 邮箱 / 密码；验证码与用户协议按后台开关决定是否显示
+ * 四个输入框：用户名 / 邮箱 / 密码 / 再输入一次密码
+ * 验证码与用户协议按后台开关决定是否显示
  */
 ?>
 <form class="Form Form--centered" method="post" action="<?= h(url('register')) ?>">
@@ -14,7 +15,6 @@
   <div class="Modal-body fl-scroll">
 
     <div class="Form-group">
-      <label class="label" for="username"><?= L('用户名') ?></label>
       <input class="FormControl" id="username" name="username" type="text"
              placeholder="<?= L('用户名') ?>" aria-label="<?= L('用户名') ?>"
              required minlength="3" maxlength="20" autocomplete="username"
@@ -22,22 +22,25 @@
     </div>
 
     <div class="Form-group">
-      <label class="label" for="email"><?= L('邮箱') ?></label>
       <input class="FormControl" id="email" name="email" type="email"
              placeholder="<?= L('邮箱') ?>" aria-label="<?= L('邮箱') ?>"
              required autocomplete="email" value="<?= h(old('email')) ?>">
     </div>
 
     <div class="Form-group">
-      <label class="label" for="password"><?= L('密码') ?></label>
       <input class="FormControl" id="password" name="password" type="password"
              placeholder="<?= L('密码') ?>" aria-label="<?= L('密码') ?>"
              required minlength="6" autocomplete="new-password">
     </div>
 
+    <div class="Form-group">
+      <input class="FormControl" id="confirm_password" name="confirm_password" type="password"
+             placeholder="<?= L('再输入一次密码') ?>" aria-label="<?= L('再输入一次密码') ?>"
+             required minlength="6" autocomplete="new-password">
+    </div>
+
     <?php if ((int)config('register_captcha', 1)): ?>
       <div class="Form-group">
-        <label class="label" for="captcha"><?= L('验证码') ?></label>
         <div class="fl-captcha">
           <input class="FormControl" id="captcha" name="captcha" type="text"
                  placeholder="<?= L('验证码') ?>" aria-label="<?= L('验证码') ?>"
@@ -70,9 +73,9 @@
   </div>
 
   <div class="Modal-footer">
-    <p class="SignUpModal-logIn"><?= L('已有账号？') ?>
+    <p class="SignUpModal-logIn"><?= L('已经有账号？') ?>
       <a class="Button Button--text Button--link" href="<?= h(url('login')) ?>">
-        <span class="Button-label"><span class="Button-labelText"><?= L('登录') ?></span></span>
+        <span class="Button-label"><span class="Button-labelText"><?= L('去登录') ?></span></span>
       </a>
     </p>
   </div>

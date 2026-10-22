@@ -2,7 +2,7 @@
   <div class="cb-card__header"><?= L('购买附件') ?></div>
   <div class="cb-card__body">
     <div class="flex gap-12 items-center">
-      <div style="font-size:36px">📦</div>
+      <div><?= cb_icon('package', 'cb-ico-xl') ?></div>
       <div>
         <div style="font-weight:600"><?= h($att['name']) ?></div>
         <div class="text-xs text-muted"><?= h(format_size($att['size'])) ?> · <?= (int)$att['downloads'] ?> 次下载</div>

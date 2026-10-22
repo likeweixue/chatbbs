@@ -106,7 +106,7 @@ $show_toc = true;
             <button type="button" data-like data-type="post" data-id="<?= (int)$p['id'] ?>"
                     data-guest="<?= $current_user ? 0 : 1 ?>"
                     class="<?= in_array((int)$p['id'], $liked_posts ?? [], true) ? 'on' : '' ?>">
-              <span class="icon">👍</span> <?= L('赞') ?> <span class="count"><?= (int)$p['likes'] ?></span>
+              <?= cb_icon('thumbs-up') ?> <?= L('赞') ?> <span class="count"><?= (int)$p['likes'] ?></span>
             </button>
           </div>
         <?php endif; ?>
@@ -157,31 +157,31 @@ $show_toc = true;
     <div class="flex gap-12" style="flex-wrap:wrap;align-items:center">
       <button type="button" class="cb-btn <?= ($liked ?? false) ? 'primary' : '' ?>"
               data-like data-type="thread" data-id="<?= (int)$thread['id'] ?>" data-guest="<?= $current_user ? 0 : 1 ?>">
-        <span class="icon">👍</span> <?= ($liked ?? false) ? L('已赞') : L('点赞') ?> <span class="count"><?= (int)$thread['likes'] ?></span>
+        <?= cb_icon('thumbs-up') ?> <?= ($liked ?? false) ? L('已赞') : L('点赞') ?> <span class="count"><?= (int)$thread['likes'] ?></span>
       </button>
 
       <?php if ((int)config('recommend_enable', 1)): ?>
         <button type="button" class="cb-btn" data-recommend="1" data-id="<?= (int)$thread['id'] ?>">
-          <?= L('⭐ 推荐') ?> <span><?= (int)$thread['recommends'] ?></span>
+          <?= cb_icon('star') ?> <?= L('推荐') ?> <span><?= (int)$thread['recommends'] ?></span>
         </button>
-        <button type="button" class="cb-btn" data-recommend="-1" data-id="<?= (int)$thread['id'] ?>"><?= L('⚡ 避雷') ?></button>
+        <button type="button" class="cb-btn" data-recommend="-1" data-id="<?= (int)$thread['id'] ?>"><?= cb_icon('bolt') ?> <?= L('避雷') ?></button>
       <?php endif; ?>
 
       <?php if ($current_user): ?>
-        <button type="button" class="cb-btn" onclick="document.getElementById('report-box').classList.toggle('hide')"><?= L('🚩 举报') ?></button>
+        <button type="button" class="cb-btn" onclick="document.getElementById('report-box').classList.toggle('hide')"><?= cb_icon('flag') ?> <?= L('举报') ?></button>
       <?php endif; ?>
 
       <button type="button" class="cb-btn" id="cb-share-btn"
               data-title="<?= h((string)$thread['title']) ?>"
               data-link="<?= h(url('thread/' . (int)$thread['id'])) ?>"
-              data-site="<?= h((string)config('site_name', 'ChatBBS')) ?>">🔗 <?= L('分享') ?></button>
+              data-site="<?= h((string)config('site_name', 'ChatBBS')) ?>"><?= cb_icon('link') ?> <?= L('分享') ?></button>
 
       <?php if ($isOwner || $canManage): ?>
-        <a class="cb-btn" href="<?= h(url('thread/' . $thread['id'] . '/edit')) ?>"><?= L('✏️ 编辑') ?></a>
+        <a class="cb-btn" href="<?= h(url('thread/' . $thread['id'] . '/edit')) ?>"><?= cb_icon('edit') ?> <?= L('编辑') ?></a>
       <?php endif; ?>
 
       <?php if ($canManage): ?>
-        <a class="cb-btn" href="<?= h(url('admin/threads?keyword=' . urlencode((string)$thread['title']))) ?>"><?= L('🛠️ 后台管理') ?></a>
+        <a class="cb-btn" href="<?= h(url('admin/threads?keyword=' . urlencode((string)$thread['title']))) ?>"><?= cb_icon('tools') ?> <?= L('后台管理') ?></a>
       <?php endif; ?>
     </div>
 

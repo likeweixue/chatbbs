@@ -24,7 +24,7 @@ $threadIcon = function (array $t) use ($imgBase, $hotLine): string {
 <div class="cb-thread-list<?= $cls ?>">
   <?php if (!$threads): ?>
     <div class="cb-empty">
-      <div class="icon">📭</div>
+      <div class="icon"><?= cb_icon('inbox') ?></div>
       <p><?= L('还没有内容，来发第一个帖子吧。') ?></p>
     </div>
   <?php elseif ($compact): ?>

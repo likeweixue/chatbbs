@@ -66,10 +66,11 @@ class NotifyController extends BaseController
 
     public static function typeIcon(string $type): string
     {
-        return [
-            'system' => '⚙️', 'like' => '👍', 'reply' => '💬', 'mention' => '@',
-            'pm' => '✉️', 'audit' => '🛡️', 'level' => '🎉', 'checkin' => '📅',
-            'follow' => '👤', 'friend' => '🤝', 'recommend' => '⭐', 'say' => '💭',
-        ][$type] ?? '🔔';
+        $icons = [
+            'system' => 'bell', 'like' => 'thumbs-up', 'reply' => 'comment', 'mention' => 'reply',
+            'pm' => 'mail', 'audit' => 'shield', 'level' => 'star', 'checkin' => 'calendar',
+            'follow' => 'user', 'friend' => 'user', 'recommend' => 'star', 'say' => 'comment',
+        ];
+        return cb_icon($icons[$type] ?? 'bell');
     }
 }

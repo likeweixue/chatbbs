@@ -134,11 +134,12 @@ class AdminUI
             $block = in_array(($f['type'] ?? 'text'), ['editor', 'textarea', 'checkboxes'], true);
             $html .= '<div class="adm-form-item' . ($block ? ' adm-form-item--block' : '') . '">';
             $html .= '<label for="f-' . h($name) . '">' . h($f['label']) . '</label>';
+            $html .= '<div class="adm-field">';
             $html .= self::field($f, $value);
             if (!empty($f['tip'])) {
                 $html .= '<div class="adm-form-tip">' . h($f['tip']) . '</div>';
             }
-            $html .= '</div>';
+            $html .= '</div></div>';
         }
         $html .= '<div class="adm-form-actions">';
         $html .= '<button class="adm-btn primary" type="submit">' . h($config['submit'] ?? '保存') . '</button>';
@@ -165,15 +166,15 @@ class AdminUI
                     $sel = (string)$value === (string)$k ? ' selected' : '';
                     $opts .= '<option value="' . h((string)$k) . '"' . $sel . '>' . h((string)$v) . '</option>';
                 }
-                return '<select class="adm-input" id="' . $id . '" name="' . h($name) . '">' . $opts . '</select>';
+                return '<select class="adm-input" id="' . $id . '" name="' . h($name) . '" style="width:260px;max-width:100%">' . $opts . '</select>';
             case 'switch':
                 $on = ((int)$value === 1);
                 return '<label class="adm-switch"><input type="checkbox" name="' . h($name) . '" value="1"'
                     . ($on ? ' checked' : '') . '><span></span></label>';
             case 'number':
-                return '<input class="adm-input" type="number" step="' . h((string)($f['step'] ?? '1')) . '" id="' . $id . '" name="' . h($name) . '" value="' . h((string)$value) . '"' . $ph . '>';
+                return '<input class="adm-input" type="number" step="' . h((string)($f['step'] ?? '1')) . '" id="' . $id . '" name="' . h($name) . '" value="' . h((string)$value) . '"' . $ph . ' style="width:160px;max-width:100%">';
             case 'color':
-                return '<input class="adm-input" type="color" id="' . $id . '" name="' . h($name) . '" value="' . h((string)($value ?: '#0b87fd')) . '" style="width:80px">';
+                return '<input class="adm-input" type="color" id="' . $id . '" name="' . h($name) . '" value="' . h((string)($value ?: '#0b87fd')) . '" style="width:64px">';
             case 'password':
                 return '<input class="adm-input" type="password" id="' . $id . '" name="' . h($name) . '"' . $ph . ' autocomplete="new-password">';
             case 'checkboxes':

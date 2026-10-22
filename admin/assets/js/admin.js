@@ -99,7 +99,8 @@
     if (!btn) return;
     function paint() {
         var dark = document.documentElement.dataset.admTheme === 'dark';
-        btn.textContent = dark ? '☀️' : '🌙';
+        btn.title = dark ? '切换到浅色模式' : '切换到暗色模式';
+        btn.setAttribute('aria-label', btn.title);
     }
     paint();
     btn.addEventListener('click', function () {

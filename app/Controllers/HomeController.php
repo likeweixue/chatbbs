@@ -24,6 +24,7 @@ class HomeController extends BaseController
             'essence' => $tabRes['essence'],
             'mark_id' => $tabRes['mark_id'],
             'digest' => $tabRes['digest'],
+            'recommend_kind' => $tabRes['recommend_kind'],
         ]);
         $tabQuery = '?tab=' . rawurlencode($tabRes['tab']);
         $baseUrl = url($tabQuery);

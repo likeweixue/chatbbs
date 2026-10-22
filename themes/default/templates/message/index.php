@@ -45,7 +45,7 @@
             <button class="cb-btn primary" type="submit"><?= L('发送') ?></button>
           </form>
         <?php else: ?>
-          <div class="cb-empty" style="margin:auto"><div class="icon">✉️</div><p><?= L('选择一个会话开始聊天') ?></p></div>
+          <div class="cb-empty" style="margin:auto"><div class="icon"><?= cb_icon('mail') ?></div><p><?= L('选择一个会话开始聊天') ?></p></div>
         <?php endif; ?>
       </div>
     </div>

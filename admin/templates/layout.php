@@ -102,7 +102,11 @@ foreach ($menu as $gk => $group) {
                 <div class="adm-search-list hide" id="adm-search-list"></div>
             </div>
             <div class="spacer"></div>
-            <button class="adm-btn sm" id="adm-theme-toggle" type="button" title="切换暗色 / 浅色模式">🌙</button>
+            <button class="adm-btn sm adm-theme-toggle" id="adm-theme-toggle" type="button"
+                    title="切换暗色 / 浅色模式" aria-label="切换暗色 / 浅色模式">
+                <span class="ico-light"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+                <span class="ico-dark"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+            </button>
             <a class="adm-btn sm" href="<?= h(url('')) ?>" target="_blank">前台首页</a>
             <?php if ($reports > 0): ?>
                 <a class="adm-btn sm warn" href="<?= h(admin_url('reports')) ?>">待审 <?= $reports ?></a>

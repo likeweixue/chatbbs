@@ -155,7 +155,7 @@ $mySeg = (string)($my_segment ?? '');
               </div>
             <?php endforeach; ?>
             <?php if (!$group_messages): ?>
-              <div class="cb-empty" style="margin:auto"><div class="icon">💬</div><p><?= L('群里还没有消息，说点什么吧') ?></p></div>
+              <div class="cb-empty" style="margin:auto"><div class="icon"><?= cb_icon('comment') ?></div><p><?= L('群里还没有消息，说点什么吧') ?></p></div>
             <?php endif; ?>
           </div>
           <form class="cb-chat__composer" id="cb-chat-form" method="post" action="<?= h(url('chat/send')) ?>">
@@ -186,7 +186,7 @@ $mySeg = (string)($my_segment ?? '');
               </div>
             <?php endforeach; ?>
             <?php if (!$messages): ?>
-              <div class="cb-empty" style="margin:auto"><div class="icon">✉️</div><p><?= L('还没有消息，打个招呼吧') ?></p></div>
+              <div class="cb-empty" style="margin:auto"><div class="icon"><?= cb_icon('mail') ?></div><p><?= L('还没有消息，打个招呼吧') ?></p></div>
             <?php endif; ?>
           </div>
           <form class="cb-chat__composer" id="cb-chat-form" method="post" action="<?= h(url('chat/send')) ?>">
@@ -198,7 +198,7 @@ $mySeg = (string)($my_segment ?? '');
 
         <?php else: ?>
           <div class="cb-empty" style="margin:auto">
-            <div class="icon">💬</div>
+            <div class="icon"><?= cb_icon('comment') ?></div>
             <p><?= L('选择一个会话或群聊开始聊天') ?></p>
             <div class="text-xs text-muted" style="margin-top:8px"><?= L('也可以到「附近的人」找同网段的朋友') ?></div>
           </div>
