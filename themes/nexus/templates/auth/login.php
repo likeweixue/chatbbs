@@ -1,8 +1,8 @@
 <?php
 /**
  * 登录表单 —— 视觉参考 Flarum 的 LogInModal（MIT License）
- * 结构：Modal-header / Modal-body(Form-group + FormControl) / Modal-footer
- * 站点原有逻辑（CSRF、back 回跳、记住我、忘记密码、注册入口）全部保留
+ * 结构：Modal-header / Modal-body（Form-group + FormControl）/ Modal-footer
+ * 保留站点原有逻辑：CSRF、back 回跳、记住我、忘记密码、注册入口
  */
 ?>
 <form class="Form Form--centered" method="post" action="<?= h(url('login')) ?>">
@@ -20,12 +20,10 @@
              autocomplete="username" required autofocus value="<?= h(old('username')) ?>">
     </div>
 
-    <div class="Form-group fl-pwd">
+    <div class="Form-group">
       <input class="FormControl" id="password" name="password" type="password"
              placeholder="<?= L('密码') ?>" aria-label="<?= L('密码') ?>"
              autocomplete="current-password" required>
-      <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="password"
-              aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
     </div>
 
     <div class="Form-group">

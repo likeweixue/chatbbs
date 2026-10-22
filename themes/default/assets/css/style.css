@@ -100,8 +100,6 @@ html[data-theme="dark"] {
 
 .cb-logo { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; color: var(--color-text); }
 .cb-logo img { height: 30px; max-width: 190px; object-fit: contain; }
-.cb-logo__mark { display: inline-flex; color: var(--color-primary); }
-.cb-logo__mark .cb-ico { width: 22px; height: 22px; vertical-align: -4px; }
 .cb-logo__text { letter-spacing: .3px; }
 .cb-nav { display: flex; align-items: center; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: none; }
 /* 左侧抽屉（移动端）内的标题栏，桌面端隐藏 */
@@ -169,18 +167,17 @@ html[data-theme="dark"] [data-theme-toggle] .ico-dark { display: inline-flex; }
 .cb-btn.block { width: 100%; }
 .cb-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-/* 复古风「发布主题」按钮（vBulletin 立体按钮质感） */
+/* 「发布主题」按钮：纯色扁平，不再使用渐变与立体阴影 */
 .cb-btn-newthread {
   height: 30px; padding: 0 12px; gap: 6px; white-space: nowrap;
-  border: 1px solid var(--color-primary-dark);
+  border: 1px solid var(--color-primary);
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 1px 2px rgba(20, 30, 50, .18);
+  background: var(--color-primary);
+  color: #fff; box-shadow: none;
   font-weight: 600;
 }
-.cb-btn-newthread:hover { color: #fff; filter: brightness(1.08); border-color: var(--color-primary-dark); }
-.cb-btn-newthread:active { box-shadow: inset 0 2px 4px rgba(0, 0, 0, .25); transform: translateY(1px); }
-.cb-btn-newthread .cb-ico { vertical-align: -3px; }
+.cb-btn-newthread:hover { color: #fff; background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+.cb-btn-newthread:active { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
 
 /* ---------- 布局 ---------- */
 /* 主布局用 grid：列宽完全由容器决定。
@@ -716,6 +713,9 @@ html[data-theme="dark"] .cb-alert { background: var(--color-surface-alt); }
 .cb-footer { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 24px 0; color: var(--color-text-muted); font-size: 13px; }
 .cb-footer__inner { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .cb-footer a { color: var(--color-text-sub); }
+.cb-footer__github { display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-sub); }
+.cb-footer__github:hover { color: var(--color-text); }
+.cb-footer__github .cb-ico { width: 15px; height: 15px; vertical-align: -3px; }
 
 /* ---------- 登录 / 注册（独立全屏卡片） ---------- */
 body.gateway-body { background: var(--color-bg); min-height: 100vh; }

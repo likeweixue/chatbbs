@@ -6,6 +6,9 @@ $unreadMsg = $unread_messages ?? 0;
 $menus = $menus ?? [];
 $sidebarOn = ($sidebar_enable ?? 1) && (!isset($hide_sidebar) || !$hide_sidebar);
 $side = $sidebar_side ?? 'right';
+// 侧边栏默认折叠：未手动切换过的访客先看到完整内容区
+$sidebarDefaultHidden = (int)config('sidebar_default_hidden', 1) === 1;
+$sidebarCollapsed = !$sidebarOn || $sidebarDefaultHidden;
 $theme = \App\Core\View::theme();
 
 $logoType = (string)config('logo_type', 'text');
@@ -69,7 +72,6 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
       <?php if ($logoType === 'image' && $logoImg !== ''): ?>
         <img src="<?= h($logoImg) ?>" alt="<?= h($siteName) ?>">
       <?php else: ?>
-        <span class="cb-logo__mark"><?= cb_icon('quill') ?></span>
         <span class="cb-logo__text"><?= h($logoText) ?></span>
       <?php endif; ?>
     </a>
@@ -167,7 +169,7 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
         <?php endif; ?>
 
         <?php if ($sidebarOn): ?>
-          <button class="cb-icon-btn cb-sidebar-toggle-btn" id="btn-sidebar-toggle" title="<?= L('显示 / 隐藏侧边栏') ?>">
+          <button class="cb-icon-btn cb-sidebar-toggle-btn <?= $sidebarCollapsed ? 'off' : '' ?>" id="btn-sidebar-toggle" title="<?= L('显示 / 隐藏侧边栏') ?>">
             <?= cb_icon('panel-right') ?>
           </button>
           <button class="cb-icon-btn" id="btn-sidebar-side" title="<?= L('切换侧边栏到左侧 / 右侧') ?>">
@@ -191,7 +193,23 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
   <?php endif; ?>
 </div>
 
-<main class="container cb-main <?= $side === 'left' ? 'sidebar-left' : '' ?><?= $sidebarOn ? '' : ' sidebar-hidden' ?>">
+<main class="container cb-main <?= $side === 'left' ? 'sidebar-left' : '' ?><?= $sidebarCollapsed ? ' sidebar-hidden' : '' ?>"
+      data-sidebar-default="<?= $sidebarDefaultHidden ? 'hidden' : 'visible' ?>">
+  <?php if ($sidebarOn): ?>
+  <script>
+    // 恢复访客上次手动选择的侧栏状态，避免服务端默认值与本地偏好不一致时闪动
+    (function () {
+      try {
+        var main = document.querySelector('.cb-main');
+        var v = localStorage.getItem('cb_sidebar_hidden');
+        if (!main || v === null) { return; }
+        main.classList.toggle('sidebar-hidden', v === '1');
+        var btn = document.getElementById('btn-sidebar-toggle');
+        if (btn) { btn.classList.toggle('off', v === '1'); }
+      } catch (e) {}
+    })();
+  </script>
+  <?php endif; ?>
   <div class="cb-content">
     <?= $content ?? '' ?>
   </div>
@@ -209,7 +227,9 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
     </div>
     <div class="cb-footer__meta">
       <?php if (config('site_icp')): ?><span><?= h(config('site_icp')) ?></span><?php endif; ?>
-      <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= cb_icon('quill') ?>授权</a>
+      <a class="cb-footer__github" href="https://github.com/likeweixue/chatbbs" target="_blank" rel="noopener"
+         title="GitHub 仓库" aria-label="GitHub 仓库"><?= cb_icon('github') ?><span>GitHub</span></a>
+      <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= L('授权') ?></a>
       <span>页面耗时 <?= number_format((microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1) ?> ms</span>
     </div>
   </div>

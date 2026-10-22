@@ -16,30 +16,31 @@ $langUrl = static fn (string $l): string => h(url('license') . '?lang=' . $l);
 
 if ($lang === 'en') {
     $cTitle = 'License Certificate';
-    $cBody1 = 'Developed by <strong>WorkBuddy</strong> and <strong>likeweixue</strong> (Ma Changsheng).';
+    $cBody1 = 'Developed by <strong>WorkBuddy</strong>, <strong>likeweixue</strong> (Ma Changsheng) '
+        . 'and <strong>DeepSeek</strong>.';
     $cBody2 = 'Official site: <a href="' . h($official) . '" target="_blank" rel="noopener">chatbbs.cn</a>';
     $cBody3 = 'On the basis of strict compliance with all applicable laws and regulations and the '
         . '<a href="' . h($official) . '/?r=license" target="_blank" rel="noopener">ChatBBS License Agreement</a>, '
         . 'your website <span class="cb-license__host">' . h($host) . '</span> is hereby granted a '
         . '<span class="cb-license__free">free license</span> to use ' . h($siteName) . '.';
-    $cFoot = 'WorkBuddy &middot; likeweixue';
+    $cFoot = 'WorkBuddy &middot; likeweixue &middot; DeepSeek';
     $back = 'Back to ' . $siteName;
 } else {
     $cTitle = L('授权证书');
-    $cBody1 = 'ChatBBS 由 <strong>WorkBuddy</strong> 与 <strong>likeweixue</strong>（麻昌生）共同开发。';
+    $cBody1 = 'ChatBBS 由 <strong>WorkBuddy</strong>、<strong>likeweixue</strong>（麻昌生）与 '
+        . '<strong>DeepSeek</strong> 共同开发。';
     $cBody2 = '官方网站：<a href="' . h($official) . '" target="_blank" rel="noopener">chatbbs.cn</a>';
     $cBody3 = '在严格遵守国家各项法律法规及'
         . '<a href="' . h($official) . '/?r=license" target="_blank" rel="noopener">《ChatBBS 授权协议》</a>'
         . '的基础上，您的网站 <span class="cb-license__host">' . h($host) . '</span> 默认获得 '
         . '<span class="cb-license__free">免费授权</span>，即可以正常使用本程序搭建社区。';
-    $cFoot = L('WorkBuddy &middot; likeweixue（麻昌生）');
+    $cFoot = L('WorkBuddy &middot; likeweixue（麻昌生）&middot; DeepSeek');
     $back = L('返回 ') . $siteName;
 }
 ?>
 <div class="cb-license">
   <div class="cb-license__card">
     <div class="cb-license__logo">
-      <span class="cb-logo__mark"><?= cb_icon('quill', 'cb-ico-lg') ?></span>
       <span class="cb-license__brand"><?= h($siteName) ?></span>
       <span class="cb-license__ver">v<?= CB_VERSION ?></span>
     </div>

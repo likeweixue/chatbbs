@@ -33,10 +33,10 @@ $editingPage = (string)($editing_page ?? '');
   <div class="cb-card" style="padding:12px">
     <?php if ($editingPage !== ''): ?>
       <button type="submit" form="thread-form" id="cb-side-publish" class="cb-btn cb-btn-newthread block">
-        <?= cb_icon('quill') ?><?= $editingPage === 'edit' ? L('保存修改') : L('发布主题') ?>
+        <?= $editingPage === 'edit' ? L('保存修改') : L('发布主题') ?>
       </button>
     <?php else: ?>
-      <a class="cb-btn cb-btn-newthread block" href="<?= h(url('thread/create')) ?>"><?= cb_icon('quill') ?><?= L('发布主题') ?></a>
+      <a class="cb-btn cb-btn-newthread block" href="<?= h(url('thread/create')) ?>"><?= L('发布主题') ?></a>
     <?php endif; ?>
   </div>
 

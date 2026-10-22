@@ -24,10 +24,8 @@
   margin: 0;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
   padding: 32px 16px;
   background: #eef1f6;
   color: var(--fl-text);
@@ -43,24 +41,7 @@ html[data-theme="dark"] .flarum-gate {
   --fl-muted: #95a1b5;
   --fl-border: #333c4a;
   --fl-border-strong: #45505f;
-}
-
-/* 背景：柔和渐变 + 两团主色光斑，模拟 Flarum 弹窗后的虚化页面 */
-.flarum-gate__bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(48vw 48vw at 18% 12%, rgba(45, 110, 229, .16), transparent 62%),
-    radial-gradient(42vw 42vw at 84% 88%, rgba(45, 110, 229, .12), transparent 60%),
-    linear-gradient(160deg, #f3f6fb 0%, #e9eef7 100%);
-}
-html[data-theme="dark"] .flarum-gate__bg {
-  background:
-    radial-gradient(48vw 48vw at 18% 12%, rgba(45, 110, 229, .22), transparent 62%),
-    radial-gradient(42vw 42vw at 84% 88%, rgba(45, 110, 229, .16), transparent 60%),
-    linear-gradient(160deg, #12161d 0%, #0e1218 100%);
+  background: #11151b;
 }
 
 /* ---------- 弹窗本体 ---------- */
@@ -88,8 +69,8 @@ html[data-theme="dark"] .flarum-gate__bg {
 /* 关闭按钮（返回首页） */
 .flarum-gate .Modal-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   z-index: 3;
   display: inline-flex;
   align-items: center;
@@ -107,24 +88,8 @@ html[data-theme="dark"] .flarum-gate__bg {
   text-decoration: none;
 }
 
-/* 品牌区 */
-.flarum-gate .flarum-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 26px 24px 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  color: var(--fl-text);
-}
-.flarum-gate .flarum-brand img { max-height: 40px; max-width: 220px; object-fit: contain; }
-.flarum-gate .flarum-brand__mark { display: inline-flex; color: var(--fl-primary); }
-.flarum-gate .flarum-brand__mark svg { width: 22px; height: 22px; }
-
 /* 提示条 */
-.flarum-gate .flarum-alerts { padding: 12px 24px 0; }
+.flarum-gate .flarum-alerts { padding: 16px 24px 0; }
 .flarum-gate .flarum-alert {
   padding: 9px 12px;
   margin-bottom: 8px;
@@ -146,21 +111,21 @@ html[data-theme="dark"] .flarum-gate__bg {
 
 /* ---------- 头部 / 主体 / 底部 ---------- */
 .flarum-gate .Modal-header {
-  padding: 18px 24px 10px;
+  padding: 24px 24px 12px;
   text-align: center;
 }
 .flarum-gate .App-titleControl {
   margin: 0;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.4;
   color: var(--fl-text);
 }
 .flarum-gate .Modal-body {
-  padding: 4px 24px 16px;
+  padding: 4px 24px 20px;
 }
 .flarum-gate .Modal-footer {
-  padding: 14px 24px 20px;
+  padding: 14px 24px 18px;
   border-top: 1px solid var(--fl-border);
   background: var(--fl-surface-2);
   border-radius: 0 0 var(--fl-radius) var(--fl-radius);
@@ -186,7 +151,7 @@ html[data-theme="dark"] .flarum-gate__bg {
 /* ---------- 表单 ---------- */
 .flarum-gate .Form { margin: 0; }
 .flarum-gate .Form--centered { text-align: left; }
-.flarum-gate .Form-group { margin-bottom: 14px; }
+.flarum-gate .Form-group { margin-bottom: 12px; }
 .flarum-gate .Form-group:last-child { margin-bottom: 0; }
 
 .flarum-gate .label {
@@ -224,30 +189,6 @@ html[data-theme="dark"] .flarum-gate__bg {
   font-size: 12px;
   color: var(--fl-muted);
 }
-
-/* 密码可见按钮 */
-.flarum-gate .fl-pwd { position: relative; }
-.flarum-gate .fl-pwd .FormControl { padding-right: 40px; }
-.flarum-gate .fl-pwd__toggle {
-  position: absolute;
-  top: 50%;
-  right: 6px;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  line-height: 1;
-  color: var(--fl-muted);
-  background: transparent;
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.flarum-gate .fl-pwd__toggle:hover { background: var(--fl-surface-2); color: var(--fl-text); }
 
 /* 复选框 */
 .flarum-gate .checkbox {
@@ -354,23 +295,13 @@ html[data-theme="dark"] .flarum-gate__bg {
   background: transparent;
 }
 
-/* 底部返回入口 */
-.flarum-gate__foot {
-  position: relative;
-  z-index: 1;
-  font-size: 12px;
-  color: var(--fl-muted);
-}
-.flarum-gate__foot a { color: var(--fl-muted); text-decoration: none; }
-.flarum-gate__foot a:hover { color: var(--fl-text); text-decoration: underline; }
-
 /* ---------- 移动端 ---------- */
 @media (max-width: 480px) {
-  .flarum-gate { padding: 16px 12px; justify-content: flex-start; padding-top: 8vh; }
+  .flarum-gate { padding: 16px 12px; align-items: flex-start; padding-top: 8vh; }
   .flarum-gate .Modal { max-width: 100%; }
-  .flarum-gate .Modal-header { padding: 14px 18px 8px; }
-  .flarum-gate .Modal-body { padding: 4px 18px 14px; }
+  .flarum-gate .Modal-header { padding: 20px 18px 10px; }
+  .flarum-gate .Modal-body { padding: 4px 18px 16px; }
   .flarum-gate .Modal-footer { padding: 12px 18px 16px; }
-  .flarum-gate .flarum-brand { padding: 20px 18px 0; }
+  .flarum-gate .flarum-alerts { padding: 14px 18px 0; }
   .flarum-gate .Modal-body.fl-scroll { max-height: none; }
 }

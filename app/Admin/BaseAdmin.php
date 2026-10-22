@@ -155,10 +155,11 @@ abstract class BaseAdmin
             'product' => 'ChatBBS',
             'slogan' => '轻量、快速、零依赖的现代化社区论坛系统',
             'stack' => 'PHP 8 + MySQL 8，无 Composer 依赖，上传即用',
-            'dev' => 'WorkBuddy（架构设计 · 核心开发）',
+            'dev' => 'WorkBuddy（beta21 及之前：架构设计 · 核心开发）',
+            'dev_current' => 'DeepSeek（beta22 起：核心开发 · 持续迭代）',
             'product_owner' => 'likeweixue（产品 · 体验 · 测试）',
             'license' => '自由使用与二次开发，保留署名即可',
-            'note' => '本系统在对话中迭代完成：需求梳理、代码编写、问题排查与版本发布由 WorkBuddy 与 likeweixue 协作完成。',
+            'note' => 'beta21 及之前的架构、核心功能与界面由 WorkBuddy 与 likeweixue 协作完成；从 beta22 起由 DeepSeek 持续开发与维护。',
         ];
     }
 

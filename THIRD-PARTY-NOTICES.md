@@ -52,7 +52,14 @@ SOFTWARE.
 
 ---
 
+## GitHub 标志
+
+- **图形来源**：Simple Icons（https://simpleicons.org），CC0 1.0 Universal
+- **商标说明**：GitHub 名称与 Octocat 标志是 GitHub, Inc. 的商标，ChatBBS 仅在页脚使用该标志链接到本项目的 GitHub 仓库（https://github.com/likeweixue/chatbbs），不代表 GitHub 对本项目的认可或赞助。
+
+---
+
 ## 其它
 
-- 图标：ChatBBS 自绘 SVG（`static/images/retro/icons.svg`），未使用第三方图标库。
+- 图标：除页脚 GitHub 标志外，其余图标为 ChatBBS 自绘 SVG（`static/images/retro/icons.svg`），未使用第三方图标库。
 - 字体：使用系统字体栈，不内嵌第三方字体文件。

@@ -37,7 +37,7 @@ class SettingController extends BaseAdmin
                 ['name' => 'site_keywords', 'label' => '关键词', 'tip' => '多个用英文逗号分隔'],
                 ['name' => 'home_seo_title', 'label' => '首页 SEO 标题', 'tip' => '留空使用站点名称'],
                 ['name' => 'logo_type', 'label' => 'Logo 类型', 'type' => 'select', 'options' => [
-                    'text' => '图标 + 文字（复古羽毛笔图标 + 站点文字）',
+                    'text' => '仅文字（推荐，简洁）',
                     'image' => '自定义 Logo 图片',
                 ], 'tip' => '选择"自定义 Logo 图片"时，下方上传或填写的图片会替换站点名称位置'],
                 ['name' => 'logo_text', 'label' => 'Logo 文字', 'tip' => '留空使用站点名称；配合上方可自定义成任意字样'],
@@ -68,6 +68,8 @@ class SettingController extends BaseAdmin
                 ['name' => 'threads_per_page', 'label' => '每页主题数', 'type' => 'number'],
                 ['name' => 'posts_per_page', 'label' => '每页回复数', 'type' => 'number'],
                 ['name' => 'sidebar_enable', 'label' => '启用侧边栏', 'type' => 'switch'],
+                ['name' => 'sidebar_default_hidden', 'label' => '默认隐藏侧边栏', 'type' => 'switch',
+                    'tip' => '开启后，首页、板块页与个人中心默认只显示内容区；访客可点顶栏的侧栏按钮展开，选择会记录在浏览器中'],
                 ['name' => 'lang_switch', 'label' => '顶栏语言切换', 'type' => 'switch',
                     'tip' => '开启后前台顶栏显示 🌐 语言切换下拉；关闭则全站固定使用设定的「语言」'],
                 ['name' => 'sidebar_side', 'label' => '侧边栏位置', 'type' => 'select', 'options' => ['right' => '右侧', 'left' => '左侧']],
@@ -204,7 +206,7 @@ class SettingController extends BaseAdmin
                 $data[$k] = $this->pure($k, 0);
             }
             $data['site_footer'] = Security::cleanHtml(Request::raw('site_footer'));
-            foreach (['allow_guest_view', 'site_closed', 'sidebar_enable', 'list_compact', 'show_latest_card', 'lang_switch'] as $k) {
+            foreach (['allow_guest_view', 'site_closed', 'sidebar_enable', 'sidebar_default_hidden', 'list_compact', 'show_latest_card', 'lang_switch'] as $k) {
                 $data[$k] = Request::bool($k) ? 1 : 0;
             }
             // Logo / 站点图标上传（保存到 data/uploads/site 下）

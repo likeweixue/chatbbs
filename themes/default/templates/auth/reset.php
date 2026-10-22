@@ -14,24 +14,16 @@
   <div class="Modal-body">
     <div class="Form-group">
       <label class="label" for="password"><?= L('新密码') ?></label>
-      <div class="fl-pwd">
-        <input class="FormControl" id="password" name="password" type="password"
-               placeholder="<?= L('新密码') ?>" aria-label="<?= L('新密码') ?>"
-               required minlength="6" autofocus autocomplete="new-password">
-        <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="password"
-                aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
-      </div>
+      <input class="FormControl" id="password" name="password" type="password"
+             placeholder="<?= L('新密码') ?>" aria-label="<?= L('新密码') ?>"
+             required minlength="6" autofocus autocomplete="new-password">
     </div>
 
     <div class="Form-group">
       <label class="label" for="confirm_password"><?= L('确认新密码') ?></label>
-      <div class="fl-pwd">
-        <input class="FormControl" id="confirm_password" name="confirm_password" type="password"
-               placeholder="<?= L('确认新密码') ?>" aria-label="<?= L('确认新密码') ?>"
-               required minlength="6" autocomplete="new-password">
-        <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="confirm_password"
-                aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
-      </div>
+      <input class="FormControl" id="confirm_password" name="confirm_password" type="password"
+             placeholder="<?= L('确认新密码') ?>" aria-label="<?= L('确认新密码') ?>"
+             required minlength="6" autocomplete="new-password">
     </div>
 
     <div class="Form-group">

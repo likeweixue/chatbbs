@@ -423,28 +423,32 @@
   /* ---------- 侧边栏：显示/隐藏 + 左右位置（记忆到 localStorage） ---------- */
   (function () {
     var main = document.querySelector('.cb-main');
-    if (!main) { return; }
+    var toggle = document.getElementById('btn-sidebar-toggle');
+    // 侧边栏被后台关闭时没有切换按钮：保留服务端输出的布局类名，不做任何改动
+    if (!main || !toggle) { return; }
     var KEY_HIDDEN = 'cb_sidebar_hidden';
     var KEY_SIDE = 'cb_sidebar_side';
     var defaultSide = main.classList.contains('sidebar-left') ? 'left' : 'right';
+    // 服务端通过 data-sidebar-default 告诉前端「默认隐藏 / 默认展开」
+    var defaultHidden = main.getAttribute('data-sidebar-default') !== 'visible';
+
+    function isHidden() {
+      var stored = localStorage.getItem(KEY_HIDDEN);
+      return stored === null ? defaultHidden : stored === '1';
+    }
 
     function apply() {
-      var hidden = localStorage.getItem(KEY_HIDDEN) === '1';
+      var hidden = isHidden();
       var side = localStorage.getItem(KEY_SIDE) || defaultSide;
       main.classList.toggle('sidebar-hidden', hidden);
       main.classList.toggle('sidebar-left', side === 'left');
-      var btn = document.getElementById('btn-sidebar-toggle');
-      if (btn) { btn.classList.toggle('off', hidden); }
+      toggle.classList.toggle('off', hidden);
     }
 
-    var toggle = document.getElementById('btn-sidebar-toggle');
-    if (toggle) {
-      toggle.addEventListener('click', function () {
-        var hidden = localStorage.getItem(KEY_HIDDEN) === '1';
-        localStorage.setItem(KEY_HIDDEN, hidden ? '0' : '1');
-        apply();
-      });
-    }
+    toggle.addEventListener('click', function () {
+      localStorage.setItem(KEY_HIDDEN, isHidden() ? '0' : '1');
+      apply();
+    });
     var sideBtn = document.getElementById('btn-sidebar-side');
     if (sideBtn) {
       sideBtn.addEventListener('click', function () {

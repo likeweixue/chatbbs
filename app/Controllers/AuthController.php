@@ -85,13 +85,12 @@ class AuthController extends BaseController
             'email' => (string)Request::post('email', ''),
             'password' => (string)Request::post('password', ''),
         ];
-        $confirm = (string)Request::post('confirm_password', '');
-
-        $v = Validator::make($data + ['confirm_password' => $confirm], [
+        // 注册表单已精简为 Flarum 风格的用户名 / 邮箱 / 密码三项，
+        // 不再要求二次确认密码；昵称留空时由下方逻辑自动使用用户名。
+        $v = Validator::make($data, [
             'username' => 'required|min:3|max:20|alpha_num',
             'email' => 'required|email',
             'password' => 'required|min:6|max:64',
-            'confirm_password' => 'required|same:password',
         ]);
         if ($v->fails()) {
             $this->backWithErrors($v->errors(), $v->firstError());

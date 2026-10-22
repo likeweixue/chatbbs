@@ -18,7 +18,7 @@ class Settings
         'site_description' => '简洁轻量的现代化社区论坛系统',
         'site_keywords' => '论坛,社区,ChatBBS',
         'site_logo' => '',
-        // Logo 展示方式：text（图标 + 文字）/ image（自定义 Logo 图片）
+        // Logo 展示方式：text（仅站点文字）/ image（自定义 Logo 图片）
         'logo_type' => 'text',
         'logo_text' => '',
         // 站点图标（favicon），留空使用内置复古图标
@@ -36,6 +36,8 @@ class Settings
         // 前台顶栏是否显示语言切换（关闭则全站固定为上方默认语言）
         'lang_switch' => '1',
         'sidebar_enable' => '1',
+        // 侧边栏默认折叠：未手动切换过的访客先看到完整内容区，需要时点顶栏按钮展开
+        'sidebar_default_hidden' => '1',
         'sidebar_side' => 'right',
         'sidebar_modules' => 'stats,calendar,newest_users,newest_threads,checkin,recommend,links',
         // 楼层下「楼中楼」回复默认展示条数，超出部分点击「展开更多回复」

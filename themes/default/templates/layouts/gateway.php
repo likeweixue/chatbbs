@@ -8,12 +8,6 @@
  * 样式与实现均为 ChatBBS 自行编写。详见源码根目录 THIRD-PARTY-NOTICES.md
  */
 $siteName = $site_name ?? config('site_name', 'ChatBBS');
-$logoType = (string)config('logo_type', 'text');
-$logoImg = (string)config('site_logo', '');
-$logoText = trim((string)config('logo_text', ''));
-if ($logoText === '') {
-    $logoText = $siteName;
-}
 $favicon = (string)config('site_favicon', '');
 ?>
 <!DOCTYPE html>
@@ -44,23 +38,12 @@ if (!preg_match('/^#[0-9a-fA-F]{6}$/', $flPrimary)) {
 </head>
 <body class="gateway-body flarum-gate">
 
-<div class="flarum-gate__bg" aria-hidden="true"></div>
-
 <div class="Modal Modal--small flarum-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="Modal-content">
 
     <a class="Modal-close" href="<?= h(url('')) ?>" aria-label="<?= L('关闭') ?>" title="<?= L('关闭') ?>">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </a>
-
-    <?php if ($logoType === 'image' && $logoImg !== ''): ?>
-      <div class="flarum-brand"><img src="<?= h($logoImg) ?>" alt="<?= h($siteName) ?>"></div>
-    <?php else: ?>
-      <div class="flarum-brand">
-        <span class="flarum-brand__mark"><?= cb_icon('quill') ?></span>
-        <span class="flarum-brand__text"><?= h($logoText) ?></span>
-      </div>
-    <?php endif; ?>
 
     <?php $fs = flash('success'); $fe = flash('error'); $fes = flash('errors'); ?>
     <?php if ($fs || $fe || (is_array($fes) && $fes)): ?>
@@ -78,10 +61,6 @@ if (!preg_match('/^#[0-9a-fA-F]{6}$/', $flPrimary)) {
     <?= $content ?? '' ?>
 
   </div>
-</div>
-
-<div class="flarum-gate__foot">
-  <a href="<?= h(url('')) ?>">← <?= L('返回') ?><?= h($siteName) ?></a>
 </div>
 
 <script src="<?= h(theme_asset('js/app.js') . '?v=' . CB_VERSION) ?>"></script>

@@ -1,7 +1,7 @@
 <?php
 /**
  * 注册表单 —— 视觉参考 Flarum 的 SignUpModal（MIT License）
- * 保留站点全部注册项：用户名 / 昵称 / 邮箱 / 密码 / 确认密码 / 验证码 / 用户协议
+ * 只保留最必要的三项：用户名 / 邮箱 / 密码；验证码与用户协议按后台开关决定是否显示
  */
 ?>
 <form class="Form Form--centered" method="post" action="<?= h(url('register')) ?>">
@@ -19,14 +19,6 @@
              placeholder="<?= L('用户名') ?>" aria-label="<?= L('用户名') ?>"
              required minlength="3" maxlength="20" autocomplete="username"
              value="<?= h(old('username')) ?>">
-      <div class="Form-tip"><?= L('3 - 20 位字母、数字或下划线，注册后不可修改') ?></div>
-    </div>
-
-    <div class="Form-group">
-      <label class="label" for="nickname"><?= L('昵称') ?></label>
-      <input class="FormControl" id="nickname" name="nickname" type="text"
-             placeholder="<?= L('留空则与用户名相同') ?>" aria-label="<?= L('昵称') ?>"
-             autocomplete="nickname" value="<?= h(old('nickname')) ?>">
     </div>
 
     <div class="Form-group">
@@ -38,25 +30,9 @@
 
     <div class="Form-group">
       <label class="label" for="password"><?= L('密码') ?></label>
-      <div class="fl-pwd">
-        <input class="FormControl" id="password" name="password" type="password"
-               placeholder="<?= L('密码') ?>" aria-label="<?= L('密码') ?>"
-               required minlength="6" autocomplete="new-password">
-        <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="password"
-                aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
-      </div>
-      <div class="Form-tip"><?= L('至少 6 位') ?></div>
-    </div>
-
-    <div class="Form-group">
-      <label class="label" for="confirm_password"><?= L('确认密码') ?></label>
-      <div class="fl-pwd">
-        <input class="FormControl" id="confirm_password" name="confirm_password" type="password"
-               placeholder="<?= L('确认密码') ?>" aria-label="<?= L('确认密码') ?>"
-               required minlength="6" autocomplete="new-password">
-        <button class="fl-pwd__toggle cb-pwd-toggle" type="button" data-toggle-password="confirm_password"
-                aria-label="<?= L('显示 / 隐藏密码') ?>" title="<?= L('显示 / 隐藏密码') ?>">👁</button>
-      </div>
+      <input class="FormControl" id="password" name="password" type="password"
+             placeholder="<?= L('密码') ?>" aria-label="<?= L('密码') ?>"
+             required minlength="6" autocomplete="new-password">
     </div>
 
     <?php if ((int)config('register_captcha', 1)): ?>

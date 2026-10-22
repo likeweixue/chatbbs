@@ -132,8 +132,6 @@ blockquote {
 .cb-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; color: var(--nx-text); }
 .cb-logo:hover { text-decoration: none; }
 .cb-logo img { max-height: 34px; }
-.cb-logo__mark { display: inline-flex; color: var(--nx-head-bg); }
-.cb-logo__mark svg { width: 22px; height: 22px; }
 .cb-logo__text { letter-spacing: 1px; }
 /* NexusPHP 顶栏导航：横条、方角、选中反白 */
 .cb-nav { display: flex; align-items: center; flex: 1; gap: 0; flex-wrap: wrap; }
@@ -284,7 +282,13 @@ body.cb-drawer-open .cb-nav a { width: 100%; border-right: 0; border-bottom: 1px
 .cb-btn.sm { height: 24px; padding: 0 9px; font-size: 12px; }
 .cb-btn.lg { height: 34px; padding: 0 18px; font-size: 14px; }
 .cb-btn svg { width: 14px; height: 14px; }
-.cb-btn-newthread { margin-bottom: 8px; }
+.cb-btn-newthread {
+  margin-bottom: 8px;
+  background: var(--nx-head-bg);
+  border-color: var(--nx-head-bg2);
+  color: #fff;
+}
+.cb-btn-newthread:hover { background: var(--nx-head-bg2); border-color: var(--nx-head-bg2); color: #fff; }
 .cb-input, .cb-select, .cb-textarea {
   width: 100%; padding: 6px 8px; font: 13px/1.5 var(--font);
   color: var(--nx-text); background: var(--nx-surface);
@@ -561,6 +565,8 @@ td.fl_mod { font-size: 12px; color: var(--nx-text-sub); width: 120px; }
 .cb-footer__meta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .cb-footer__license { display: inline-flex; align-items: center; gap: 4px; }
 .cb-footer__license svg { width: 14px; height: 14px; }
+.cb-footer__github { display: inline-flex; align-items: center; gap: 4px; }
+.cb-footer__github svg { width: 14px; height: 14px; }
 
 /* ---------- 17. 杂项装饰 ---------- */
 .cb-ico { display: inline-flex; }
