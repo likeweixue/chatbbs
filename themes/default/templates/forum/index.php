@@ -61,7 +61,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
       <ul>
         <?php foreach (($cell['threads'] ?? []) as $st): ?>
           <li>
-            <a href="<?= h(url('thread/' . (int)$st['id'])) ?>" title="<?= h((string)$st['title']) ?>"><?= h(str_cut((string)$st['title'], 24)) ?></a>
+            <a href="<?= h(url('thread/' . (int)$st['id'])) ?>" title="<?= h((string)$st['title']) ?>"<?php if (!empty($st['title_color'])): ?> style="color:<?= h((string)$st['title_color']) ?>"<?php endif; ?>><?= h(str_cut((string)$st['title'], 24)) ?></a>
             <time><?= h(time_ago((string)$st['created_at'])) ?></time>
           </li>
         <?php endforeach; ?>

@@ -246,7 +246,7 @@ class Thread
             $params[] = $forumId;
         }
         return Database::fetchAll(
-            'SELECT t.id,t.title,t.created_at,t.views,t.replies,u.nickname,u.username
+            'SELECT t.id,t.title,t.title_color,t.created_at,t.views,t.replies,u.nickname,u.username
              FROM ' . Database::table('threads') . ' t
              LEFT JOIN ' . Database::table('users') . ' u ON u.id = t.user_id
              WHERE ' . $where . ' ORDER BY t.created_at DESC LIMIT ' . (int)$limit,

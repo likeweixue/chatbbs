@@ -160,7 +160,7 @@ $editingPage = (string)($editing_page ?? '');
         <div class="cb-card__body">
           <?php foreach ($latest as $t): ?>
             <div class="cb-list-item">
-              <a class="t" href="<?= h(url('thread/' . $t['id'])) ?>" style="color:var(--color-text)"><?= h(str_cut($t['title'], 22)) ?></a>
+              <a class="t" href="<?= h(url('thread/' . $t['id'])) ?>"<?php if (!empty($t['title_color'])): ?> style="color:<?= h((string)$t['title_color']) ?>"<?php endif; ?>><?= h(str_cut($t['title'], 22)) ?></a>
               <span class="text-xs text-muted nowrap"><?= h(time_ago($t['created_at'])) ?></span>
             </div>
           <?php endforeach; ?>

@@ -150,6 +150,16 @@ class Schema
                   PRIMARY KEY (`id`),
                   UNIQUE KEY `uk_word` (`word`),
                   KEY `idx_enabled` (`enabled`)',
+            // 个人主页留言板
+            'guestbook' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `profile_user_id` int unsigned NOT NULL DEFAULT 0,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `content` varchar(500) NOT NULL DEFAULT \'\',
+                  `status` tinyint(1) NOT NULL DEFAULT 1,
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  KEY `idx_profile` (`profile_user_id`,`id`),
+                  KEY `idx_user` (`user_id`)',
             // 群聊
             'chat_groups' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
                   `name` varchar(60) NOT NULL DEFAULT \'\',
@@ -216,6 +226,7 @@ class Schema
             ['threads', 'content_format', 'varchar(16) NOT NULL DEFAULT \'rich\' COMMENT \'rich 富文本 / markdown\''],
             ['posts', 'content_format', 'varchar(16) NOT NULL DEFAULT \'rich\' COMMENT \'rich 富文本 / markdown\''],
             ['users', 'lan_discover', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'允许附近的人发现我\''],
+            ['users', 'guestbook_enable', 'tinyint(1) NOT NULL DEFAULT 1 COMMENT \'允许他人在个人主页留言\''],
             // 附件空间：shared 共享 / private 私人（编辑器附件库与共享空间依赖，缺列会导致「加载失败」）
             ['attachments', 'space', 'varchar(20) NOT NULL DEFAULT \'shared\' COMMENT \'shared 共享 / private 私人\''],
             ['attachments', 'is_image', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'是否图片\''],

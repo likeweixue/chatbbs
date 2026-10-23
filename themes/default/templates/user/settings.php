@@ -47,6 +47,16 @@
           <div class="cb-form-tip">支持 jpg / png / gif / webp，大小不超过 <?= h(config('upload_max_size')) ?>MB</div>
         </div>
       </div>
+      <form method="post" action="<?= h(url('user/settings/avatar-url')) ?>" class="cb-avatar-url">
+        <?= csrf_field() ?>
+        <label for="avatar_url"><?= L('使用图床图片链接') ?></label>
+        <div class="cb-avatar-url__row">
+          <input class="cb-input" id="avatar_url" name="avatar_url" type="url" maxlength="240"
+                 placeholder="https://example.com/avatar.png" required>
+          <button class="cb-btn primary" type="submit"><?= L('使用链接') ?></button>
+        </div>
+        <div class="cb-form-tip"><?= L('直接填写 http / https 图片地址，不占用本站存储空间') ?></div>
+      </form>
     <?php endif; ?>
 
     <?php if ($tab === 'password'): ?>
@@ -92,6 +102,11 @@
             <div class="text-xs text-muted"><?= L('开启后，与你同一网段（局域网）的用户可以在聊天页「附近的人」里看到你') ?></div>
           </span>
           <label class="cb-checkbox"><input type="checkbox" name="lan_discover" value="1" <?= !empty($lan_discover) ? 'checked' : '' ?>> <?= L('允许') ?></label>
+        </div>
+        <input type="hidden" name="guestbook_settings" value="1">
+        <div class="cb-switch-row">
+          <span><?= L('允许他人在我的主页留言') ?></span>
+          <label class="cb-checkbox"><input type="checkbox" name="guestbook_enable" value="1" <?= (int)($p['guestbook_enable'] ?? 1) === 1 ? 'checked' : '' ?>> <?= L('允许') ?></label>
         </div>
         <div class="cb-switch-row">
           <span><?= L('暗色模式偏好') ?></span>

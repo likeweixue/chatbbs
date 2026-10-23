@@ -4,6 +4,9 @@ $lv = $p['level'] ?? null;
 $cert = $p['cert'] ?? null;
 $grp = $p['group'] ?? null;
 $prog = $level_progress ?? [];
+$guestbook = $guestbook ?? [];
+$guestbook_count = $guestbook_count ?? count($guestbook);
+$guestbook_enabled = $guestbook_enabled ?? true;
 ?>
 <div class="cb-profile-header">
   <img class="cb-avatar cb-avatar-lg" src="<?= h(avatar_url($p)) ?>" alt="">
@@ -77,12 +80,71 @@ $prog = $level_progress ?? [];
   </div>
 </div>
 
+<div class="cb-card" id="guestbook">
+  <div class="cb-card__header">
+    <span><?= L('留言板') ?> <span class="more"><?= (int)$guestbook_count ?> <?= L('条') ?></span></span>
+    <?php if ($is_self): ?>
+      <form method="post" action="<?= h(url('user/settings/guestbook')) ?>" class="cb-guestbook-toggle">
+        <?= csrf_field() ?>
+        <label class="cb-checkbox">
+          <input type="checkbox" name="guestbook_enable" value="1" <?= $guestbook_enabled ? 'checked' : '' ?>
+                 onchange="this.form.submit()"> <?= L('允许留言') ?>
+        </label>
+      </form>
+    <?php endif; ?>
+  </div>
+  <div class="cb-card__body">
+    <?php if ($guestbook_enabled): ?>
+      <?php if ($current_user): ?>
+        <form method="post" action="<?= h(url('user/' . (int)$p['id'] . '/guestbook')) ?>" class="cb-guestbook-form">
+          <?= csrf_field() ?>
+          <textarea class="cb-textarea" name="content" rows="3" maxlength="300" required
+                    placeholder="<?= L('写下你的留言…（最多 300 字）') ?>"></textarea>
+          <div class="flex justify-between items-center" style="margin-top:8px">
+            <span class="text-xs text-muted"><?= L('友善交流，留言会通知对方') ?></span>
+            <button class="cb-btn primary" type="submit"><?= L('发表留言') ?></button>
+          </div>
+        </form>
+      <?php else: ?>
+        <div class="text-sm text-muted"><a href="<?= h(url('login')) ?>"><?= L('登录') ?></a> <?= L('后可以留言') ?></div>
+      <?php endif; ?>
+    <?php else: ?>
+      <div class="cb-empty"><div class="icon"><?= cb_icon('comment') ?></div><p><?= L('该用户已关闭留言板') ?></p></div>
+    <?php endif; ?>
+
+    <?php if ($guestbook): ?>
+      <div class="cb-guestbook-list">
+        <?php foreach ($guestbook as $g): ?>
+          <div class="cb-guestbook-item">
+            <img class="cb-avatar cb-avatar-sm" src="<?= h(avatar_url(['avatar' => $g['avatar'] ?? ''])) ?>" alt="">
+            <div class="cb-guestbook-item__main">
+              <div class="cb-guestbook-item__meta">
+                <a href="<?= h(url('user/' . (int)$g['user_id'])) ?>"><?= h($g['nickname'] ?: $g['username']) ?></a>
+                <span><?= h(time_ago((string)$g['created_at'])) ?></span>
+                <?php if ($current_user && ($is_self || is_admin() || (int)$g['user_id'] === (int)$current_user['id'])): ?>
+                  <form method="post" action="<?= h(url('user/guestbook/' . (int)$g['id'] . '/delete')) ?>" style="display:inline;margin-left:auto">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="cb-link-danger" onclick="return confirm('确定删除这条留言？')"><?= L('删除') ?></button>
+                  </form>
+                <?php endif; ?>
+              </div>
+              <div class="cb-guestbook-item__content"><?= nl2br(h((string)$g['content'])) ?></div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <div class="text-sm text-muted" style="margin-top:12px"><?= L('还没有留言，来抢沙发吧。') ?></div>
+    <?php endif; ?>
+  </div>
+</div>
+
 <div class="cb-card mt-16">
   <div class="cb-card__header"><?= L('最近主题') ?></div>
   <div class="cb-card__body">
     <?php foreach ($threads as $t): ?>
       <div class="cb-list-item">
-        <a class="t" href="<?= h(url('thread/' . $t['id'])) ?>" style="color:var(--color-text)"><?= h(str_cut($t['title'], 30)) ?></a>
+        <a class="t" href="<?= h(url('thread/' . $t['id'])) ?>"<?php if (!empty($t['title_color'])): ?> style="color:<?= h((string)$t['title_color']) ?>"<?php endif; ?>><?= h(str_cut($t['title'], 30)) ?></a>
         <span class="text-xs text-muted"><?= h(time_ago($t['created_at'])) ?></span>
       </div>
     <?php endforeach; ?>

@@ -9,7 +9,7 @@ $contentMd = $isEdit ? trim((string)($thread['content_md'] ?? '')) : '';
 $contentFmt = $isEdit ? (string)($thread['content_format'] ?? '') : '';
 $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !== '')) ? 'markdown' : 'rich';
 ?>
-<div class="cb-card">
+<div class="cb-card cb-card--editor">
   <div class="cb-card__header"><?= $isEdit ? L('编辑主题') : L('发布主题') ?></div>
   <div class="cb-card__body">
     <form id="thread-form" method="post"

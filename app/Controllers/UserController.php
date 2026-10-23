@@ -12,7 +12,9 @@ use App\Core\Settings;
 use App\Core\Security;
 use App\Core\Upload;
 use App\Core\View;
+use App\Models\Guestbook;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\Post;
 use App\Models\Say;
 use App\Models\Thread;
@@ -53,6 +55,9 @@ class UserController extends BaseController
             'hot_tags' => \App\Models\Tag::hot(15),
             'new_users' => User::newest(8),
             'latest_threads' => Thread::latest(8),
+            'guestbook' => Guestbook::list($uid, 30),
+            'guestbook_count' => Guestbook::count($uid),
+            'guestbook_enabled' => (int)($user['guestbook_enable'] ?? 1) === 1,
         ]);
     }
 
@@ -100,6 +105,9 @@ class UserController extends BaseController
         ], JSON_UNESCAPED_UNICODE);
         $data['privacy'] = $privacy;
         $data['theme_dark'] = Request::bool('theme_dark') ? 1 : 0;
+        if ((string)Request::post('guestbook_settings', '') !== '') {
+            $data['guestbook_enable'] = Request::bool('guestbook_enable') ? 1 : 0;
+        }
         User::update($uid, $data);
         // 「附近的人」开关（users.lan_discover，老站点可能还没这个字段）
         \App\Models\Lan::setDiscover($uid, Request::bool('lan_discover'));
@@ -120,11 +128,101 @@ class UserController extends BaseController
             $this->fail((string)$res);
         }
         $user = User::find($uid);
-        if (!empty($user['avatar'])) {
+        if (!empty($user['avatar']) && !preg_match('#^https?://#i', (string)$user['avatar'])) {
             Upload::delete('avatars', (string)$user['avatar']);
         }
         User::update($uid, ['avatar' => $res['path']]);
         $this->success(['url' => Upload::url('avatars', $res['path'])], '头像已更新');
+    }
+
+    /**
+     * 设置头像为图床 / 外链地址（不下载到服务器）
+     */
+    public function updateAvatarUrl(): void
+    {
+        $this->requireLogin();
+        $uid = $this->userId();
+        $url = trim((string)Request::post('avatar_url', ''));
+        if ($url === '' || mb_strlen($url) > 240 || !preg_match('#^https?://#i', $url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            $this->backWithErrors(['avatar_url' => '请填写有效的 http / https 图片地址']);
+        }
+        $user = User::find($uid);
+        if (!empty($user['avatar']) && !preg_match('#^https?://#i', (string)$user['avatar'])) {
+            Upload::delete('avatars', (string)$user['avatar']);
+        }
+        User::update($uid, ['avatar' => $url]);
+        Session::flash('success', '头像链接已更新');
+        $this->back();
+    }
+
+    /**
+     * 个人主页留言板开关（仅本人）
+     */
+    public function updateGuestbookSetting(): void
+    {
+        $this->requireLogin();
+        User::update($this->userId(), [
+            'guestbook_enable' => Request::bool('guestbook_enable') ? 1 : 0,
+        ]);
+        Session::flash('success', '留言板设置已更新');
+        $this->back();
+    }
+
+    /**
+     * 在个人主页留言
+     */
+    public function guestbookAdd(int $id): void
+    {
+        $this->requireLogin();
+        $profileUser = User::find($id);
+        if (!$profileUser) {
+            $this->back('用户不存在');
+        }
+        $uid = $this->userId();
+        $enabled = (int)($profileUser['guestbook_enable'] ?? 1) === 1;
+        if (!$enabled && $uid !== $id && !Auth::isAdmin()) {
+            $this->back('该用户已关闭留言板');
+        }
+        $content = trim((string)Request::post('content', ''));
+        if ($content === '') {
+            $this->back('留言内容不能为空');
+        }
+        if (mb_strlen($content) > 300) {
+            $this->back('留言最多 300 字');
+        }
+        Guestbook::add($id, $uid, $content);
+        if ($uid !== $id) {
+            Notification::send(
+                $id,
+                'guestbook',
+                '你的主页收到一条新留言',
+                mb_substr($content, 0, 60),
+                url('user/' . $id . '#guestbook'),
+                $uid
+            );
+        }
+        Session::flash('success', '留言已发布');
+        \redirect('user/' . $id . '#guestbook');
+    }
+
+    /**
+     * 删除留言：留言作者、主页主人或管理员
+     */
+    public function guestbookDelete(int $id): void
+    {
+        $this->requireLogin();
+        $row = Guestbook::find($id);
+        if (!$row) {
+            $this->back('留言不存在');
+        }
+        $uid = $this->userId();
+        if ($uid !== (int)$row['profile_user_id'] && $uid !== (int)$row['user_id'] && !Auth::isAdmin()) {
+            $this->back('无权删除这条留言');
+        }
+        $profileId = (int)$row['profile_user_id'];
+        Guestbook::delete($id);
+        Session::flash('success', '留言已删除');
+        \redirect('user/' . $profileId . '#guestbook');
     }
 
     public function updatePassword(): void

@@ -27,7 +27,7 @@ class ForumController extends BaseController
             'title' => '板块列表',
             'tree' => $tree,
             'stats' => Stats::forum(),
-            'spotlight' => Spotlight::cells(5),
+            'spotlight' => Spotlight::cells(),
             'hot_tags' => \App\Models\Tag::hot(15),
             'new_users' => \App\Models\User::newest(8),
             'latest_threads' => Thread::latest(8),

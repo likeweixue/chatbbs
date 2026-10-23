@@ -221,7 +221,7 @@ $show_toc = true;
 </div>
 
 <?php if ($can_reply ?? false): ?>
-  <div class="cb-card" id="reply-card">
+  <div class="cb-card cb-card--editor" id="reply-card">
     <div class="cb-card__header">
       <?= L('快速回复') ?>
       <a class="cb-btn sm" id="btn-reply-mode" href="javascript:void(0)"><?= L('高级模式') ?></a>

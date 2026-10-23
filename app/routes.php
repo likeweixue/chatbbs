@@ -100,6 +100,10 @@ Router::get('/user/settings', \App\Controllers\UserController::class . '@setting
 Router::post('/user/settings/profile', \App\Controllers\UserController::class . '@updateProfile', ['auth', 'csrf']);
 Router::post('/user/settings/password', \App\Controllers\UserController::class . '@updatePassword', ['auth', 'csrf']);
 Router::post('/user/settings/avatar', \App\Controllers\UserController::class . '@updateAvatar', ['auth', 'csrf']);
+Router::post('/user/settings/avatar-url', \App\Controllers\UserController::class . '@updateAvatarUrl', ['auth', 'csrf']);
+Router::post('/user/settings/guestbook', \App\Controllers\UserController::class . '@updateGuestbookSetting', ['auth', 'csrf']);
+Router::post('/user/{id}/guestbook', \App\Controllers\UserController::class . '@guestbookAdd', ['auth', 'csrf']);
+Router::post('/user/guestbook/{id}/delete', \App\Controllers\UserController::class . '@guestbookDelete', ['auth', 'csrf']);
 Router::get('/user/threads', \App\Controllers\UserController::class . '@threads', ['auth']);
 Router::get('/user/drafts', \App\Controllers\UserController::class . '@drafts', ['auth']);
 Router::post('/user/draft/{id}/delete', \App\Controllers\UserController::class . '@deleteDraft', ['auth', 'csrf']);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Cache;
 use App\Core\Database;
 use App\Core\Settings;
 use App\Models\Thread;
@@ -67,11 +68,27 @@ class Spotlight
     /**
      * 生成前台格子（总开关关闭时返回空数组）
      */
-    public static function cells(int $limit = 5): array
+    public static function cells(int $limit = 0): array
     {
         if (!(int)Settings::get('forum_spotlight_enable', 1)) {
             return [];
         }
+        if ($limit <= 0) {
+            $limit = (int)Settings::get('forum_spotlight_limit', 5);
+        }
+        $limit = max(1, min(10, $limit));
+        $ttl = max(0, min(3600, (int)Settings::get('forum_spotlight_ttl', 60)));
+        $build = static function () use ($limit): array {
+            return self::buildCells($limit);
+        };
+        return $ttl > 0 ? Cache::remember('forum_spotlight_cells', $ttl, $build) : $build();
+    }
+
+    /**
+     * 实际查询四个格子的数据
+     */
+    private static function buildCells(int $limit): array
+    {
         $out = [];
         foreach (self::items() as $item) {
             $opt = ['per_page' => max(1, min(10, $limit)), 'order' => 'default'];

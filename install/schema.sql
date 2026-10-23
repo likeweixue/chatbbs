@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__users` (
   `last_login_ip` varchar(45) NOT NULL DEFAULT '',
   `last_active_at` datetime DEFAULT NULL,
   `lan_discover` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否允许附近的人发现我',
+  `guestbook_enable` tinyint(1) NOT NULL DEFAULT 1 COMMENT '允许他人在个人主页留言',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_username` (`username`),
   UNIQUE KEY `uk_email` (`email`),
@@ -376,6 +377,22 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__private_messages` (
   PRIMARY KEY (`id`),
   KEY `idx_from` (`from_id`),
   KEY `idx_to` (`to_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- ----------------------------
+-- 个人主页留言板
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__guestbook` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `profile_user_id` int unsigned NOT NULL DEFAULT 0,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `content` varchar(500) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_profile` (`profile_user_id`,`id`),
+  KEY `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------

@@ -1,6 +1,6 @@
 <?php $load_editor = true; ?>
 <?php if ($can_publish ?? false): ?>
-  <div class="cb-card">
+  <div class="cb-card cb-card--editor">
     <div class="cb-card__header"><?= L('发布说说') ?></div>
     <div class="cb-card__body">
       <form method="post" action="<?= h(url('say/publish')) ?>" id="say-form">

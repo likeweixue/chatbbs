@@ -117,6 +117,8 @@ class Settings
         // 板块页顶部聚合"链路"：总开关 + 四个格子类型（JSON）
         'forum_spotlight_enable' => '1',
         'forum_spotlight_items' => '[{"t":"new","title":"最新帖子"},{"t":"reply","title":"最新回复"},{"t":"essence","title":"精华帖"},{"t":"announce","title":"公告"}]',
+        'forum_spotlight_limit' => '5',
+        'forum_spotlight_ttl' => '60',
         // 列表筛选栏（首页 / 板块页顶部标签）：JSON 数组
         // [{t:'类型', title:'标题', url:'链接（仅 link 类型）', on:1|0}]
         // 类型：new(最新发布) default(最新回复) hot(热门) replies(最多回复) essence(精华)

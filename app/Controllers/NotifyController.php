@@ -69,7 +69,7 @@ class NotifyController extends BaseController
         $icons = [
             'system' => 'bell', 'like' => 'thumbs-up', 'reply' => 'comment', 'mention' => 'reply',
             'pm' => 'mail', 'audit' => 'shield', 'level' => 'star', 'checkin' => 'calendar',
-            'follow' => 'user', 'friend' => 'user', 'recommend' => 'star', 'say' => 'comment',
+            'follow' => 'user', 'friend' => 'user', 'recommend' => 'star', 'say' => 'comment', 'guestbook' => 'comment',
         ];
         return cb_icon($icons[$type] ?? 'bell');
     }

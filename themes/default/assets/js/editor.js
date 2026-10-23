@@ -220,15 +220,15 @@
       var hSel = document.createElement('select');
       hSel.className = 'cb-ed-sel';
       hSel.innerHTML = '<option value="">' + cbT('标题级别') + '</option>'
-        + '<option value="h1">' + cbT('标题 1') + '</option><option value="h2">' + cbT('标题 2') + '</option>'
-        + '<option value="h3">' + cbT('标题 3') + '</option><option value="h4">' + cbT('标题 4') + '</option>'
-        + '<option value="h5">' + cbT('标题 5') + '</option><option value="h6">' + cbT('标题 6') + '</option>'
+        + [1,2,3,4,5,6,7,8,9,10].map(function (i) {
+            return '<option value="h' + i + '">' + cbT('标题 ' + i) + '</option>';
+          }).join('')
         + '<option value="p">' + cbT('正文') + '</option>';
       hSel.addEventListener('mousedown', function () { self.saveRange(); });
       hSel.addEventListener('change', function () {
         if (!hSel.value) return;
         self.restoreRange();
-        document.execCommand('formatBlock', false, hSel.value);
+        self.applyHeading(hSel.value);
         hSel.value = '';
         self.sync();
       });
@@ -893,7 +893,9 @@
       bar.innerHTML =
         '<select class="cb-ed-sel cb-ed-fsel" data-act="format">'
         + '<option value="">' + cbT('格式') + '</option><option value="p">' + cbT('正文') + '</option>'
-        + '<option value="h2">' + cbT('标题 2') + '</option><option value="h3">' + cbT('标题 3') + '</option><option value="h4">' + cbT('标题 4') + '</option>'
+        + [1,2,3,4,5,6,7,8,9,10].map(function (i) {
+            return '<option value="h' + i + '">' + cbT('标题 ' + i) + '</option>';
+          }).join('')
         + '</select>'
         + '<select class="cb-ed-sel cb-ed-fsel" data-act="size">'
         + '<option value="">' + cbT('字号') + '</option>'
@@ -951,7 +953,7 @@
           if (!b.value) return;
           self.restoreRange();
           if (act === 'format') {
-            document.execCommand('formatBlock', false, b.value);
+            self.applyHeading(b.value);
           } else {
             self.applyFontSize(b.value);
           }
@@ -979,6 +981,41 @@
       span.innerHTML = f.innerHTML;
       f.parentNode.replaceChild(span, f);
     });
+  };
+
+  /**
+   * 应用标题级别：h1 - h6 使用标准标签，h7 - h10 复用 h6 并附加 cb-h7... 类，
+   * 由内容区 CSS 控制字号（浏览器没有 h7 - h10 标签）。
+   */
+  Editor.prototype.applyHeading = function (value) {
+    value = String(value || '').toLowerCase();
+    if (value === 'p') {
+      document.execCommand('formatBlock', false, 'p');
+    } else {
+      var level = parseInt(value.replace('h', ''), 10);
+      if (!level || level < 1) return;
+      var tag = Math.min(6, Math.max(1, level));
+      document.execCommand('formatBlock', false, 'h' + tag);
+      if (level > 6) {
+        var sel = window.getSelection();
+        var node = sel && sel.anchorNode;
+        var el = node && (node.nodeType === 1 ? node : node.parentNode);
+        var block = el && el.closest ? el.closest('h' + tag) : null;
+        if (block) {
+          for (var i = 7; i <= 10; i++) block.classList.remove('cb-h' + i);
+          block.classList.add('cb-h' + level);
+        }
+      }
+    }
+    // 从 h7-h10 / h6 切回普通标题或正文时，清掉自定义级别类
+    var s = window.getSelection();
+    var n = s && s.anchorNode;
+    var e = n && (n.nodeType === 1 ? n : n.parentNode);
+    var blk = e && e.closest ? e.closest('h1,h2,h3,h4,h5,h6,p,div') : null;
+    if (blk && !(blk.classList && blk.classList.contains('cb-h' + (parseInt(value.replace('h', ''), 10) || 0)))) {
+      for (var j = 7; j <= 10; j++) blk.classList.remove('cb-h' + j);
+    }
+    this.sync();
   };
 
   Editor.prototype.hideFloatBar = function () {

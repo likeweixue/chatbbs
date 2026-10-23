@@ -6,6 +6,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\AdminUI;
 use App\Admin\BaseAdmin;
+use App\Core\Cache;
 use App\Core\Database;
 use App\Core\Request;
 use App\Core\Security;
@@ -55,7 +56,11 @@ class ContentController extends BaseAdmin
         $html = '<div class="adm-alert info">提示：分区（type=1）用于归类，板块（type=2）才能发帖；支持无限层级（板块下也能再建分区或板块）。删除前请先移动或删除其下级。</div>';
         // 板块页顶部聚合设置（四个格子）
         $spotItems = Spotlight::items();
-        $spotData = ['forum_spotlight_enable' => (int)Settings::get('forum_spotlight_enable', 1)];
+        $spotData = [
+            'forum_spotlight_enable' => (int)Settings::get('forum_spotlight_enable', 1),
+            'forum_spotlight_limit' => (int)Settings::get('forum_spotlight_limit', 5),
+            'forum_spotlight_ttl' => (int)Settings::get('forum_spotlight_ttl', 60),
+        ];
         for ($i = 1; $i <= 4; $i++) {
             $spotData['spotlight_' . $i] = $spotItems[$i - 1]['t'] ?? 'none';
         }
@@ -63,6 +68,10 @@ class ContentController extends BaseAdmin
         $spotFields = [
             ['name' => 'forum_spotlight_enable', 'label' => '显示聚合', 'type' => 'switch',
                 'tip' => '关闭后板块页只显示板块列表，不显示顶部聚合。'],
+            ['name' => 'forum_spotlight_limit', 'label' => '每格帖子数', 'type' => 'number',
+                'tip' => '1 - 10 条，默认 5 条。'],
+            ['name' => 'forum_spotlight_ttl', 'label' => '缓存刷新间隔（秒）', 'type' => 'number',
+                'tip' => '0 表示每次访问都重新查询；默认 60 秒，最大 3600 秒。'],
         ];
         for ($i = 1; $i <= 4; $i++) {
             $spotFields[] = ['name' => 'spotlight_' . $i, 'label' => '格子 ' . $i, 'type' => 'select', 'options' => $spotOpts];
@@ -139,6 +148,9 @@ class ContentController extends BaseAdmin
         }
         Settings::set('forum_spotlight_enable', Request::bool('forum_spotlight_enable') ? 1 : 0);
         Settings::set('forum_spotlight_items', json_encode($items, JSON_UNESCAPED_UNICODE));
+        Settings::set('forum_spotlight_limit', (string)max(1, min(10, (int)Request::post('forum_spotlight_limit', 5))));
+        Settings::set('forum_spotlight_ttl', (string)max(0, min(3600, (int)Request::post('forum_spotlight_ttl', 60))));
+        Cache::forget('forum_spotlight_cells');
         $this->log('保存板块页聚合', count($items) . ' 个格子');
         $this->back('板块页聚合设置已保存');
     }

@@ -292,7 +292,7 @@ if (!function_exists('avatar_url')) {
             $avatar = (string)$user;
         }
         if ($avatar !== '') {
-            if (strpos($avatar, 'http') === 0) {
+            if (preg_match('#^https?://#i', $avatar)) {
                 return $avatar;
             }
             return site_base() . '/data/uploads/avatars/' . $avatar;
