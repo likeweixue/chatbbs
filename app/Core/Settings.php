@@ -114,13 +114,9 @@ class Settings
         'forum_layout' => 'list',
         // 网格布局每行显示的板块数（2 - 6）
         'forum_grid_cols' => '4',
-        // 板块页底部"全站最新"卡片开关
-        'show_latest_card' => '1',
-        // 板块默认图标（留空使用内置图标）
-        'forum_icon_new' => '',
-        'forum_icon_old' => '',
-        // 热门帖判定：回复数达到该值视为热门
-        'thread_hot_replies' => '20',
+        // 板块页顶部聚合"链路"：总开关 + 四个格子类型（JSON）
+        'forum_spotlight_enable' => '1',
+        'forum_spotlight_items' => '[{"t":"new","title":"最新帖子"},{"t":"reply","title":"最新回复"},{"t":"essence","title":"精华帖"},{"t":"announce","title":"公告"}]',
         // 列表筛选栏（首页 / 板块页顶部标签）：JSON 数组
         // [{t:'类型', title:'标题', url:'链接（仅 link 类型）', on:1|0}]
         // 类型：new(最新发布) default(最新回复) hot(热门) replies(最多回复) essence(精华)

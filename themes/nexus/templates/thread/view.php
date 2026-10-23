@@ -154,11 +154,19 @@ $show_toc = true;
 
 <div class="cb-card mt-16">
   <div class="cb-card__body">
-    <div class="flex gap-12" style="flex-wrap:wrap;align-items:center">
-      <button type="button" class="cb-btn <?= ($liked ?? false) ? 'primary' : '' ?>"
+    <div class="flex gap-12 cb-thread-actions" style="flex-wrap:wrap;align-items:center">
+      <div class="cb-thread-actions__sheet-head">
+        <span><?= L('更多操作') ?></span>
+        <button type="button" class="cb-thread-actions__close" aria-label="<?= L('关闭') ?>"><?= L('关闭') ?></button>
+      </div>
+      <button type="button" class="cb-btn cb-thread-actions__like <?= ($liked ?? false) ? 'primary' : '' ?>"
               data-like data-type="thread" data-id="<?= (int)$thread['id'] ?>" data-guest="<?= $current_user ? 0 : 1 ?>">
         <?= cb_icon('thumbs-up') ?> <?= ($liked ?? false) ? L('已赞') : L('点赞') ?> <span class="count"><?= (int)$thread['likes'] ?></span>
       </button>
+
+      <?php if ($can_reply ?? false): ?>
+        <a class="cb-btn cb-thread-actions__reply" href="#reply-card"><?= cb_icon('comment') ?> <?= L('回复') ?></a>
+      <?php endif; ?>
 
       <?php if ((int)config('recommend_enable', 1)): ?>
         <button type="button" class="cb-btn" data-recommend="1" data-id="<?= (int)$thread['id'] ?>">
@@ -183,7 +191,10 @@ $show_toc = true;
       <?php if ($canManage): ?>
         <a class="cb-btn" href="<?= h(url('admin/threads?keyword=' . urlencode((string)$thread['title']))) ?>"><?= cb_icon('tools') ?> <?= L('后台管理') ?></a>
       <?php endif; ?>
+
+      <button type="button" class="cb-btn cb-thread-actions__more" aria-expanded="false" aria-controls="cb-actions-mask"><?= L('更多') ?></button>
     </div>
+    <div class="cb-sheet-mask" id="cb-actions-mask"></div>
 
     <?php if ($current_user): ?>
       <div id="report-box" class="hide mt-16">

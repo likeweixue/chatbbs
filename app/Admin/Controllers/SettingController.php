@@ -76,15 +76,10 @@ class SettingController extends BaseAdmin
                 ['name' => 'list_compact', 'label' => '帖子列表简洁模式', 'type' => 'switch',
                     'tip' => '开启后首页/板块页的帖子列表不再显示正文摘要，改为紧凑单行显示，列表更清爽'],
                 ['name' => 'forum_layout', 'label' => '板块页布局', 'type' => 'select', 'options' => [
-                    'list' => '列表（Discuz 风格，图标 + 简介 + 最后发表）',
+                    'list' => '列表（Discuz 风格，简介 + 最后发表）',
                     'grid' => '网格（一行多个，紧凑）',
                 ], 'tip' => '板块总览页（/forums）的展示方式'],
                 ['name' => 'forum_grid_cols', 'label' => '网格每行板块数', 'type' => 'number', 'tip' => '仅"网格"布局生效，建议 3 - 5'],
-                ['name' => 'show_latest_card', 'label' => '板块页显示"全站最新"', 'type' => 'switch'],
-                ['name' => 'thread_hot_replies', 'label' => '热门帖回复数阈值', 'type' => 'number',
-                    'tip' => '回复数达到该值即显示为"热门"图标'],
-                ['name' => 'forum_icon_new', 'label' => '板块默认图标（有新帖）', 'tip' => '留空使用内置图标'],
-                ['name' => 'forum_icon_old', 'label' => '板块默认图标（无新帖）', 'tip' => '留空使用内置图标'],
                 ['name' => 'friend_links', 'label' => '友情链接', 'type' => 'textarea', 'tip' => '每行一条，格式：名称|网址'],
                 ['name' => 'sensitive_words', 'label' => '敏感词过滤', 'type' => 'textarea', 'tip' => '多个用英文逗号分隔，命中内容将被替换'],
             ],
@@ -201,12 +196,12 @@ class SettingController extends BaseAdmin
                 'logo_type', 'logo_text', 'site_icp', 'theme', 'language', 'site_access',
                 'closed_reason', 'sidebar_side', 'friend_links', 'sensitive_words', 'url_mode',
                 'about_title', 'about_text', 'about_team',
-                'forum_layout', 'forum_grid_cols', 'thread_hot_replies', 'forum_icon_new', 'forum_icon_old',
+                'forum_layout', 'forum_grid_cols',
             ] as $k) {
                 $data[$k] = $this->pure($k, 0);
             }
             $data['site_footer'] = Security::cleanHtml(Request::raw('site_footer'));
-            foreach (['allow_guest_view', 'site_closed', 'sidebar_enable', 'sidebar_default_hidden', 'list_compact', 'show_latest_card', 'lang_switch'] as $k) {
+            foreach (['allow_guest_view', 'site_closed', 'sidebar_enable', 'sidebar_default_hidden', 'list_compact', 'lang_switch'] as $k) {
                 $data[$k] = Request::bool($k) ? 1 : 0;
             }
             // Logo / 站点图标上传（保存到 data/uploads/site 下）

@@ -9,6 +9,7 @@ use App\Core\Settings;
 use App\Core\View;
 use App\Models\Forum;
 use App\Models\Thread;
+use App\Services\Spotlight;
 use App\Services\Stats;
 
 class ForumController extends BaseController
@@ -26,6 +27,7 @@ class ForumController extends BaseController
             'title' => '板块列表',
             'tree' => $tree,
             'stats' => Stats::forum(),
+            'spotlight' => Spotlight::cells(5),
             'hot_tags' => \App\Models\Tag::hot(15),
             'new_users' => \App\Models\User::newest(8),
             'latest_threads' => Thread::latest(8),

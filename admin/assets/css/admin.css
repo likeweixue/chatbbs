@@ -372,6 +372,7 @@ html[data-adm-theme="dark"] .adm-theme-toggle .ico-light { display: none; }
     padding-top: 5px;
 }
 .adm-form-tip { font-size: 12px; color: var(--adm-muted); margin-top: 0; }
+.adm-tree-indent { display: inline-block; width: 18px; }
 .adm-form-actions {
     padding: 18px 0 4px 154px;
     display: flex;

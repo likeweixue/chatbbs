@@ -37,6 +37,8 @@ Router::group('', function () use ($C): void {
     Router::post('/forums/clear/{id}', $C . 'ContentController@forumClear', ['csrf']);
     Router::post('/forums/bulk', $C . 'ContentController@forumBulk', ['csrf']);
     Router::post('/forums/resync', $C . 'ContentController@forumResync', ['csrf']);
+    Router::post('/forums/spotlight', $C . 'ContentController@forumSpotlightSave', ['csrf']);
+    Router::post('/forums/sort', $C . 'ContentController@forumSort', ['csrf']);
 
     Router::get('/threads', $C . 'ContentController@threads');
     Router::get('/threads/edit/{id}', $C . 'ContentController@threadEdit');

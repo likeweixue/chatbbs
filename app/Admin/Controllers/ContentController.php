@@ -9,10 +9,12 @@ use App\Admin\BaseAdmin;
 use App\Core\Database;
 use App\Core\Request;
 use App\Core\Security;
+use App\Core\Settings;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Thread;
 use App\Models\User;
+use App\Services\Spotlight;
 
 /**
  * 内容管理：板块 / 主题 / 回复
@@ -51,6 +53,27 @@ class ContentController extends BaseAdmin
         $moveHtml .= '</select>';
 
         $html = '<div class="adm-alert info">提示：分区（type=1）用于归类，板块（type=2）才能发帖；支持无限层级（板块下也能再建分区或板块）。删除前请先移动或删除其下级。</div>';
+        // 板块页顶部聚合设置（四个格子）
+        $spotItems = Spotlight::items();
+        $spotData = ['forum_spotlight_enable' => (int)Settings::get('forum_spotlight_enable', 1)];
+        for ($i = 1; $i <= 4; $i++) {
+            $spotData['spotlight_' . $i] = $spotItems[$i - 1]['t'] ?? 'none';
+        }
+        $spotOpts = ['none' => '不显示'] + Spotlight::types();
+        $spotFields = [
+            ['name' => 'forum_spotlight_enable', 'label' => '显示聚合', 'type' => 'switch',
+                'tip' => '关闭后板块页只显示板块列表，不显示顶部聚合。'],
+        ];
+        for ($i = 1; $i <= 4; $i++) {
+            $spotFields[] = ['name' => 'spotlight_' . $i, 'label' => '格子 ' . $i, 'type' => 'select', 'options' => $spotOpts];
+        }
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">板块页顶部聚合</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('forums/spotlight'),
+                'data' => $spotData,
+                'submit' => '保存聚合设置',
+                'fields' => $spotFields,
+            ]) . '</div></div>';
         $html .= AdminUI::table([
             'primary' => 'id',
             'rows' => $sorted,
@@ -65,9 +88,11 @@ class ContentController extends BaseAdmin
             'columns' => [
                 ['key' => 'id', 'label' => 'ID', 'width' => '60px'],
                 ['key' => 'name', 'label' => '名称', 'render' => function ($r) {
-                    $prefix = (int)$r['parent_id'] > 0 ? '　└ ' : '';
+                    $isChild = (int)$r['parent_id'] > 0;
+                    $prefix = $isChild ? '　└ ' : '';
+                    $indent = $isChild ? '<span class="adm-tree-indent"></span>' : '';
                     $color = (string)$r['color'];
-                    return $prefix . '<span class="adm-color-dot" style="background:' . h($color) . '"></span>'
+                    return $indent . $prefix . '<span class="adm-color-dot" style="background:' . h($color) . '"></span>'
                         . '<a href="' . h(admin_url('forums/edit/' . (int)$r['id'])) . '">' . h((string)$r['name']) . '</a>'
                         . ((int)$r['visible'] === 0 ? ' <span class="adm-tag gray">隐藏</span>' : '');
                 }],
@@ -76,7 +101,15 @@ class ContentController extends BaseAdmin
                     ? '<span class="adm-tag blue">分区</span>' : '<span class="adm-tag green">板块</span>'],
                 ['key' => 'threads', 'label' => '主题', 'width' => '80px'],
                 ['key' => 'posts', 'label' => '回复', 'width' => '80px'],
-                ['key' => 'sort_order', 'label' => '排序', 'width' => '80px'],
+                ['key' => 'sort_order', 'label' => '排序', 'width' => '170px', 'render' => function ($r) {
+                    $id = (int)$r['id'];
+                    $url = h(admin_url('forums/sort'));
+                    return '<div class="adm-row-actions" style="justify-content:flex-start">'
+                        . '<span style="min-width:18px;margin-right:6px;text-align:center;color:var(--adm-muted);font-size:12px">' . (int)$r['sort_order'] . '</span>'
+                        . '<button type="button" class="adm-link" data-forum-sort data-dir="up" data-id="' . $id . '" data-url="' . $url . '">↑ 上移</button>'
+                        . '<button type="button" class="adm-link" data-forum-sort data-dir="down" data-id="' . $id . '" data-url="' . $url . '">↓ 下移</button>'
+                        . '</div>';
+                }],
             ],
             'actions' => [
                 ['label' => '编辑', 'url' => admin_url('forums/edit/{id}')],
@@ -89,6 +122,59 @@ class ContentController extends BaseAdmin
             ['label' => '+ 新增板块', 'url' => admin_url('forums/create'), 'class' => 'primary'],
             ['label' => '重建统计', 'url' => admin_url('forums/resync'), 'type' => 'post', 'confirm' => '重新统计各板块主题/回复数？'],
         ]);
+    }
+
+    /**
+     * 保存板块页顶部聚合设置（4 个格子）
+     */
+    public function forumSpotlightSave(): void
+    {
+        $types = Spotlight::types();
+        $items = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $t = (string)Request::post('spotlight_' . $i, 'none');
+            if (isset($types[$t])) {
+                $items[] = ['t' => $t, 'title' => $types[$t]];
+            }
+        }
+        Settings::set('forum_spotlight_enable', Request::bool('forum_spotlight_enable') ? 1 : 0);
+        Settings::set('forum_spotlight_items', json_encode($items, JSON_UNESCAPED_UNICODE));
+        $this->log('保存板块页聚合', count($items) . ' 个格子');
+        $this->back('板块页聚合设置已保存');
+    }
+
+    /**
+     * 板块排序：在同类（同一父级）内上移 / 下移，重新编号避免 sort_order 重复
+     */
+    public function forumSort(): void
+    {
+        $id = Request::int('id');
+        $dir = (string)Request::post('dir', 'up') === 'up' ? 'up' : 'down';
+        $row = Database::fetch('SELECT id, parent_id FROM ' . Database::table('forums') . ' WHERE id = ?', [$id]);
+        if (!$row) {
+            $this->json(['ok' => false, 'msg' => '板块不存在']);
+        }
+        $rows = Database::fetchAll(
+            'SELECT id FROM ' . Database::table('forums') . ' WHERE parent_id = ? ORDER BY sort_order ASC, id ASC',
+            [(int)$row['parent_id']]
+        );
+        $ids = array_map('intval', array_column($rows, 'id'));
+        $idx = array_search($id, $ids, true);
+        if ($idx === false) {
+            $this->json(['ok' => false, 'msg' => '板块不存在']);
+        }
+        $swap = $dir === 'up' ? $idx - 1 : $idx + 1;
+        if ($swap < 0 || $swap >= count($ids)) {
+            $this->json(['ok' => true, 'msg' => $dir === 'up' ? '已经在最上面了' : '已经在最下面了']);
+        }
+        $tmp = $ids[$idx];
+        $ids[$idx] = $ids[$swap];
+        $ids[$swap] = $tmp;
+        foreach ($ids as $i => $sid) {
+            Database::update('forums', ['sort_order' => $i + 1], 'id = ?', [$sid]);
+        }
+        $this->log('调整板块排序', 'ID:' . $id . ' ' . $dir);
+        $this->json(['ok' => true, 'msg' => '排序已更新']);
     }
 
     public function forumForm(int $id = 0): string

@@ -1,31 +1,14 @@
 <?php
-$marks = \App\Models\Thread::marks();
 $layout = (string)config('forum_layout', 'list');
 $cols = max(2, min(6, (int)config('forum_grid_cols', 4)));
-$defaultNew = trim((string)config('forum_icon_new', '')) ?: site_base() . '/static/images/forum/forum_new.gif';
-$defaultOld = trim((string)config('forum_icon_old', '')) ?: site_base() . '/static/images/forum/forum_old.gif';
-
-// 板块图标：自定义优先，否则按是否有新帖取默认图标
-$iconOf = function (array $b) use ($defaultNew, $defaultOld): string {
-    if (!empty($b['icon'])) {
-        return (string)$b['icon'];
-    }
-    return ((int)($b['today_threads'] ?? 0) > 0) ? $defaultNew : $defaultOld;
-};
-
 /**
  * 递归渲染板块行（支持无限层级，子级缩进）
  */
-$renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string {
+$renderRow = function (array $b, int $level) use (&$renderRow): string {
     ob_start();
     $indent = $level > 0 ? ' fl_sub fl_sub-' . min($level, 3) : '';
     ?>
     <tr class="fl_row<?= $indent ?>">
-      <td class="fl_icn">
-        <a href="<?= h(url('forum/' . $b['id'])) ?>">
-          <img src="<?= h($iconOf($b)) ?>" alt="<?= h($b['name']) ?>">
-        </a>
-      </td>
       <td class="fl_ct">
         <?php if ($level > 0): ?><span class="fl_sub_mark">└</span><?php endif; ?>
         <h2><a href="<?= h(url('forum/' . $b['id'])) ?>"><?= h($b['name']) ?></a></h2>
@@ -67,6 +50,28 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
     return (string)ob_get_clean();
 };
 ?>
+<?php if (!empty($spotlight)): ?>
+<div class="cb-spotlight">
+  <?php foreach ($spotlight as $cell): ?>
+    <div class="cb-spotlight__cell">
+      <div class="cb-spotlight__head">
+        <span><?= h($cell['title']) ?></span>
+        <?php if (!empty($cell['more'])): ?><a href="<?= h($cell['more']) ?>"><?= L('更多') ?></a><?php endif; ?>
+      </div>
+      <ul>
+        <?php foreach (($cell['threads'] ?? []) as $st): ?>
+          <li>
+            <a href="<?= h(url('thread/' . (int)$st['id'])) ?>" title="<?= h((string)$st['title']) ?>"><?= h(str_cut((string)$st['title'], 24)) ?></a>
+            <time><?= h(time_ago((string)$st['created_at'])) ?></time>
+          </li>
+        <?php endforeach; ?>
+        <?php if (empty($cell['threads'])): ?><li class="empty"><?= L('暂无') ?></li><?php endif; ?>
+      </ul>
+    </div>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <?php foreach ($tree as $cat): ?>
   <?php
   $boards = array_values(array_filter($cat['children'] ?? [], static fn($b) => ($b['can_view'] ?? true) !== false));
@@ -92,11 +97,6 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
         <div class="cb-forum-grid" style="--cols:<?= $cols ?>">
           <?php foreach ($rows as $b): ?>
             <div class="cb-forum-cell">
-              <div class="cb-forum-cell__icon">
-                <a href="<?= h(url('forum/' . $b['id'])) ?>">
-                  <img src="<?= h($iconOf($b)) ?>" alt="<?= h($b['name']) ?>">
-                </a>
-              </div>
               <dl>
                 <dt><a href="<?= h(url('forum/' . $b['id'])) ?>"><?= h($b['name']) ?></a></dt>
                 <dd><em>主题 <?= (int)$b['threads'] ?></em> · <em>回复 <?= (int)$b['posts'] ?></em></dd>
@@ -126,18 +126,6 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
 
 <?php if (!$tree): ?>
   <div class="cb-card"><div class="cb-card__body"><div class="cb-empty"><div class="icon"><?= cb_icon('inbox') ?></div><p><?= L('还没有板块') ?></p></div></div></div>
-<?php endif; ?>
-
-<?php if ((int)config('show_latest_card', 1)): ?>
-  <div class="cb-card">
-    <div class="cb-card__header"><?= L('全站最新') ?></div>
-    <div class="cb-card__body" style="padding:0">
-      <?= \App\Core\View::partial('partials/thread_list', [
-        'threads' => \App\Models\Thread::list(['per_page' => 8, 'order' => 'new'])['items'],
-        'marks' => $marks,
-      ]) ?>
-    </div>
-  </div>
 <?php endif; ?>
 
 <script>

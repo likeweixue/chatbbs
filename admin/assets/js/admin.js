@@ -115,3 +115,39 @@
         paint();
     });
 })();
+
+/* ---- 板块排序：上移 / 下移 ---- */
+(function () {
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-forum-sort]');
+        if (!btn || btn.disabled) return;
+        e.preventDefault();
+        var body = '_csrf=' + encodeURIComponent(window.CB_ADMIN_CSRF || '')
+            + '&id=' + encodeURIComponent(btn.dataset.id || '')
+            + '&dir=' + encodeURIComponent(btn.dataset.dir || 'up');
+        btn.disabled = true;
+        fetch(btn.dataset.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: body
+        }).then(function (r) { return r.json(); }).then(function (res) {
+            if (res.ok) {
+                if (res.msg && res.msg.indexOf('已经') === 0) {
+                    alert(res.msg);
+                    btn.disabled = false;
+                    return;
+                }
+                location.reload();
+                return;
+            }
+            alert(res.msg || '操作失败');
+            btn.disabled = false;
+        }).catch(function () {
+            alert('网络异常');
+            btn.disabled = false;
+        });
+    });
+})();

@@ -137,6 +137,7 @@ foreach ($menu as $gk => $group) {
         </div>
     </div>
 </div>
+<script>window.CB_ADMIN_CSRF = '<?= h(csrf_token()) ?>';</script>
 <script src="<?= h(admin_asset('js/admin.js') . '?v=' . CB_VERSION) ?>"></script>
 <script>
 /* 顶栏设置搜索：输入关键词即列出匹配菜单，回车跳第一项 */

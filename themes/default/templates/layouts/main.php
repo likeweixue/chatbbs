@@ -64,9 +64,15 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
 
 <header class="cb-header" id="cb-header">
   <div class="cb-header__inner">
-    <button class="cb-burger" id="cb-burger" type="button" aria-label="<?= L('展开菜单') ?>" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <?php if (!empty($back_url)): ?>
+      <a class="cb-burger cb-back-btn" href="<?= h($back_url) ?>" aria-label="<?= L('返回') ?>" title="<?= L('返回') ?>">
+        <?= cb_icon('arrow-left') ?>
+      </a>
+    <?php else: ?>
+      <button class="cb-burger" id="cb-burger" type="button" aria-label="<?= L('展开菜单') ?>" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    <?php endif; ?>
 
     <a class="cb-logo" href="<?= h(url('')) ?>">
       <?php if ($logoType === 'image' && $logoImg !== ''): ?>
@@ -178,6 +184,10 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
         <?php endif; ?>
       </div>
     </div>
+
+    <a class="cb-header__publish" href="<?= h(url('thread/create')) ?>" aria-label="<?= L('发布主题') ?>" title="<?= L('发布主题') ?>">
+      <?= cb_icon('edit') ?>
+    </a>
   </div>
 </header>
 <div class="cb-drawer-mask" id="cb-drawer-mask"></div>

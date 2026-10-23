@@ -1,5 +1,4 @@
 <?php
-$marks = \App\Models\Thread::marks();
 $defaultNew = trim((string)config('forum_icon_new', '')) ?: site_base() . '/static/images/forum/forum_new.gif';
 $defaultOld = trim((string)config('forum_icon_old', '')) ?: site_base() . '/static/images/forum/forum_old.gif';
 
@@ -66,6 +65,28 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
     return (string)ob_get_clean();
 };
 ?>
+<?php if (!empty($spotlight)): ?>
+<div class="cb-spotlight">
+  <?php foreach ($spotlight as $cell): ?>
+    <div class="cb-spotlight__cell">
+      <div class="cb-spotlight__head">
+        <span><?= h($cell['title']) ?></span>
+        <?php if (!empty($cell['more'])): ?><a href="<?= h($cell['more']) ?>"><?= L('更多') ?></a><?php endif; ?>
+      </div>
+      <ul>
+        <?php foreach (($cell['threads'] ?? []) as $st): ?>
+          <li>
+            <a href="<?= h(url('thread/' . (int)$st['id'])) ?>" title="<?= h((string)$st['title']) ?>"><?= h(str_cut((string)$st['title'], 24)) ?></a>
+            <time><?= h(time_ago((string)$st['created_at'])) ?></time>
+          </li>
+        <?php endforeach; ?>
+        <?php if (empty($cell['threads'])): ?><li class="empty"><?= L('暂无') ?></li><?php endif; ?>
+      </ul>
+    </div>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <div class="cb-card">
   <div class="cb-card__header">
     <span><?= h($site_name ?? config('site_name', 'ChatBBS')) ?> <?= L('论坛') ?></span>
@@ -115,17 +136,6 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
   </div>
 </div>
 
-<?php if ((int)config('show_latest_card', 1)): ?>
-  <div class="cb-card">
-    <div class="cb-card__header"><?= L('全站最新') ?></div>
-    <div class="cb-card__body" style="padding:0">
-      <?= \App\Core\View::partial('partials/thread_list', [
-        'threads' => \App\Models\Thread::list(['per_page' => 8, 'order' => 'new'])['items'],
-        'marks' => $marks,
-      ]) ?>
-    </div>
-  </div>
-
   <div class="cb-card">
     <div class="cb-card__header"><?= L('数据') ?></div>
     <div class="cb-card__body nx-forum-stat">
@@ -137,7 +147,6 @@ $renderRow = function (array $b, int $level) use (&$renderRow, $iconOf): string 
       <b class="text-danger"><?= $todayPosts ?></b> 个今日帖子。
     </div>
   </div>
-<?php endif; ?>
 
 <script>
   (function () {

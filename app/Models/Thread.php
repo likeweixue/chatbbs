@@ -56,6 +56,7 @@ class Thread
         $recommendKind = (int)($opt['recommend_kind'] ?? 0);
         $markId = (int)($opt['mark_id'] ?? 0);
         $digest = (int)($opt['digest'] ?? 0);
+        $announce = (int)($opt['announce'] ?? 0);
 
         $where = 't.status = ?';
         $params = [$status];
@@ -79,6 +80,9 @@ class Thread
         }
         if ($essence) {
             $where .= ' AND t.is_essence = 1';
+        }
+        if ($announce) {
+            $where .= ' AND t.forum_id IN (SELECT af.id FROM ' . Database::table('forums') . " af WHERE af.slug = 'notice' OR af.name LIKE '%公告%')";
         }
         if ($recommendKind === 1 || $recommendKind === -1) {
             $where .= ' AND EXISTS (SELECT 1 FROM ' . Database::table('recommendations') . ' rec WHERE rec.thread_id = t.id AND rec.kind = ?)';

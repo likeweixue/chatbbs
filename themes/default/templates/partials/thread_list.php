@@ -6,20 +6,6 @@ $boxed = $boxed ?? true;
 // $compact = true 时为简洁模式：不显示正文摘要，紧凑单行
 $compact = $compact ?? ((int)config('list_compact', 0) === 1);
 $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--compact' : '');
-// vBulletin 风格状态图标
-$imgBase = site_base() . '/static/images/forum/';
-$hotLine = max(10, (int)config('thread_hot_replies', 20)); // 达到该回复数算热门
-$threadIcon = function (array $t) use ($imgBase, $hotLine): string {
-    $hot = (int)($t['replies'] ?? 0) >= $hotLine || (int)($t['views'] ?? 0) >= $hotLine * 20;
-    $new = (int)($t['created_at'] ? (time() - strtotime((string)$t['created_at'])) : 999999) < 86400;
-    if ((int)($t['is_closed'] ?? 0) === 1) {
-        return $imgBase . 'thread_lock.gif';
-    }
-    if ($hot) {
-        return $imgBase . ($new ? 'thread_hot_new.gif' : 'thread_hot.gif');
-    }
-    return $imgBase . ($new ? 'thread_new.gif' : 'thread.gif');
-};
 ?>
 <div class="cb-thread-list<?= $cls ?>">
   <?php if (!$threads): ?>
@@ -30,7 +16,6 @@ $threadIcon = function (array $t) use ($imgBase, $hotLine): string {
   <?php elseif ($compact): ?>
     <?php foreach ($threads as $t): ?>
       <article class="cb-trow">
-        <img class="cb-trow__icon" src="<?= h($threadIcon($t)) ?>" alt="" width="20" height="20">
         <a class="cb-trow__avatar" href="<?= h(url('user/' . $t['user_id'])) ?>">
           <img class="cb-avatar" src="<?= h(avatar_url(['avatar' => $t['avatar'] ?? ''])) ?>" alt="">
         </a>
@@ -66,7 +51,6 @@ $threadIcon = function (array $t) use ($imgBase, $hotLine): string {
     <?php foreach ($threads as $t): ?>
       <div class="cb-thread">
         <div class="cb-thread__avatar">
-          <img class="cb-thread__icon" src="<?= h($threadIcon($t)) ?>" alt="" width="20" height="20">
           <a href="<?= h(url('user/' . $t['user_id'])) ?>">
             <img class="cb-avatar cb-avatar-md" src="<?= h(avatar_url(['avatar' => $t['avatar'] ?? ''])) ?>" alt="">
           </a>

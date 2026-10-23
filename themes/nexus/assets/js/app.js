@@ -680,3 +680,33 @@
   })();
 
 })();
+
+  /* ---------- 移动端帖子操作：更多（底部面板） ---------- */
+  (function () {
+    var bar = document.querySelector('.cb-thread-actions');
+    if (!bar) return;
+    var more = bar.querySelector('.cb-thread-actions__more');
+    var close = bar.querySelector('.cb-thread-actions__close');
+    var mask = document.getElementById('cb-actions-mask');
+    if (!more) return;
+
+    function setOpen(open) {
+      bar.classList.toggle('is-open', open);
+      if (mask) mask.classList.toggle('is-open', open);
+      document.body.classList.toggle('cb-sheet-open', open);
+      more.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    more.addEventListener('click', function () {
+      setOpen(!bar.classList.contains('is-open'));
+    });
+    if (close) close.addEventListener('click', function () { setOpen(false); });
+    if (mask) mask.addEventListener('click', function () { setOpen(false); });
+    bar.addEventListener('click', function (e) {
+      if (e.target.closest('.cb-thread-actions__more') || e.target.closest('.cb-thread-actions__close')) return;
+      if (e.target.closest('.cb-btn') || e.target.closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
