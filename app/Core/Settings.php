@@ -114,6 +114,13 @@ class Settings
         'forum_layout' => 'list',
         // 网格布局每行显示的板块数（2 - 6）
         'forum_grid_cols' => '4',
+        // 前台布局：classic 经典 / island 岛屿（左侧菜单 + 内容区，预览）
+        'site_layout' => 'classic',
+        // 岛屿布局左侧菜单：每行「类型|标题|链接」，类型 posts/forums/tags/link/divider
+        'island_menu' => "posts|帖子\nforums|板块分区\ntags|标签",
+        'island_sidebar_side' => 'left',
+        'island_sidebar_width' => '240',
+        'island_sidebar_default_hidden' => '0',
         // 板块页顶部聚合"链路"：总开关 + 四个格子类型（JSON）
         'forum_spotlight_enable' => '1',
         'forum_spotlight_items' => '[{"t":"new","title":"最新帖子"},{"t":"reply","title":"最新回复"},{"t":"essence","title":"精华帖"},{"t":"announce","title":"公告"}]',

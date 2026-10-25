@@ -108,6 +108,7 @@ class ThreadController extends BaseController
             'reply_preview' => $replyPreview,
             // 帖子页侧边栏只保留「发布主题 + 目录」
             'show_toc' => true,
+            'island_tabs' => self::listTabs(),
             'back_url' => $forum ? url('forum/' . (int)$forum['id']) : url('forums'),
             'liked' => $liked,
             'liked_posts' => $likedPosts,

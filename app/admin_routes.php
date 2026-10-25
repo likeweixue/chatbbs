@@ -158,6 +158,7 @@ Router::group('', function () use ($C): void {
     Router::get('/themes', $C . 'ExtController@themes');
     Router::post('/themes/enable/{id}', $C . 'ExtController@themeEnable', ['csrf']);
     Router::post('/themes/appearance', $C . 'ExtController@themeAppearance', ['csrf']);
+Router::post('/themes/layout', $C . 'ExtController@themeLayoutSave', ['csrf']);
 
     Router::get('/languages', $C . 'ExtController@languages');
     Router::post('/languages/enable/{id}', $C . 'ExtController@languageEnable', ['csrf']);

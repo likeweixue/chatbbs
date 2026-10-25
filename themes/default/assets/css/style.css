@@ -1453,3 +1453,235 @@ input[type="file"]::file-selector-button:hover { filter: brightness(.94); }
   .cb-avatar-url__row .cb-btn { width: 100%; }
   .cb-guestbook-item { padding: 10px 0; }
 }
+
+/* ===================== 岛屿布局（左侧菜单 + 内容区） =====================
+   布局方向参考 OpenIsle（MIT License，https://github.com/nagisa77/OpenIsle）。
+   本文件样式为 ChatBBS 独立实现，详见 THIRD_PARTY_NOTICES.md。 */
+/* 全宽应用壳：左侧菜单贴住顶栏、左边缘和视口底部，右侧内容紧邻，不留外层缝隙 */
+.cb-island .cb-header__inner,
+.cb-island .cb-footer__inner {
+  max-width: none;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.cb-main--island {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--island-nav-width, 240px) minmax(0, 1fr);
+  grid-template-areas: "nav content";
+  gap: 0;
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - var(--header-height));
+  margin: 0;
+  padding: 0;
+  align-items: stretch;
+  background: linear-gradient(to right, var(--color-surface), var(--color-surface) var(--island-nav-width, 240px), var(--color-bg) var(--island-nav-width, 240px));
+}
+.cb-main--island .cb-content {
+  grid-area: content;
+  min-width: 0;
+  padding: 20px 24px 40px;
+  background: var(--color-surface);
+}
+/* 内容区内部不再画成一叠圆角卡片，避免和左侧栏形成一块块的缝隙感 */
+.cb-main--island .cb-content > .cb-card,
+.cb-main--island .cb-content > .cb-thread-detail {
+  margin-bottom: 18px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+.cb-main--island .cb-content > .cb-card:last-child,
+.cb-main--island .cb-content > .cb-thread-detail:last-child { margin-bottom: 0; }
+.cb-main--island .cb-content > .cb-spotlight { padding: 20px 24px 0; }
+.cb-main--island .cb-sidebar { display: none; }
+
+.cb-island-nav {
+  grid-area: nav;
+  position: sticky;
+  top: var(--header-height);
+  align-self: start;
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 14px 24px;
+  background: var(--color-surface);
+  border: 0;
+  border-radius: 0;
+  scrollbar-width: thin;
+}
+.cb-island-nav__tools {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 0 4px 10px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.cb-island-nav__title {
+  flex: 1;
+  color: var(--color-text-muted);
+  font-size: 12px; font-weight: 600; letter-spacing: .04em;
+}
+.cb-island-tool {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-sub);
+  cursor: pointer;
+}
+.cb-island-tool:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.cb-island-tool .cb-ico { width: 16px; height: 16px; }
+.cb-island-nav__inner { display: flex; flex-direction: column; gap: 2px; }
+.cb-island-group { padding: 8px 0; border-bottom: 1px solid var(--color-border); }
+.cb-island-group:first-child { padding-top: 0; }
+.cb-island-group:last-child { padding-bottom: 0; border-bottom: 0; }
+.cb-island-group__title {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 8px 6px;
+  color: var(--color-text-muted);
+  font-size: 12px; font-weight: 600; letter-spacing: .04em;
+}
+.cb-island-group__title .cb-ico { width: 15px; height: 15px; }
+.cb-island-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-sub);
+  font-size: 14px; line-height: 1.35;
+}
+.cb-island-link:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.cb-island-link.active { background: var(--color-primary-light); color: var(--color-primary); font-weight: 600; }
+.cb-island-link .cb-ico { width: 16px; height: 16px; flex: none; opacity: .8; }
+.cb-island-forum-parent {
+  padding: 8px 10px 3px;
+  color: var(--color-text-muted);
+  font-size: 11px; font-weight: 600;
+}
+.cb-island-forum-link--child { padding-left: 22px; font-size: 13px; }
+.cb-island-forum-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.cb-island-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 2px 4px; }
+.cb-island-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  background: color-mix(in srgb, var(--tag-color) 12%, transparent);
+  color: var(--tag-color);
+  font-size: 12px; line-height: 1.2;
+}
+.cb-island-tag em { font-style: normal; opacity: .65; font-size: 10px; }
+.cb-island-tag.active { box-shadow: 0 0 0 1px var(--tag-color) inset; }
+.cb-island-empty { padding: 6px 10px; color: var(--color-text-muted); font-size: 12px; }
+.cb-island-divider { margin: 6px 0; border: 0; border-top: 1px solid var(--color-border); }
+
+.cb-main--island.island-side-right {
+  grid-template-columns: minmax(0, 1fr) var(--island-nav-width, 240px);
+  grid-template-areas: "content nav";
+  background: linear-gradient(to left, var(--color-surface), var(--color-surface) var(--island-nav-width, 240px), var(--color-bg) var(--island-nav-width, 240px));
+}
+.cb-main--island.island-side-right .cb-island-resizer {
+  left: auto;
+  right: var(--island-nav-width, 240px);
+}
+.cb-main--island.island-nav-hidden {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "content";
+  background: var(--color-surface);
+}
+.cb-main--island.island-nav-hidden .cb-island-nav,
+.cb-main--island.island-nav-hidden .cb-island-resizer { display: none; }
+
+.cb-island-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--island-nav-width, 240px);
+  width: 12px;
+  transform: translateX(-50%);
+  z-index: 6;
+  cursor: col-resize;
+  touch-action: none;
+}
+.cb-island-resizer::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 50%;
+  width: 1px;
+  background: var(--color-border);
+}
+.cb-island-resizer:hover::before,
+body.island-resizing .cb-island-resizer::before { width: 2px; background: var(--color-primary); }
+body.island-resizing { user-select: none; cursor: col-resize; }
+
+/* 帖子页顶部筛选条：贴住内容区的顶边和左右边 */
+.cb-island-tabs {
+  margin: -20px -24px 20px;
+  padding: 0 24px;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  scrollbar-width: none;
+}
+.cb-island-tabs::-webkit-scrollbar { display: none; }
+.cb-island-tabs .cb-tabs { flex-wrap: nowrap; }
+.cb-island-tabs .cb-tab { white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .cb-main--island,
+  .cb-main--island.island-side-right {
+    grid-template-columns: 1fr;
+    grid-template-areas: "nav" "content";
+    min-height: 0;
+    background: var(--color-bg);
+  }
+  .cb-island-nav {
+    position: static;
+    height: auto;
+    border-bottom: 1px solid var(--color-border);
+    padding: 12px 16px;
+  }
+  .cb-island-nav__tools { position: static; }
+  .cb-island-nav [data-island-side],
+  #island-nav-side { display: none; }
+  .cb-island-resizer { display: none; }
+  .cb-main--island.island-nav-hidden,
+  .cb-main--island.island-nav-hidden.island-side-right { grid-template-areas: "content"; }
+  .cb-main--island .cb-content { padding: 12px 16px 28px; }
+  .cb-main--island .cb-content > .cb-spotlight { padding: 12px 16px 0; }
+  .cb-island-tabs { margin: -12px -16px 12px; padding: 0 8px; }
+  .cb-island-nav__inner { gap: 0; }
+  .cb-island-group { padding: 6px 0; }
+  .cb-island-link { padding: 7px 8px; font-size: 13px; }
+  .cb-island-forum-link--child { padding-left: 18px; }
+}
+@media (max-width: 480px) {
+  .cb-island-nav { padding: 12px 16px; }
+  .cb-main--island .cb-content { padding: 12px 0 24px; }
+  .cb-main--island .cb-content > .cb-spotlight { padding: 12px 16px 0; }
+  .cb-island-tabs { margin: -12px 0 12px; padding: 0 4px; }
+}
+
+/* 岛屿布局：可折叠菜单组 */
+.cb-island-group > summary { list-style: none; cursor: pointer; }
+.cb-island-group > summary::-webkit-details-marker { display: none; }
+.cb-island-group > summary:hover { color: var(--color-text-sub); }
+.cb-island-caret {
+  width: 0; height: 0; margin-left: auto; flex: none;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform .15s;
+}
+.cb-island-group[open] > summary .cb-island-caret { transform: rotate(90deg); }

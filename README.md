@@ -1,4 +1,4 @@
-# ChatBBS 论坛系统 v1.0.0-beta.26
+# ChatBBS 论坛系统 v1.0.0-RC1
 
 > 修改记录见本目录下的 `CHANGELOG.md`。
 
@@ -180,3 +180,9 @@ A：主题放入 `themes/目录名/`（含 `theme.json`），插件放入 `plugi
 ---
 
 ChatBBS · 用 PHP 写一个简单好用的论坛
+
+---
+
+## 十、第三方参考
+
+「岛屿布局」的信息架构与交互方向参考了 [OpenIsle](https://github.com/nagisa77/OpenIsle)（MIT License）；ChatBBS 的模板、样式和脚本均为独立实现。完整许可说明见根目录 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

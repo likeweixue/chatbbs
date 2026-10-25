@@ -9,7 +9,28 @@ $side = $sidebar_side ?? 'right';
 // 侧边栏默认折叠：未手动切换过的访客先看到完整内容区
 $sidebarDefaultHidden = (int)config('sidebar_default_hidden', 1) === 1;
 $sidebarCollapsed = !$sidebarOn || $sidebarDefaultHidden;
+$island = (($site_layout ?? config('site_layout', 'classic')) === 'island' && \App\Core\View::theme() === 'default');
+$islandSide = (string)config('island_sidebar_side', 'left') === 'right' ? 'right' : 'left';
+$islandWidth = max(200, min(360, (int)config('island_sidebar_width', 240)));
+$islandDefaultHidden = (int)config('island_sidebar_default_hidden', 0) === 1;
 $theme = \App\Core\View::theme();
+$mainClass = 'container cb-main';
+if ($island) {
+    $mainClass .= ' cb-main--island';
+    if ($islandSide === 'right') {
+        $mainClass .= ' island-side-right';
+    }
+    if ($islandDefaultHidden) {
+        $mainClass .= ' island-nav-hidden';
+    }
+} else {
+    if ($side === 'left') {
+        $mainClass .= ' sidebar-left';
+    }
+    if ($sidebarCollapsed) {
+        $mainClass .= ' sidebar-hidden';
+    }
+}
 
 $logoType = (string)config('logo_type', 'text');
 $logoImg = (string)config('site_logo', '');
@@ -60,7 +81,7 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
   };
 </script>
 </head>
-<body class="cb-body">
+<body class="cb-body<?= $island ? ' cb-island' : '' ?>">
 
 <header class="cb-header" id="cb-header">
   <div class="cb-header__inner">
@@ -174,7 +195,17 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
           <a class="cb-btn sm primary" href="<?= h(url('register')) ?>"><?= L('注册') ?></a>
         <?php endif; ?>
 
-        <?php if ($sidebarOn): ?>
+        <?php if ($island): ?>
+          <button class="cb-icon-btn" id="island-nav-toggle" data-island-hide type="button"
+                  aria-expanded="<?= $islandDefaultHidden ? 'false' : 'true' ?>" title="<?= L('显示 / 隐藏侧栏') ?>" aria-label="<?= L('显示 / 隐藏侧栏') ?>">
+            <?= cb_icon('panel-left') ?>
+          </button>
+          <button class="cb-icon-btn" id="island-nav-side" data-island-side type="button" title="<?= L('切换侧栏位置') ?>" aria-label="<?= L('切换侧栏位置') ?>">
+            <?= cb_icon('panel-right') ?>
+          </button>
+        <?php endif; ?>
+
+        <?php if ($sidebarOn && !$island): ?>
           <button class="cb-icon-btn cb-sidebar-toggle-btn <?= $sidebarCollapsed ? 'off' : '' ?>" id="btn-sidebar-toggle" title="<?= L('显示 / 隐藏侧边栏') ?>">
             <?= cb_icon('panel-right') ?>
           </button>
@@ -203,9 +234,32 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
   <?php endif; ?>
 </div>
 
-<main class="container cb-main <?= $side === 'left' ? 'sidebar-left' : '' ?><?= $sidebarCollapsed ? ' sidebar-hidden' : '' ?>"
-      data-sidebar-default="<?= $sidebarDefaultHidden ? 'hidden' : 'visible' ?>">
-  <?php if ($sidebarOn): ?>
+<main class="<?= h($mainClass) ?>"
+      data-sidebar-default="<?= $sidebarDefaultHidden ? 'hidden' : 'visible' ?>"
+      <?php if ($island): ?>style="--island-nav-width:<?= (int)$islandWidth ?>px"
+      data-island-default-width="<?= (int)$islandWidth ?>"<?php endif; ?>>
+  <?php if ($island): ?>
+  <script>
+    // 岛屿布局：优先恢复访客本地偏好，避免服务端默认值造成闪动
+    (function () {
+      var main = document.querySelector('.cb-main--island');
+      if (!main) return;
+      try {
+        var side = localStorage.getItem('cb_island_side');
+        if (side === 'right') { main.classList.add('island-side-right'); }
+        else if (side === 'left') { main.classList.remove('island-side-right'); }
+        var w = parseInt(localStorage.getItem('cb_island_width'), 10);
+        if (w >= 200 && w <= 360) { main.style.setProperty('--island-nav-width', w + 'px'); }
+        var h = localStorage.getItem('cb_island_hidden');
+        if (h === '1') { main.classList.add('island-nav-hidden'); }
+        else if (h === '0') { main.classList.remove('island-nav-hidden'); }
+        var btn = document.getElementById('island-nav-toggle');
+        if (btn) { btn.setAttribute('aria-expanded', main.classList.contains('island-nav-hidden') ? 'false' : 'true'); }
+      } catch (e) {}
+    })();
+  </script>
+  <?php endif; ?>
+  <?php if ($sidebarOn && !$island): ?>
   <script>
     // 恢复访客上次手动选择的侧栏状态，避免服务端默认值与本地偏好不一致时闪动
     (function () {
@@ -220,11 +274,21 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
     })();
   </script>
   <?php endif; ?>
+  <?php if ($island): ?>
+    <?= \App\Core\View::partial('partials/island_nav', get_defined_vars()) ?>
+    <div class="cb-island-resizer" id="island-resizer" role="separator" aria-orientation="vertical"
+         aria-label="<?= L('拖拽调整侧栏宽度') ?>" aria-valuemin="200" aria-valuemax="360"
+         aria-valuenow="<?= (int)$islandWidth ?>" tabindex="0"></div>
+  <?php endif; ?>
+
   <div class="cb-content">
+    <?php if ($island && !empty($island_tabs)): ?>
+      <?= \App\Core\View::partial('partials/island_tabs', ['tabs' => $island_tabs]) ?>
+    <?php endif; ?>
     <?= $content ?? '' ?>
   </div>
 
-  <?php if ($sidebarOn): ?>
+  <?php if ($sidebarOn && !$island): ?>
     <?= \App\Core\View::partial('partials/sidebar', get_defined_vars()) ?>
   <?php endif; ?>
 </main>

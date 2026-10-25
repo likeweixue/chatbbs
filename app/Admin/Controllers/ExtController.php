@@ -6,9 +6,11 @@ namespace App\Admin\Controllers;
 
 use App\Admin\AdminUI;
 use App\Admin\BaseAdmin;
+use App\Core\Cache;
 use App\Core\Database;
 use App\Core\Request;
 use App\Core\Settings;
+use App\Services\Island;
 
 /**
  * 扩展管理：插件 / 主题 / 语言包
@@ -174,6 +176,39 @@ class ExtController extends BaseAdmin
             . '<div class="adm-form-tip">提示：外观设置保存后前台立即生效；若浏览器有缓存，请强制刷新（Ctrl+F5）。</div>'
             . '</div></div>';
 
+        // 站点布局：默认 / 岛屿（参考 OpenIsle 的交互方向）
+        $islandWidth = max(200, min(360, (int)Settings::get('island_sidebar_width', 240)));
+        $layoutData = [
+            'site_layout' => (string)Settings::get('site_layout', 'classic') === 'island' ? 'island' : 'classic',
+            'island_sidebar_side' => (string)Settings::get('island_sidebar_side', 'left') === 'right' ? 'right' : 'left',
+            'island_sidebar_width' => $islandWidth,
+            'island_sidebar_default_hidden' => (int)Settings::get('island_sidebar_default_hidden', 0),
+            'island_menu' => (string)Settings::get('island_menu', Island::DEFAULT_MENU),
+        ];
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">站点布局</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/layout'),
+                'data' => $layoutData,
+                'submit' => '保存布局设置',
+                'fields' => [
+                    ['name' => 'site_layout', 'label' => '布局样式', 'type' => 'select', 'options' => [
+                        'classic' => '默认布局（经典两栏）',
+                        'island' => '岛屿布局（侧栏工作台）',
+                    ], 'tip' => '岛屿布局目前只在默认主题下生效；切回默认布局即可恢复原样'],
+                    ['name' => 'island_sidebar_side', 'label' => '侧栏默认位置', 'type' => 'select', 'options' => [
+                        'left' => '左侧', 'right' => '右侧',
+                    ], 'tip' => '访客也可以在前台顶栏自行切换，选择会记录在浏览器中'],
+                    ['name' => 'island_sidebar_width', 'label' => '侧栏默认宽度', 'type' => 'number',
+                        'tip' => '200 - 360 px；访客拖拽分隔线后使用自己的宽度'],
+                    ['name' => 'island_sidebar_default_hidden', 'label' => '默认隐藏侧栏', 'type' => 'switch',
+                        'tip' => '开启后访客首次进入岛屿布局时先看到全宽内容区，可点顶栏按钮展开'],
+                    ['name' => 'island_menu', 'label' => '侧栏菜单', 'type' => 'textarea',
+                        'tip' => '每行一项：类型|标题|链接。类型：posts（帖子入口）、forums（板块分区）、tags（标签）、link（自定义链接）、divider（分隔线）'],
+                ],
+            ])
+            . '<div class="adm-form-tip">岛屿布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
+            . '</div></div>';
+
         return $this->pageView('主题管理', 'themes', $html);
     }
 
@@ -195,6 +230,30 @@ class ExtController extends BaseAdmin
         \App\Core\Cache::forget('settings');
         $this->log('修改主题外观', '圆角:' . $radius . ' 主色:' . $primary);
         $this->back('外观设置已保存（圆角 ' . $radius . 'px）');
+    }
+
+    /**
+     * 保存站点布局（默认 / 岛屿）与岛屿侧栏默认值
+     */
+    public function themeLayoutSave(): void
+    {
+        $layout = (string)Request::post('site_layout', 'classic') === 'island' ? 'island' : 'classic';
+        $side = (string)Request::post('island_sidebar_side', 'left') === 'right' ? 'right' : 'left';
+        $width = max(200, min(360, Request::int('island_sidebar_width', 240)));
+        $menu = trim(strip_tags((string)Request::post('island_menu', '')));
+        if ($menu === '') {
+            $menu = Island::DEFAULT_MENU;
+        }
+        Settings::setMany([
+            'site_layout' => $layout,
+            'island_sidebar_side' => $side,
+            'island_sidebar_width' => (string)$width,
+            'island_sidebar_default_hidden' => Request::bool('island_sidebar_default_hidden') ? 1 : 0,
+            'island_menu' => $menu,
+        ]);
+        Cache::forget('settings');
+        $this->log('修改站点布局', $layout . ' / ' . $side . ' / ' . $width . 'px');
+        $this->back('布局设置已保存');
     }
 
     public function themeEnable(int $id): void

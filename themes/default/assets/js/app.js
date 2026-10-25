@@ -710,3 +710,95 @@
       if (e.key === 'Escape') setOpen(false);
     });
   })();
+
+/* 岛屿布局：移动端默认收起板块 / 标签菜单组 */
+(function () {
+  var groups = document.querySelectorAll('.cb-island-nav details[data-island-group]');
+  if (!groups.length) return;
+  try {
+    if (window.matchMedia('(max-width: 860px)').matches) {
+      Array.prototype.forEach.call(groups, function (g) { g.open = false; });
+    }
+  } catch (e) {}
+})();
+
+/* 岛屿布局：侧栏显示/隐藏、左右切换、拖拽宽度 */
+(function () {
+  var main = document.querySelector('.cb-main--island');
+  if (!main) return;
+  var MIN = 200, MAX = 360;
+  var resizer = document.getElementById('island-resizer');
+
+  function save(key, value) {
+    try { localStorage.setItem(key, String(value)); } catch (e) {}
+  }
+
+  function setWidth(width) {
+    width = Math.max(MIN, Math.min(MAX, Math.round(width)));
+    main.style.setProperty('--island-nav-width', width + 'px');
+    save('cb_island_width', width);
+    if (resizer) resizer.setAttribute('aria-valuenow', String(width));
+  }
+
+  function setHidden(hidden) {
+    main.classList.toggle('island-nav-hidden', hidden);
+    save('cb_island_hidden', hidden ? '1' : '0');
+    document.querySelectorAll('[data-island-hide]').forEach(function (btn) {
+      btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+      btn.setAttribute('title', hidden ? cbT('显示侧栏') : cbT('隐藏侧栏'));
+    });
+  }
+
+  function toggleSide() {
+    var right = main.classList.toggle('island-side-right');
+    save('cb_island_side', right ? 'right' : 'left');
+  }
+
+  document.querySelectorAll('[data-island-hide]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setHidden(!main.classList.contains('island-nav-hidden'));
+    });
+  });
+  document.querySelectorAll('[data-island-side]').forEach(function (btn) {
+    btn.addEventListener('click', toggleSide);
+  });
+
+  if (!resizer) return;
+
+  var drag = null;
+  resizer.addEventListener('pointerdown', function (e) {
+    if (window.matchMedia('(max-width: 860px)').matches) return;
+    drag = { x: e.clientX, width: main.querySelector('.cb-island-nav').offsetWidth };
+    try { resizer.setPointerCapture(e.pointerId); } catch (err) {}
+    document.body.classList.add('island-resizing');
+    e.preventDefault();
+  });
+  resizer.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x;
+    if (main.classList.contains('island-side-right')) dx = -dx;
+    setWidth(drag.width + dx);
+  });
+  function endDrag() {
+    if (!drag) return;
+    drag = null;
+    document.body.classList.remove('island-resizing');
+  }
+  resizer.addEventListener('pointerup', endDrag);
+  resizer.addEventListener('pointercancel', endDrag);
+
+  resizer.addEventListener('dblclick', function () {
+    var d = parseInt(main.getAttribute('data-island-default-width') || '240', 10);
+    setWidth(isNaN(d) ? 240 : d);
+  });
+  resizer.addEventListener('keydown', function (e) {
+    var w = parseInt(getComputedStyle(main).getPropertyValue('--island-nav-width'), 10) || 240;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); setWidth(w - 10); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); setWidth(w + 10); }
+    if (e.key === 'Home') {
+      e.preventDefault();
+      var d = parseInt(main.getAttribute('data-island-default-width') || '240', 10);
+      setWidth(isNaN(d) ? 240 : d);
+    }
+  });
+})();

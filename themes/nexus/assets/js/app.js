@@ -710,3 +710,14 @@
       if (e.key === 'Escape') setOpen(false);
     });
   })();
+
+/* 岛屿布局：移动端默认收起板块 / 标签菜单组 */
+(function () {
+  var groups = document.querySelectorAll('.cb-island-nav details[data-island-group]');
+  if (!groups.length) return;
+  try {
+    if (window.matchMedia('(max-width: 860px)').matches) {
+      Array.prototype.forEach.call(groups, function (g) { g.open = false; });
+    }
+  } catch (e) {}
+})();

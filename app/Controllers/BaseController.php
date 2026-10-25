@@ -10,6 +10,7 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Core\Settings;
+use App\Services\Island;
 
 abstract class BaseController
 {
@@ -39,8 +40,14 @@ abstract class BaseController
         if ($user) {
             $user = \App\Models\User::withMeta($user);
         }
+        $layout = (string)Settings::get('site_layout', 'classic');
+        $island = $layout === 'island';
         $cached = [
             'site_name' => Settings::get('site_name', 'ChatBBS'),
+            'site_layout' => $layout,
+            'island_menu' => $island ? Island::menu() : [],
+            'island_forums' => $island ? Island::forums() : [],
+            'island_tags' => $island ? Island::tags() : [],
             'current_user' => $user,
             'unread_notifications' => $user ? \App\Models\Notification::unreadCount((int)$user['id']) : 0,
             // 顶栏「聊天」角标 = 单聊未读 + 群聊未读

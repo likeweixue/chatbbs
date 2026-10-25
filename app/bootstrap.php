@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-define('CB_VERSION', '1.0.0-beta.26');
+define('CB_VERSION', '1.0.0-RC1');
 define('CB_ROOT', dirname(__DIR__));
 define('CB_APP', CB_ROOT . '/app');
 define('CB_CONFIG', CB_ROOT . '/config');
