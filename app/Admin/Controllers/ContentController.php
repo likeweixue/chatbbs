@@ -208,8 +208,16 @@ class ContentController extends BaseAdmin
         foreach (User::groups() as $g) {
             $groupOpts[(int)$g['id']] = (string)$g['name'];
         }
+        $copyOpts = [0 => '不复制（使用下面填写的内容）'];
+        foreach (Forum::options(false) as $fid => $fname) {
+            if ((int)$fid === $id) {
+                continue;
+            }
+            $copyOpts[(int)$fid] = $fname;
+        }
 
-        $html = AdminUI::form([
+        $html = '<div class="adm-panel"><div class="adm-panel-head">板块设置</div><div class="adm-panel-body">'
+            . AdminUI::form([
             'action' => admin_url('forums/save'),
             'data' => $data ?? [],
             'hidden' => ['id' => $id],
@@ -221,16 +229,20 @@ class ContentController extends BaseAdmin
                 ['name' => 'type', 'label' => '类型', 'type' => 'select', 'options' => [1 => '分区（归类用）', 2 => '板块（可发帖）']],
                 ['name' => 'parent_id', 'label' => '上级', 'type' => 'select', 'options' => $parentOpts,
                     'tip' => '可选择任意分区或板块作为上级，支持无限层级嵌套'],
+                ['name' => 'copy_from', 'label' => '复制权限', 'type' => 'select', 'options' => $copyOpts,
+                    'tip' => '保存时把源板块的访问/发帖/回复/匿名/附件/等级/货币/用户组/版主权限复制到当前板块；不会复制名称、简介和排序'],
                 ['name' => 'description', 'label' => '板块简介', 'type' => 'textarea'],
                 ['name' => 'icon', 'label' => '图标', 'tip' => '可填 emoji 或图标 class，如 💬'],
                 ['name' => 'color', 'label' => '主题色', 'type' => 'color'],
                 ['name' => 'cover', 'label' => '封面图地址', 'tip' => '留空则使用主题色背景'],
-                ['name' => 'visible', 'label' => '是否显示', 'type' => 'switch'],
-                ['name' => 'need_login', 'label' => '需登录访问', 'type' => 'switch'],
-                ['name' => 'allow_post', 'label' => '允许发帖', 'type' => 'switch'],
-                ['name' => 'allow_reply', 'label' => '允许回复', 'type' => 'switch'],
-                ['name' => 'allow_anonymous', 'label' => '允许匿名', 'type' => 'switch'],
-                ['name' => 'allow_attachment', 'label' => '允许附件', 'type' => 'switch'],
+                ['name' => 'permissions', 'label' => '权限开关', 'type' => 'switch_group', 'items' => [
+                    ['name' => 'visible', 'label' => '是否显示'],
+                    ['name' => 'need_login', 'label' => '需登录访问'],
+                    ['name' => 'allow_post', 'label' => '允许发帖'],
+                    ['name' => 'allow_reply', 'label' => '允许回复'],
+                    ['name' => 'allow_anonymous', 'label' => '允许匿名'],
+                    ['name' => 'allow_attachment', 'label' => '允许附件'],
+                ], 'tip' => '这些开关会合并在一行显示；复制权限时也会同步复制'],
                 ['name' => 'need_level', 'label' => '发帖等级要求', 'type' => 'number', 'tip' => '0 表示不限制'],
                 ['name' => 'need_money', 'label' => '发帖货币要求', 'type' => 'number', 'step' => '0.01'],
                 ['name' => 'view_groups', 'label' => '可访问用户组', 'type' => 'checkboxes', 'options' => $groupOpts, 'tip' => '全部不勾选表示不限制'],
@@ -238,7 +250,7 @@ class ContentController extends BaseAdmin
                 ['name' => 'moderators', 'label' => '版主', 'tip' => '多个用户名用英文逗号分隔'],
                 ['name' => 'sort_order', 'label' => '排序值', 'type' => 'number', 'tip' => '越小越靠前'],
             ],
-        ]);
+        ]) . '</div></div>';
 
         return $this->pageView($id > 0 ? '编辑板块：' . (string)$data['name'] : '新增板块', 'forums', $html);
     }
@@ -278,6 +290,16 @@ class ContentController extends BaseAdmin
             'moderators' => $this->pure('moderators', 255),
             'sort_order' => Request::int('sort_order'),
         ];
+
+        $copyFrom = Request::int('copy_from');
+        if ($copyFrom > 0 && $copyFrom !== $id) {
+            $src = Forum::find($copyFrom);
+            if ($src) {
+                foreach (['need_login', 'allow_post', 'allow_reply', 'allow_anonymous', 'allow_attachment', 'need_level', 'need_money', 'view_groups', 'post_groups', 'moderators'] as $key) {
+                    $data[$key] = $src[$key] ?? $data[$key];
+                }
+            }
+        }
 
         if ($id > 0) {
             Forum::update($id, $data);

@@ -13,6 +13,7 @@ use App\Core\Request;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\Settings;
+use App\Models\Forum;
 use App\Models\Notification;
 use App\Models\User;
 
@@ -25,7 +26,8 @@ class SettingController extends BaseAdmin
     public function settings(): string
     {
         $themes = self::scanThemes();
-        $html = AdminUI::form([
+        $html = '<div class="adm-panel"><div class="adm-panel-head">站点设置</div><div class="adm-panel-body">'
+            . AdminUI::form([
             'action' => admin_url('settings/save'),
             'data' => Settings::all(),
             'hidden' => ['scope' => 'base'],
@@ -44,9 +46,6 @@ class SettingController extends BaseAdmin
                 ['name' => 'site_logo', 'label' => 'Logo 图片', 'type' => 'image', 'tip' => '可直接填写图片地址，也可以选择本地文件上传（上传后自动填入）'],
                 ['name' => 'site_favicon', 'label' => '站点图标（Favicon）', 'type' => 'image',
                     'accept' => 'image/*,.ico', 'tip' => '建议 32×32 或 64×64 的 png / ico；留空使用内置复古图标'],
-                ['name' => 'about_title', 'label' => '侧边栏面板标题', 'tip' => '显示在侧边栏"关于本站"卡片顶部，留空则不显示该卡片'],
-                ['name' => 'about_text', 'label' => '侧边栏介绍文案', 'type' => 'textarea'],
-                ['name' => 'about_team', 'label' => '开发 / 运营团队', 'tip' => '显示在介绍卡片底部'],
                 ['name' => 'site_icp', 'label' => 'ICP 备案号'],
                 ['name' => 'site_footer', 'label' => '页脚信息', 'type' => 'textarea', 'tip' => '支持 HTML'],
                 ['name' => 'theme', 'label' => '前台主题', 'type' => 'select', 'options' => $themes],
@@ -83,7 +82,7 @@ class SettingController extends BaseAdmin
                 ['name' => 'friend_links', 'label' => '友情链接', 'type' => 'textarea', 'tip' => '每行一条，格式：名称|网址'],
                 ['name' => 'sensitive_words', 'label' => '敏感词过滤', 'type' => 'textarea', 'tip' => '多个用英文逗号分隔，命中内容将被替换'],
             ],
-        ]);
+        ]) . '</div></div>';
 
         $html .= '<div class="adm-panel"><div class="adm-panel-head">注册协议</div><div class="adm-panel-body">'
             . AdminUI::form([
@@ -101,7 +100,55 @@ class SettingController extends BaseAdmin
                 ],
             ]) . '</div></div>';
 
+        $forumOpts = [0 => '全部板块'] + Forum::options(false);
+        $tagOpts = [0 => '全部标签'];
+        foreach (Database::fetchAll('SELECT id, name FROM ' . Database::table('tags') . ' ORDER BY threads DESC, id ASC LIMIT 100') as $tg) {
+            $tagOpts[(int)$tg['id']] = (string)$tg['name'];
+        }
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">RSS 订阅</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('settings/rss'),
+                'data' => Settings::all(),
+                'submit' => '保存 RSS 设置',
+                'fields' => [
+                    ['name' => 'rss_enable', 'label' => '启用 RSS', 'type' => 'switch'],
+                    ['name' => 'rss_title', 'label' => 'RSS 标题', 'tip' => '留空使用「站点名称 - 最新主题」'],
+                    ['name' => 'rss_limit', 'label' => '每次输出条数', 'type' => 'number', 'tip' => '1 - 100，默认 20'],
+                    ['name' => 'rss_forum', 'label' => '默认板块', 'type' => 'select', 'options' => $forumOpts,
+                        'tip' => '只推送该板块的主题；也可以在订阅地址加 ?forum=ID 临时指定'],
+                    ['name' => 'rss_tag', 'label' => '默认标签', 'type' => 'select', 'options' => $tagOpts,
+                        'tip' => '只推送该标签的主题；也可以在订阅地址加 ?tag=ID 临时指定'],
+                    ['name' => 'reader_enable', 'label' => '启用 RSS 阅读', 'type' => 'switch'],
+                    ['name' => 'reader_title', 'label' => '阅读页标题', 'type' => 'text'],
+                    ['name' => 'reader_limit', 'label' => '每个源显示条数', 'type' => 'number', 'tip' => '1 - 50'],
+                    ['name' => 'reader_sources', 'label' => '订阅源', 'type' => 'textarea', 'tip' => '每行一个：名称|RSS地址；例如：少数派|https://sspai.com/feed'],
+                ],
+            ])
+            . '<div class="adm-form-tip">阅读页：<code>' . h(url('reader')) . '</code><br>订阅地址：<code>' . h(url('rss')) . '</code><br>按板块：<code>' . h(url('rss?forum=1')) . '</code>　按标签：<code>' . h(url('rss?tag=1')) . '</code></div>'
+            . '</div></div>';
+
         return $this->pageView('站点设置', 'settings', $html);
+    }
+
+    /**
+     * 保存 RSS 设置
+     */
+    public function saveRss(): void
+    {
+        Settings::setMany([
+            'rss_enable' => Request::bool('rss_enable') ? 1 : 0,
+            'rss_title' => $this->pure('rss_title', 100),
+            'rss_limit' => (string)max(1, min(100, Request::int('rss_limit', 20))),
+            'rss_forum' => (string)max(0, Request::int('rss_forum')),
+            'rss_tag' => (string)max(0, Request::int('rss_tag')),
+            'reader_enable' => Request::bool('reader_enable') ? 1 : 0,
+            'reader_title' => $this->pure('reader_title', 100) ?: 'RSS 阅读',
+            'reader_limit' => (string)max(1, min(50, Request::int('reader_limit', 20))),
+            'reader_sources' => $this->pure('reader_sources', 10000),
+        ]);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改 RSS 设置');
+        $this->back('RSS 设置已保存');
     }
 
     /* ================== 安全设置（独立菜单） ================== */
@@ -195,7 +242,6 @@ class SettingController extends BaseAdmin
             foreach (['site_name', 'site_url', 'site_description', 'site_keywords', 'home_seo_title',
                 'logo_type', 'logo_text', 'site_icp', 'theme', 'language', 'site_access',
                 'closed_reason', 'sidebar_side', 'friend_links', 'sensitive_words', 'url_mode',
-                'about_title', 'about_text', 'about_team',
                 'forum_layout', 'forum_grid_cols',
             ] as $k) {
                 $data[$k] = $this->pure($k, 0);

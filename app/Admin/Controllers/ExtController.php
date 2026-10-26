@@ -176,6 +176,21 @@ class ExtController extends BaseAdmin
             . '<div class="adm-form-tip">提示：外观设置保存后前台立即生效；若浏览器有缓存，请强制刷新（Ctrl+F5）。</div>'
             . '</div></div>';
 
+        // 默认布局设置（经典两栏）
+        $html .= '<div class="adm-panel js-default-layout"><div class="adm-panel-head">默认布局设置</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/default-layout'),
+                'data' => Settings::all(),
+                'submit' => '保存默认布局设置',
+                'fields' => [
+                    ['name' => 'about_title', 'label' => '侧边栏面板标题', 'tip' => '显示在侧边栏“关于本站”卡片顶部，留空则不显示该卡片'],
+                    ['name' => 'about_text', 'label' => '侧边栏介绍文案', 'type' => 'textarea'],
+                    ['name' => 'about_team', 'label' => '开发 / 运营团队', 'tip' => '显示在介绍卡片底部'],
+                ],
+            ])
+            . '<div class="adm-form-tip">这些设置只在“默认布局”下显示；切换到岛屿布局后本面板会自动禁用，但配置会保留。</div>'
+            . '</div></div>';
+
         // 站点布局：默认 / 岛屿（参考 OpenIsle 的交互方向）
         $islandWidth = max(200, min(360, (int)Settings::get('island_sidebar_width', 240)));
         $layoutData = [
@@ -208,6 +223,41 @@ class ExtController extends BaseAdmin
             ])
             . '<div class="adm-form-tip">岛屿布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
             . '</div></div>';
+
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">DIY 装饰图</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/diy'),
+                'data' => Settings::all(),
+                'submit' => '保存 DIY 设置',
+                'fields' => [
+                    ['name' => 'diy_image', 'label' => '装饰图片', 'type' => 'image',
+                        'tip' => '支持本地上传或图床地址；留空关闭装饰图'],
+                    ['name' => 'diy_position', 'label' => '显示位置', 'type' => 'select', 'options' => [
+                        'top' => '顶部横幅（顶栏下方）',
+                        'bottom' => '底部横幅（页脚上方）',
+                        'global' => '全局背景（固定铺满）',
+                    ]],
+                    ['name' => 'diy_opacity', 'label' => '透明度', 'type' => 'number',
+                        'tip' => '0 - 100；数值越小越透明，建议 10 - 30'],
+                ],
+            ]) . '</div></div>';
+
+        $html .= '<script>
+        (function () {
+          var sel = document.getElementById("f-site_layout");
+          var panel = document.querySelector(".js-default-layout");
+          if (!sel || !panel) return;
+          function sync() {
+            var off = sel.value === "island";
+            panel.classList.toggle("adm-layout-disabled", off);
+            panel.querySelectorAll("input, textarea, select, button").forEach(function (el) {
+              el.disabled = off;
+            });
+          }
+          sync();
+          sel.addEventListener("change", sync);
+        })();
+        </script>';
 
         return $this->pageView('主题管理', 'themes', $html);
     }
@@ -254,6 +304,50 @@ class ExtController extends BaseAdmin
         Cache::forget('settings');
         $this->log('修改站点布局', $layout . ' / ' . $side . ' / ' . $width . 'px');
         $this->back('布局设置已保存');
+    }
+
+    /**
+     * 保存主题 DIY 装饰图
+     */
+    public function themeDiySave(): void
+    {
+        $image = trim((string)Request::post('diy_image', ''));
+        $file = Request::file('diy_image_file');
+        if ($file && !empty($file['name']) && (int)($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            [$ok, $res] = \App\Core\Upload::save($file, 'site', (int)(\App\Core\Auth::id() ?? 0));
+            if ($ok) {
+                $image = (string)$res['url'];
+            } else {
+                $this->back('图片上传失败：' . (string)$res, 'error');
+            }
+        }
+        if ($image !== '' && !preg_match('#^https?://#i', $image) && !str_starts_with($image, '/')) {
+            $image = '';
+        }
+        Settings::setMany([
+            'diy_image' => $image,
+            'diy_position' => in_array(Request::post('diy_position', 'top'), ['top', 'bottom', 'global'], true)
+                ? (string)Request::post('diy_position', 'top') : 'top',
+            'diy_opacity' => (string)max(0, min(100, Request::int('diy_opacity', 20))),
+        ]);
+        Cache::forget('settings');
+        $this->log('保存主题 DIY 装饰');
+        $this->back('DIY 装饰设置已保存');
+    }
+
+    /**
+     * 保存默认布局（经典两栏）的侧栏关于面板
+     */
+    public function themeDefaultLayoutSave(): void
+    {
+        Settings::setMany([
+            'about_title' => $this->pure('about_title', 100),
+            'about_text' => $this->pure('about_text', 2000),
+            'about_team' => $this->pure('about_team', 255),
+        ]);
+        Cache::forget('settings');
+        $this->log('保存默认布局设置');
+        $this->back('默认布局设置已保存');
     }
 
     public function themeEnable(int $id): void

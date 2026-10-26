@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__user_certifications` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
   `icon` varchar(255) NOT NULL DEFAULT '',
+  `image` varchar(500) NOT NULL DEFAULT '',
   `color` varchar(20) NOT NULL DEFAULT '#4D698E',
   `description` varchar(255) NOT NULL DEFAULT '',
   `sort_order` int NOT NULL DEFAULT 0,
@@ -379,6 +380,66 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__private_messages` (
   KEY `idx_to` (`to_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
+
+
+-- ----------------------------
+-- Wiki 词条
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__wiki_pages` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(100) NOT NULL DEFAULT '',
+  `title` varchar(200) NOT NULL DEFAULT '',
+  `content_html` mediumtext,
+  `content_text` text,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_slug` (`slug`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- 勋章
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__medals` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) NOT NULL DEFAULT '',
+  `image` varchar(500) NOT NULL DEFAULT '',
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `sort_order` int NOT NULL DEFAULT 0,
+  `visible` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__user_medals` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `medal_id` int unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_medal` (`user_id`,`medal_id`),
+  KEY `idx_medal` (`medal_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- 网站导航页的推荐链接
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__nav_links` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) NOT NULL DEFAULT '',
+  `url` varchar(500) NOT NULL DEFAULT '',
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `icon` varchar(500) NOT NULL DEFAULT '',
+  `sort_order` int NOT NULL DEFAULT 0,
+  `visible` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_visible` (`visible`,`sort_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- 个人主页留言板

@@ -31,6 +31,7 @@ $show_toc = true;
       <?php endif; ?>
       <?php if (!empty($threadUser['cert'])): ?>
         <span class="cb-badge-pill" style="background:<?= h($threadUser['cert']['color'] . '1a') ?>;color:<?= h($threadUser['cert']['color']) ?>">
+          <?php if (!empty($threadUser['cert']['image'])): ?><img class="cb-cert-img" src="<?= h((string)$threadUser['cert']['image']) ?>" alt=""><?php endif; ?>
           <?= h($threadUser['cert']['name']) ?>
         </span>
       <?php endif; ?>

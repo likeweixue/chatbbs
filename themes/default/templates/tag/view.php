@@ -11,5 +11,5 @@
   </div>
 </div>
 
-<?= \App\Core\View::partial('partials/thread_list', ['threads' => $threads, 'marks' => $marks]) ?>
+<?= \App\Core\View::partial('partials/thread_list', ['threads' => $threads, 'marks' => $marks, 'boxed' => false]) ?>
 <?= $pager ?? '' ?>

@@ -10,6 +10,7 @@ use App\Core\Database;
 use App\Core\Request;
 use App\Core\Security;
 use App\Models\Currency;
+use App\Models\Medal;
 use App\Models\User;
 use App\Services\Level;
 
@@ -112,6 +113,9 @@ class UserAdminController extends BaseAdmin
     public function userForm(int $id = 0): string
     {
         $data = $id > 0 ? User::find($id) : null;
+        if ($id > 0 && $data) {
+            $data['medals'] = Medal::idsForUser($id);
+        }
         if ($id > 0 && !$data) {
             return $this->pageView('用户不存在', 'users', '<div class="adm-alert error">用户不存在</div>');
         }
@@ -127,6 +131,7 @@ class UserAdminController extends BaseAdmin
             ['name' => 'group_id', 'label' => '用户组', 'type' => 'select', 'options' => self::groupOptions()],
             ['name' => 'level_id', 'label' => '等级', 'type' => 'select', 'options' => self::levelOptions()],
             ['name' => 'cert_id', 'label' => '认证', 'type' => 'select', 'options' => [0 => '（无）'] + self::certOptions()],
+            ['name' => 'medals', 'label' => '勋章', 'type' => 'checkboxes', 'options' => self::medalOptions(), 'tip' => '可以多选；勋章图片在「用户管理 → 勋章管理」里配置'],
             ['name' => 'status', 'label' => '状态', 'type' => 'select', 'options' => [1 => '正常', 0 => '待激活', 2 => '禁用']],
             ['name' => 'is_admin', 'label' => '设为管理员', 'type' => 'switch'],
             ['name' => 'money', 'label' => '货币余额', 'type' => 'number', 'step' => '0.01'],
@@ -179,6 +184,7 @@ class UserAdminController extends BaseAdmin
                 'bio' => $this->pure('bio', 500),
             ];
             User::update($id, $data);
+            Medal::setForUser($id, (array)Request::post('medals', []));
             $this->log('编辑用户', $username);
             $this->back('用户资料已保存');
         }
@@ -190,7 +196,7 @@ class UserAdminController extends BaseAdmin
         if (User::findByUsername($username) || User::findByEmail($email)) {
             $this->back('用户名或邮箱已存在', 'error');
         }
-        User::create([
+        $newId = User::create([
             'username' => $username,
             'nickname' => $this->pure('nickname', 50) ?: $username,
             'email' => $email,
@@ -206,6 +212,7 @@ class UserAdminController extends BaseAdmin
             'bio' => $this->pure('bio', 500),
             'email_verified' => 1,
         ]);
+        Medal::setForUser((int)$newId, (array)Request::post('medals', []));
         $this->log('新增用户', $username);
         $this->back('用户已创建');
     }
@@ -414,6 +421,8 @@ class UserAdminController extends BaseAdmin
             'rows' => $rows,
             'columns' => [
                 ['key' => 'id', 'label' => 'ID', 'width' => '60px'],
+                ['key' => 'image', 'label' => '认证图片', 'width' => '70px', 'render' => fn($r) => !empty($r['image'])
+                    ? '<img src="' . h((string)$r['image']) . '" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:6px">' : '—'],
                 ['key' => 'name', 'label' => '认证名称', 'render' => fn($r) => '<span class="adm-tag" style="background:' . h((string)$r['color']) . '22;color:' . h((string)$r['color']) . '">'
                     . h((string)$r['icon'] . ' ' . $r['name']) . '</span>'],
                 ['key' => 'description', 'label' => '说明'],
@@ -437,7 +446,8 @@ class UserAdminController extends BaseAdmin
                 'submit' => '保存',
                 'fields' => [
                     ['name' => 'name', 'label' => '认证名称', 'placeholder' => '如：官方认证'],
-                    ['name' => 'icon', 'label' => '图标', 'tip' => 'emoji 或图标字符'],
+                    ['name' => 'icon', 'label' => '图标字符', 'tip' => 'emoji 或图标字符；与下方图片二选一'],
+                    ['name' => 'image', 'label' => '认证图片', 'type' => 'image', 'tip' => '支持本地上传或图床地址'],
                     ['name' => 'color', 'label' => '颜色', 'type' => 'color'],
                     ['name' => 'description', 'label' => '说明'],
                     ['name' => 'sort_order', 'label' => '排序', 'type' => 'number'],
@@ -449,9 +459,19 @@ class UserAdminController extends BaseAdmin
     public function certSave(): void
     {
         $id = Request::int('id');
+        $image = trim((string)Request::post('image', ''));
+        $file = Request::file('image_file');
+        if ($file && !empty($file['name']) && (int)($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            [$ok, $res] = \App\Core\Upload::save($file, 'certs', (int)(\App\Core\Auth::id() ?? 0));
+            if (!$ok) {
+                $this->back('图片上传失败：' . (string)$res, 'error');
+            }
+            $image = (string)$res['url'];
+        }
         $data = [
             'name' => $this->pure('name', 50),
             'icon' => $this->pure('icon', 255),
+            'image' => mb_substr($image, 0, 500),
             'color' => $this->pure('color', 20),
             'description' => $this->pure('description', 255),
             'sort_order' => Request::int('sort_order'),
@@ -757,6 +777,15 @@ class UserAdminController extends BaseAdmin
         $opts = [];
         foreach (User::levels() as $l) {
             $opts[(int)$l['id']] = (string)$l['name'];
+        }
+        return $opts;
+    }
+
+    public static function medalOptions(): array
+    {
+        $opts = [];
+        foreach (Medal::all() as $m) {
+            $opts[(int)$m['id']] = (string)$m['name'];
         }
         return $opts;
     }

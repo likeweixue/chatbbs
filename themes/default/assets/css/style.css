@@ -737,7 +737,7 @@ html[data-theme="dark"] .cb-alert { background: var(--color-surface-alt); }
 .cb-footer a { color: var(--color-text-sub); }
 .cb-footer__github { display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-sub); }
 .cb-footer__github:hover { color: var(--color-text); }
-.cb-footer__github .cb-ico { width: 15px; height: 15px; vertical-align: -3px; }
+.cb-footer__github .cb-ico, .cb-footer__rss .cb-ico { width: 15px; height: 15px; vertical-align: -3px; }
 
 /* ---------- 登录 / 注册（独立全屏卡片） ---------- */
 body.gateway-body { background: var(--color-bg); min-height: 100vh; }
@@ -1685,3 +1685,72 @@ body.island-resizing { user-select: none; cursor: col-resize; }
   transition: transform .15s;
 }
 .cb-island-group[open] > summary .cb-island-caret { transform: rotate(90deg); }
+
+/* ===================== 网站导航页 ===================== */
+.cb-links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.cb-link-card {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color .15s, transform .15s;
+}
+.cb-link-card:hover { border-color: var(--color-primary); transform: translateY(-1px); }
+.cb-link-card__icon {
+  width: 38px; height: 38px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 9px; overflow: hidden;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted); font-size: 18px;
+}
+.cb-link-card__icon img { width: 100%; height: 100%; object-fit: cover; }
+.cb-link-card__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cb-link-card__body b { font-size: 14px; color: var(--color-text); }
+.cb-link-card__body span { font-size: 12px; line-height: 1.55; color: var(--color-text-muted); }
+.cb-link-card__body em { font-style: normal; font-size: 11px; color: var(--color-primary); }
+@media (max-width: 480px) {
+  .cb-links-grid { grid-template-columns: 1fr; }
+}
+
+/* ===================== 主题 DIY 装饰图 ===================== */
+.cb-diy-banner { width: 100%; overflow: hidden; background: var(--color-bg); }
+.cb-diy-banner img { display: block; width: 100%; height: clamp(120px, 18vw, 240px); object-fit: cover; }
+.cb-diy-global {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+}
+.cb-has-diy .cb-main, .cb-has-diy .cb-footer { position: relative; z-index: 1; }
+
+/* 认证图片 / 勋章 */
+.cb-cert-img { width: 16px; height: 16px; border-radius: 3px; object-fit: cover; vertical-align: -3px; margin-right: 3px; }
+.cb-medal { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 3px; border-radius: 999px; background: var(--color-surface-alt); color: var(--color-text-sub); font-size: 11px; font-weight: 500; }
+.cb-medal img { width: 18px; height: 18px; object-fit: cover; border-radius: 50%; }
+
+/* ===================== Wiki ===================== */
+.cb-wiki-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.cb-wiki-card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color .15s;
+}
+.cb-wiki-card:hover { border-color: var(--color-primary); }
+.cb-wiki-card b { font-size: 15px; color: var(--color-text); }
+.cb-wiki-card span { font-size: 12px; line-height: 1.6; color: var(--color-text-muted); }
+.cb-wiki-card em { font-style: normal; font-size: 11px; color: var(--color-text-muted); }
+@media (max-width: 480px) { .cb-wiki-grid { grid-template-columns: 1fr; } }
+
+/* RSS 阅读器 */
+.cb-reader-list { display: flex; flex-direction: column; }
+.cb-reader-item { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-bottom: 1px dashed var(--color-border); }
+.cb-reader-item:last-child { border-bottom: 0; }
+.cb-reader-item b { font-size: 14px; color: var(--color-text); }
+.cb-reader-item span { font-size: 12px; line-height: 1.6; color: var(--color-text-muted); }
+.cb-reader-item em { font-style: normal; font-size: 11px; color: var(--color-text-muted); }
+
+/* 维护页只显示维护卡片 */
+.cb-maintenance .cb-header, .cb-maintenance .cb-island-nav, .cb-maintenance .cb-footer { display: none !important; }

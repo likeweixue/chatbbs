@@ -7,6 +7,7 @@ $prog = $level_progress ?? [];
 $guestbook = $guestbook ?? [];
 $guestbook_count = $guestbook_count ?? count($guestbook);
 $guestbook_enabled = $guestbook_enabled ?? true;
+$medals = $medals ?? [];
 ?>
 <div class="cb-profile-header">
   <img class="cb-avatar cb-avatar-lg" src="<?= h(avatar_url($p)) ?>" alt="">
@@ -17,8 +18,17 @@ $guestbook_enabled = $guestbook_enabled ?? true;
         <span class="cb-badge-pill" style="background:var(--color-primary-light);color:var(--color-primary)"><?= h($lv['name']) ?></span>
       <?php endif; ?>
       <?php if ($cert): ?>
-        <span class="cb-badge-pill" style="background:<?= h($cert['color'] . '1a') ?>;color:<?= h($cert['color']) ?>"><?= h($cert['name']) ?></span>
+        <span class="cb-badge-pill" style="background:<?= h($cert['color'] . '1a') ?>;color:<?= h($cert['color']) ?>">
+          <?php if (!empty($cert['image'])): ?><img class="cb-cert-img" src="<?= h((string)$cert['image']) ?>" alt=""><?php endif; ?>
+          <?= h($cert['name']) ?>
+        </span>
       <?php endif; ?>
+      <?php foreach (($medals ?? []) as $medal): ?>
+        <span class="cb-medal" title="<?= h((string)$medal['name']) ?>">
+          <?php if (!empty($medal['image'])): ?><img src="<?= h((string)$medal['image']) ?>" alt=""><?php endif; ?>
+          <span><?= h((string)$medal['name']) ?></span>
+        </span>
+      <?php endforeach; ?>
       <?php if ($grp): ?>
         <span class="cb-badge-pill" style="background:<?= h($grp['color'] . '1a') ?>;color:<?= h($grp['color']) ?>"><?= h($grp['name']) ?></span>
       <?php endif; ?>

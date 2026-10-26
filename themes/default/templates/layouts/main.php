@@ -13,6 +13,11 @@ $island = (($site_layout ?? config('site_layout', 'classic')) === 'island' && \A
 $islandSide = (string)config('island_sidebar_side', 'left') === 'right' ? 'right' : 'left';
 $islandWidth = max(200, min(360, (int)config('island_sidebar_width', 240)));
 $islandDefaultHidden = (int)config('island_sidebar_default_hidden', 0) === 1;
+$diyImage = trim((string)config('diy_image', ''));
+$diyPos = (string)config('diy_position', 'top');
+$diyPos = in_array($diyPos, ['top', 'bottom', 'global'], true) ? $diyPos : 'top';
+$diyOpacity = max(0, min(100, (int)config('diy_opacity', 20))) / 100;
+$diyOpacityCss = number_format($diyOpacity, 2, '.', '');
 $theme = \App\Core\View::theme();
 $mainClass = 'container cb-main';
 if ($island) {
@@ -49,6 +54,9 @@ $favicon = (string)config('site_favicon', '');
 <meta name="description" content="<?= h(config('site_description', '')) ?>">
 <meta name="keywords" content="<?= h(config('site_keywords', '')) ?>">
 <link rel="icon" href="<?= h($favicon !== '' ? $favicon : asset('images/retro/favicon.svg')) ?>">
+<?php if ((int)config('rss_enable', 1) === 1): ?>
+<link rel="alternate" type="application/rss+xml" title="<?= h($siteName) ?> RSS" href="<?= h(url('rss')) ?>">
+<?php endif; ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
 <?php
 // 外观微调：圆角大小 / 主题主色（后台「扩展管理 → 主题 → 外观微调」设置）
@@ -81,7 +89,10 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
   };
 </script>
 </head>
-<body class="cb-body<?= $island ? ' cb-island' : '' ?>">
+<body class="cb-body<?= $island ? ' cb-island' : '' ?><?= $diyImage !== '' ? ' cb-has-diy' : '' ?>">
+<?php if ($diyImage !== '' && $diyPos === 'global'): ?>
+<div class="cb-diy-global" style="background-image:url('<?= h($diyImage) ?>');opacity:<?= $diyOpacityCss ?>" aria-hidden="true"></div>
+<?php endif; ?>
 
 <header class="cb-header" id="cb-header">
   <div class="cb-header__inner">
@@ -223,6 +234,10 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
 </header>
 <div class="cb-drawer-mask" id="cb-drawer-mask"></div>
 
+<?php if ($diyImage !== '' && $diyPos === 'top'): ?>
+<div class="cb-diy-banner cb-diy-banner--top" aria-hidden="true"><img src="<?= h($diyImage) ?>" alt="" style="opacity:<?= $diyOpacityCss ?>"></div>
+<?php endif; ?>
+
 <?php $flashSuccess = flash('success'); $flashError = flash('error'); $flashErrors = flash('errors'); ?>
 <div class="container">
   <?php if ($flashSuccess): ?><div class="cb-alert success" style="margin-top:16px"><?= h((string)$flashSuccess) ?></div><?php endif; ?>
@@ -293,6 +308,10 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
   <?php endif; ?>
 </main>
 
+<?php if ($diyImage !== '' && $diyPos === 'bottom'): ?>
+<div class="cb-diy-banner cb-diy-banner--bottom" aria-hidden="true"><img src="<?= h($diyImage) ?>" alt="" style="opacity:<?= $diyOpacityCss ?>"></div>
+<?php endif; ?>
+
 <footer class="cb-footer">
   <div class="cb-footer__inner">
     <div>
@@ -303,6 +322,11 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
       <?php if (config('site_icp')): ?><span><?= h(config('site_icp')) ?></span><?php endif; ?>
       <a class="cb-footer__github" href="https://github.com/likeweixue/chatbbs" target="_blank" rel="noopener"
          title="GitHub 仓库" aria-label="GitHub 仓库"><?= cb_icon('github') ?><span>GitHub</span></a>
+      <?php if ((int)config('rss_enable', 1) === 1): ?>
+        <a class="cb-footer__github cb-footer__rss" href="<?= h(url('rss')) ?>" title="RSS 订阅" aria-label="RSS 订阅">
+          <?= cb_icon('rss') ?><span>RSS</span>
+        </a>
+      <?php endif; ?>
       <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= L('授权') ?></a>
       <span>页面耗时 <?= number_format((microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1) ?> ms</span>
     </div>

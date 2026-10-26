@@ -121,6 +121,11 @@ Router::group('', function () use ($C): void {
     /* ---------- 论坛设置 ---------- */
     Router::get('/settings', $C . 'SettingController@settings');
     Router::post('/settings/save', $C . 'SettingController@save', ['csrf']);
+Router::post('/settings/rss', $C . 'SettingController@saveRss', ['csrf']);
+Router::get('/nav-links', $C . 'NavLinkController@index');
+Router::post('/nav-links/save', $C . 'NavLinkController@save', ['csrf']);
+Router::post('/nav-links/delete/{id}', $C . 'NavLinkController@delete', ['csrf']);
+Router::post('/nav-links/settings', $C . 'NavLinkController@saveSettings', ['csrf']);
     Router::get('/settings/features', $C . 'SettingController@features');
     Router::post('/settings/features/save', $C . 'SettingController@saveFeatures', ['csrf']);
     Router::get('/settings/currency', $C . 'SettingController@currency');
@@ -159,6 +164,11 @@ Router::group('', function () use ($C): void {
     Router::post('/themes/enable/{id}', $C . 'ExtController@themeEnable', ['csrf']);
     Router::post('/themes/appearance', $C . 'ExtController@themeAppearance', ['csrf']);
 Router::post('/themes/layout', $C . 'ExtController@themeLayoutSave', ['csrf']);
+Router::post('/themes/default-layout', $C . 'ExtController@themeDefaultLayoutSave', ['csrf']);
+Router::post('/themes/diy', $C . 'ExtController@themeDiySave', ['csrf']);
+Router::get('/medals', $C . 'MedalController@index');
+Router::post('/medals/save', $C . 'MedalController@save', ['csrf']);
+Router::post('/medals/delete/{id}', $C . 'MedalController@delete', ['csrf']);
 
     Router::get('/languages', $C . 'ExtController@languages');
     Router::post('/languages/enable/{id}', $C . 'ExtController@languageEnable', ['csrf']);

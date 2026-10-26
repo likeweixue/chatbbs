@@ -114,6 +114,24 @@ class Settings
         'forum_layout' => 'list',
         // 网格布局每行显示的板块数（2 - 6）
         'forum_grid_cols' => '4',
+        // 主题 DIY 装饰图
+        'diy_image' => '',
+        'diy_position' => 'top',
+        'diy_opacity' => '20',
+        // 网站导航页
+        'nav_title' => '网站导航',
+        'nav_slug' => 'nav',
+        'nav_description' => '收集一些值得访问的站点，欢迎推荐。',
+        // RSS 订阅：总开关 / 条数 / 默认板块 / 默认标签
+        'rss_enable' => '1',
+        'rss_limit' => '20',
+        'rss_forum' => '0',
+        'rss_tag' => '0',
+        'rss_title' => '',
+        'reader_enable' => '1',
+        'reader_title' => 'RSS 阅读',
+        'reader_limit' => '20',
+        'reader_sources' => '',
         // 前台布局：classic 经典 / island 岛屿（左侧菜单 + 内容区，预览）
         'site_layout' => 'classic',
         // 岛屿布局左侧菜单：每行「类型|标题|链接」，类型 posts/forums/tags/link/divider

@@ -135,7 +135,7 @@ class AdminUI
             $html .= '<div class="adm-form-item' . ($block ? ' adm-form-item--block' : '') . '">';
             $html .= '<label for="f-' . h($name) . '">' . h($f['label']) . '</label>';
             $html .= '<div class="adm-field">';
-            $html .= self::field($f, $value);
+            $html .= self::field($f, $value, $data);
             if (!empty($f['tip'])) {
                 $html .= '<div class="adm-form-tip">' . h($f['tip']) . '</div>';
             }
@@ -150,7 +150,7 @@ class AdminUI
         return $html;
     }
 
-    private static function field(array $f, $value): string
+    private static function field(array $f, $value, array $data = []): string
     {
         $name = (string)$f['name'];
         $type = $f['type'] ?? 'text';
@@ -171,6 +171,18 @@ class AdminUI
                 $on = ((int)$value === 1);
                 return '<label class="adm-switch"><input type="checkbox" name="' . h($name) . '" value="1"'
                     . ($on ? ' checked' : '') . '><span></span></label>';
+            case 'switch_group':
+                $out = '<div class="adm-switch-row-group">';
+                foreach (($f['items'] ?? []) as $item) {
+                    $itemName = (string)($item['name'] ?? '');
+                    if ($itemName === '') {
+                        continue;
+                    }
+                    $on = (int)($data[$itemName] ?? 0) === 1;
+                    $out .= '<label class="adm-checkbox"><input type="checkbox" name="' . h($itemName) . '" value="1"'
+                        . ($on ? ' checked' : '') . '> ' . h((string)($item['label'] ?? $itemName)) . '</label>';
+                }
+                return $out . '</div>';
             case 'number':
                 return '<input class="adm-input" type="number" step="' . h((string)($f['step'] ?? '1')) . '" id="' . $id . '" name="' . h($name) . '" value="' . h((string)$value) . '"' . $ph . ' style="width:160px;max-width:100%">';
             case 'color':

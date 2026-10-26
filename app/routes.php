@@ -120,6 +120,28 @@ Router::get('/attachment/{id}/download', \App\Controllers\AttachmentController::
 Router::get('/attachment/{id}/buy', \App\Controllers\AttachmentController::class . '@buyForm', ['auth']);
 Router::post('/attachment/{id}/buy', \App\Controllers\AttachmentController::class . '@buy', ['auth', 'csrf']);
 
+// Wiki 词条
+Router::get('/wiki', \App\Controllers\WikiController::class . '@index');
+Router::get('/wiki/create', \App\Controllers\WikiController::class . '@createForm', ['auth']);
+Router::post('/wiki/create', \App\Controllers\WikiController::class . '@store', ['auth', 'csrf']);
+Router::get('/wiki/{slug}/edit', \App\Controllers\WikiController::class . '@editForm', ['auth']);
+Router::post('/wiki/{slug}/edit', \App\Controllers\WikiController::class . '@update', ['auth', 'csrf']);
+Router::get('/wiki/{slug}', \App\Controllers\WikiController::class . '@view');
+
+// RSS 阅读
+Router::get('/reader', \App\Controllers\ReaderController::class . '@index');
+
+// 网站导航
+Router::get('/nav', \App\Controllers\LinksController::class . '@index');
+$navSlug = trim((string)\App\Core\Settings::get('nav_slug', 'nav'), '/');
+if ($navSlug !== '' && $navSlug !== 'nav' && preg_match('/^[a-z0-9\-_]+$/', $navSlug)) {
+    Router::get('/' . $navSlug, \App\Controllers\LinksController::class . '@index');
+}
+
+// RSS 订阅
+Router::get('/rss', \App\Controllers\RssController::class . '@index');
+Router::get('/rss.xml', \App\Controllers\RssController::class . '@index');
+
 // 异步接口
 Router::post('/api/like', \App\Controllers\ApiController::class . '@like', ['csrf']);
 Router::get('/api/counters', \App\Controllers\ApiController::class . '@counters');

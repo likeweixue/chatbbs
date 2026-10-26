@@ -167,7 +167,12 @@ img { max-width: 100%; }
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    padding: 13px 16px;
+    background: var(--adm-card);
+    border: 1px solid var(--adm-border);
+    border-radius: var(--adm-radius);
+    box-shadow: var(--adm-shadow);
     flex-wrap: wrap;
 }
 .adm-page-head h2 { font-size: 18px; }
@@ -373,10 +378,19 @@ html[data-adm-theme="dark"] .adm-theme-toggle .ico-light { display: none; }
 }
 .adm-form-tip { font-size: 12px; color: var(--adm-muted); margin-top: 0; }
 .adm-tree-indent { display: inline-block; width: 18px; }
+.adm-layout-disabled { opacity: .55; }
+.adm-switch-row-group { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 5px 0; }
+.adm-switch-row-group .adm-checkbox { white-space: nowrap; }
 .adm-form-actions {
-    padding: 18px 0 4px 154px;
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    margin-top: 10px;
+    padding: 12px 0 8px 154px;
     display: flex;
     gap: 10px;
+    background: var(--adm-card);
+    border-top: 1px solid var(--adm-border);
 }
 .adm-input, .adm-form select, .adm-form textarea {
     width: 100%;

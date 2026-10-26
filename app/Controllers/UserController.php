@@ -13,6 +13,7 @@ use App\Core\Security;
 use App\Core\Upload;
 use App\Core\View;
 use App\Models\Guestbook;
+use App\Models\Medal;
 use App\Models\Message;
 use App\Models\Notification;
 use App\Models\Post;
@@ -58,6 +59,7 @@ class UserController extends BaseController
             'guestbook' => Guestbook::list($uid, 30),
             'guestbook_count' => Guestbook::count($uid),
             'guestbook_enabled' => (int)($user['guestbook_enable'] ?? 1) === 1,
+            'medals' => Medal::forUser($uid),
         ]);
     }
 
