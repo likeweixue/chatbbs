@@ -109,6 +109,26 @@ $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--
         <div class="cb-thread__stat">
           <b><?= (int)($t['views'] ?? 0) ?></b><span><?= L('浏览') ?></span>
         </div>
+        <div class="cb-thread__more">
+          <button type="button" class="cb-thread__more-btn" data-thread-more aria-label="<?= L('更多操作') ?>">⋯</button>
+          <div class="cb-thread-menu">
+            <?php if (!empty($current_user)): ?>
+              <button type="button" data-like data-type="thread" data-id="<?= (int)$t['id'] ?>" data-guest="0"><?= cb_icon('thumbs-up') ?> <?= L('点赞') ?></button>
+            <?php else: ?>
+              <a href="<?= h(url('login')) ?>"><?= cb_icon('thumbs-up') ?> <?= L('登录后点赞') ?></a>
+            <?php endif; ?>
+            <?php if (is_admin()): ?>
+              <div class="cb-thread-menu__color">
+                <input type="color" value="<?= h(!empty($t['title_color']) ? (string)$t['title_color'] : '#4D698E') ?>" data-thread-color aria-label="<?= L('标题颜色') ?>">
+                <button type="button" data-thread-quick="color" data-id="<?= (int)$t['id'] ?>"><?= L('标题颜色') ?></button>
+              </div>
+              <button type="button" data-thread-quick="hide" data-id="<?= (int)$t['id'] ?>"><?= cb_icon('eye-off') ?> <?= L('隐藏') ?></button>
+              <button type="button" data-thread-quick="move" data-id="<?= (int)$t['id'] ?>"><?= cb_icon('folder') ?> <?= L('移动板块') ?></button>
+              <button type="button" data-thread-quick="tags" data-id="<?= (int)$t['id'] ?>"><?= cb_icon('tag') ?> <?= L('编辑标签') ?></button>
+              <a href="<?= h(admin_url('threads?kw=' . urlencode((string)$t['title']))) ?>"><?= cb_icon('tools') ?> <?= L('后台编辑') ?></a>
+            <?php endif; ?>
+          </div>
+        </div>
       </div>
     <?php endforeach; ?>
   <?php endif; ?>

@@ -198,7 +198,6 @@ class ExtController extends BaseAdmin
             'island_sidebar_side' => (string)Settings::get('island_sidebar_side', 'left') === 'right' ? 'right' : 'left',
             'island_sidebar_width' => $islandWidth,
             'island_sidebar_default_hidden' => (int)Settings::get('island_sidebar_default_hidden', 0),
-            'island_menu' => (string)Settings::get('island_menu', Island::DEFAULT_MENU),
         ];
         $html .= '<div class="adm-panel"><div class="adm-panel-head">站点布局</div><div class="adm-panel-body">'
             . AdminUI::form([
@@ -217,8 +216,6 @@ class ExtController extends BaseAdmin
                         'tip' => '200 - 360 px；访客拖拽分隔线后使用自己的宽度'],
                     ['name' => 'island_sidebar_default_hidden', 'label' => '默认隐藏侧栏', 'type' => 'switch',
                         'tip' => '开启后访客首次进入岛屿布局时先看到全宽内容区，可点顶栏按钮展开'],
-                    ['name' => 'island_menu', 'label' => '侧栏菜单', 'type' => 'textarea',
-                        'tip' => '每行一项：类型|标题|链接。类型：posts（帖子入口）、forums（板块分区）、tags（标签）、link（自定义链接）、divider（分隔线）'],
                 ],
             ])
             . '<div class="adm-form-tip">岛屿布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
@@ -239,8 +236,30 @@ class ExtController extends BaseAdmin
                     ]],
                     ['name' => 'diy_opacity', 'label' => '透明度', 'type' => 'number',
                         'tip' => '0 - 100；数值越小越透明，建议 10 - 30'],
+                    ['name' => 'diy_feather', 'label' => '羽化过渡', 'type' => 'number',
+                        'tip' => '0 - 300 px；图片与内容交接处的渐变宽度，默认 60'],
                 ],
             ]) . '</div></div>';
+
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">全局颜色</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/colors'),
+                'data' => Settings::all(),
+                'submit' => '保存颜色设置',
+                'fields' => [
+                    ['name' => 'theme_header_bg', 'label' => '顶栏背景', 'type' => 'color'],
+                    ['name' => 'theme_header_text', 'label' => '顶栏文字', 'type' => 'color'],
+                    ['name' => 'theme_header_opacity', 'label' => '顶栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                    ['name' => 'theme_island_bg', 'label' => '侧栏背景', 'type' => 'color', 'tip' => '岛屿布局侧栏'],
+                    ['name' => 'theme_island_text', 'label' => '侧栏文字', 'type' => 'color'],
+                    ['name' => 'theme_island_opacity', 'label' => '侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                    ['name' => 'theme_footer_bg', 'label' => '页脚背景', 'type' => 'color'],
+                    ['name' => 'theme_footer_text', 'label' => '页脚文字', 'type' => 'color'],
+                    ['name' => 'theme_footer_opacity', 'label' => '页脚透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                ],
+            ])
+            . '<div class="adm-form-tip">透明度为 0 时完全透明；页脚使用 DIY 底部图片时，文字会使用白色以适配图片。</div>'
+            . '</div></div>';
 
         $html .= '<script>
         (function () {
@@ -290,16 +309,11 @@ class ExtController extends BaseAdmin
         $layout = (string)Request::post('site_layout', 'classic') === 'island' ? 'island' : 'classic';
         $side = (string)Request::post('island_sidebar_side', 'left') === 'right' ? 'right' : 'left';
         $width = max(200, min(360, Request::int('island_sidebar_width', 240)));
-        $menu = trim(strip_tags((string)Request::post('island_menu', '')));
-        if ($menu === '') {
-            $menu = Island::DEFAULT_MENU;
-        }
         Settings::setMany([
             'site_layout' => $layout,
             'island_sidebar_side' => $side,
             'island_sidebar_width' => (string)$width,
             'island_sidebar_default_hidden' => Request::bool('island_sidebar_default_hidden') ? 1 : 0,
-            'island_menu' => $menu,
         ]);
         Cache::forget('settings');
         $this->log('修改站点布局', $layout . ' / ' . $side . ' / ' . $width . 'px');
@@ -329,6 +343,7 @@ class ExtController extends BaseAdmin
             'diy_position' => in_array(Request::post('diy_position', 'top'), ['top', 'bottom', 'global'], true)
                 ? (string)Request::post('diy_position', 'top') : 'top',
             'diy_opacity' => (string)max(0, min(100, Request::int('diy_opacity', 20))),
+            'diy_feather' => (string)max(0, min(300, Request::int('diy_feather', 60))),
         ]);
         Cache::forget('settings');
         $this->log('保存主题 DIY 装饰');
@@ -348,6 +363,26 @@ class ExtController extends BaseAdmin
         Cache::forget('settings');
         $this->log('保存默认布局设置');
         $this->back('默认布局设置已保存');
+    }
+
+    /**
+     * 保存顶栏 / 岛屿侧栏 / 页脚颜色
+     */
+    public function themeColorsSave(): void
+    {
+        $colors = ['theme_header_bg', 'theme_header_text', 'theme_island_bg', 'theme_island_text', 'theme_footer_bg', 'theme_footer_text'];
+        $data = [];
+        foreach ($colors as $key) {
+            $c = trim((string)Request::post($key, '#ffffff'));
+            $data[$key] = preg_match('/^#[0-9a-fA-F]{6}$/', $c) ? strtolower($c) : '#ffffff';
+        }
+        foreach (['theme_header_opacity', 'theme_island_opacity', 'theme_footer_opacity'] as $key) {
+            $data[$key] = (string)max(0, min(100, Request::int($key, 100)));
+        }
+        Settings::setMany($data);
+        Cache::forget('settings');
+        $this->log('修改全局颜色');
+        $this->back('颜色设置已保存');
     }
 
     public function themeEnable(int $id): void

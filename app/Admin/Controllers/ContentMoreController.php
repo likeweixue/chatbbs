@@ -10,6 +10,7 @@ use App\Core\Auth;
 use App\Core\Database;
 use App\Core\Request;
 use App\Core\Security;
+use App\Core\Settings;
 use App\Models\Attachment;
 use App\Models\Report;
 use App\Models\Say;
@@ -41,7 +42,19 @@ class ContentMoreController extends BaseAdmin
             $this->baseUrl('tags', ['kw' => $kw])
         );
 
-        $html = AdminUI::filter([
+        $html = '<div class="adm-panel"><div class="adm-panel-head">用户标签权限</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('tags/settings'),
+                'data' => Settings::all(),
+                'submit' => '保存标签权限',
+                'fields' => [
+                    ['name' => 'allow_user_tag', 'label' => '允许普通用户自建标签', 'type' => 'switch',
+                        'tip' => '关闭后只有管理员可以创建新标签；已有标签仍可正常选择'],
+                    ['name' => 'max_tags', 'label' => '每帖最多标签数', 'type' => 'number', 'tip' => '建议 3 - 8'],
+                ],
+            ]) . '</div></div>';
+
+        $html .= AdminUI::filter([
             'action' => admin_url('tags'),
             'fields' => [['name' => 'kw', 'label' => '标签关键词', 'value' => $kw]],
         ]);
@@ -99,6 +112,17 @@ class ContentMoreController extends BaseAdmin
             ]) . '</div></div>';
 
         return $this->pageView('标签管理（共 ' . $t['total'] . ' 个）', 'tags', $html);
+    }
+
+    public function tagSettings(): void
+    {
+        Settings::setMany([
+            'allow_user_tag' => Request::bool('allow_user_tag') ? 1 : 0,
+            'max_tags' => (string)max(1, min(20, Request::int('max_tags', 5))),
+        ]);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改标签权限');
+        $this->back('标签权限已保存');
     }
 
     public function tagEdit(int $id): string

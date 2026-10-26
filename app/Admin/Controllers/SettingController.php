@@ -14,6 +14,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\Settings;
 use App\Models\Forum;
+use App\Services\Island;
 use App\Models\Notification;
 use App\Models\User;
 
@@ -718,7 +719,8 @@ class SettingController extends BaseAdmin
         }
 
         $html = '<div class="adm-alert info">勾选需要显示的模块，并用 ↑ ↓ 调整上下顺序；保存后前台侧边栏按此顺序渲染。</div>';
-        $html .= '<form method="post" action="' . h(admin_url('sidebar/save')) . '" id="sidebar-form">';
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">默认布局（双栏）侧边栏模块</div><div class="adm-panel-body">'
+            . '<form method="post" action="' . h(admin_url('sidebar/save')) . '" id="sidebar-form">';
         $html .= csrf_field();
         $html .= '<input type="hidden" name="modules" id="sidebar-modules" value="">';
         $html .= '<div class="adm-panel"><div class="adm-panel-body tight">'
@@ -734,7 +736,16 @@ class SettingController extends BaseAdmin
         }
         $html .= '</tbody></table></div></div>';
         $html .= '<div style="margin-top:12px"><button class="adm-btn primary" type="submit">保存侧边栏</button></div>';
-        $html .= '</form>';
+        $html .= '</form></div></div>';
+
+        // 岛屿布局侧栏菜单
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">岛屿布局侧边栏菜单</div><div class="adm-panel-body">'
+            . '<form method="post" action="' . h(admin_url('sidebar/island-menu')) . '">'
+            . csrf_field()
+            . '<div class="adm-field"><textarea class="adm-input" name="island_menu" rows="8">' . h((string)Settings::get('island_menu', Island::DEFAULT_MENU)) . '</textarea>'
+            . '<div class="adm-form-tip">每行一项：类型|标题|链接。类型：posts（帖子入口）、forums（板块分区）、tags（标签）、link（自定义链接）、divider（分隔线）；例如 link|导航页|/nav</div></div>'
+            . '<div style="margin-top:12px"><button class="adm-btn primary" type="submit">保存岛屿菜单</button></div>'
+            . '</form></div></div>';
 
         $html .= '<script>
         (function () {
@@ -777,6 +788,18 @@ class SettingController extends BaseAdmin
         \App\Core\Cache::forget('settings');
         $this->log('修改侧边栏模块', $modules);
         $this->back('侧边栏已保存');
+    }
+
+    public function saveIslandMenu(): void
+    {
+        $menu = trim(strip_tags((string)Request::post('island_menu', '')));
+        if ($menu === '') {
+            $menu = Island::DEFAULT_MENU;
+        }
+        Settings::set('island_menu', $menu);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改岛屿侧栏菜单');
+        $this->back('岛屿侧栏菜单已保存');
     }
 
     /* ================== 邮箱配置 ================== */

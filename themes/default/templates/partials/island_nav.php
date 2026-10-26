@@ -39,6 +39,11 @@ $typeIcon = [
 <aside class="cb-island-nav" aria-label="<?= L('论坛导航') ?>">
   <div class="cb-island-nav__tools">
     <span class="cb-island-nav__title"><?= L('论坛导航') ?></span>
+    <?php if (!empty($show_toc)): ?>
+      <button type="button" class="cb-island-tool" id="island-toc-toggle" data-island-toc title="<?= L('目录') ?>" aria-label="<?= L('目录') ?>">
+        <?= cb_icon('ul') ?>
+      </button>
+    <?php endif; ?>
     <button type="button" class="cb-island-tool" data-island-hide title="<?= L('隐藏侧栏') ?>" aria-label="<?= L('隐藏侧栏') ?>">
       <?= cb_icon('panel-left') ?>
     </button>
@@ -46,6 +51,12 @@ $typeIcon = [
       <?= cb_icon('panel-right') ?>
     </button>
   </div>
+  <?php if (!empty($show_toc)): ?>
+    <div class="cb-island-toc hide" id="island-toc">
+      <div class="cb-island-toc__head"><?= L('目录') ?></div>
+      <div class="cb-island-toc__list" id="island-toc-list"></div>
+    </div>
+  <?php endif; ?>
   <div class="cb-island-nav__inner">
     <?php foreach ($island_menu as $item): ?>
       <?php $type = (string)($item['type'] ?? ''); ?>

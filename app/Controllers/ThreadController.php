@@ -419,6 +419,53 @@ class ThreadController extends BaseController
         \redirect('thread/' . $id);
     }
 
+    /**
+     * 列表「更多」快捷操作（管理员）
+     */
+    public function quick(int $id): void
+    {
+        $this->requireLogin();
+        if (!\App\Core\Auth::isAdmin()) {
+            $this->fail('没有权限');
+        }
+        $thread = Thread::find($id);
+        if (!$thread) {
+            $this->fail('主题不存在');
+        }
+        $action = (string)Request::post('action', '');
+        if ($action === 'color') {
+            $color = trim((string)Request::post('title_color', ''));
+            if ($color !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+                $this->fail('颜色格式不正确');
+            }
+            Thread::update($id, ['title_color' => strtolower($color)]);
+            $this->success(null, '标题颜色已更新');
+        }
+        if ($action === 'hide') {
+            Thread::update($id, ['status' => 0]);
+            Forum::syncStats((int)$thread['forum_id']);
+            $this->success(null, '主题已隐藏');
+        }
+        if ($action === 'move') {
+            $forumId = Request::int('forum_id');
+            $forum = Forum::find($forumId);
+            if (!$forum) {
+                $this->fail('目标板块不存在');
+            }
+            Thread::update($id, ['forum_id' => $forumId]);
+            Forum::syncStats((int)$thread['forum_id']);
+            Forum::syncStats($forumId);
+            $this->success(null, '主题已移动');
+        }
+        if ($action === 'tags') {
+            $names = array_filter(array_map('trim', explode(',', (string)Request::post('tags', ''))));
+            $tagIds = Tag::resolve(array_slice($names, 0, 20), true);
+            Thread::setTags($id, $tagIds);
+            $this->success(null, '标签已更新');
+        }
+        $this->fail('未知操作');
+    }
+
     public function reply(int $id): void
     {
         $this->requireLogin();

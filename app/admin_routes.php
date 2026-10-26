@@ -53,6 +53,7 @@ Router::group('', function () use ($C): void {
     Router::get('/tags', $C . 'ContentMoreController@tags');
     Router::get('/tags/edit/{id}', $C . 'ContentMoreController@tagEdit');
     Router::post('/tags/save', $C . 'ContentMoreController@tagSave', ['csrf']);
+Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf']);
     Router::post('/tags/delete/{id}', $C . 'ContentMoreController@tagDelete', ['csrf']);
     Router::post('/tags/merge', $C . 'ContentMoreController@tagMerge', ['csrf']);
     Router::post('/tags/bulk', $C . 'ContentMoreController@tagBulk', ['csrf']);
@@ -140,6 +141,7 @@ Router::post('/nav-links/settings', $C . 'NavLinkController@saveSettings', ['csr
 
     Router::get('/sidebar', $C . 'SettingController@sidebar');
     Router::post('/sidebar/save', $C . 'SettingController@saveSidebar', ['csrf']);
+Router::post('/sidebar/island-menu', $C . 'SettingController@saveIslandMenu', ['csrf']);
 
     Router::get('/menus', $C . 'SettingController@menus');
     Router::post('/menus/save', $C . 'SettingController@menuSave', ['csrf']);
@@ -166,6 +168,7 @@ Router::post('/nav-links/settings', $C . 'NavLinkController@saveSettings', ['csr
 Router::post('/themes/layout', $C . 'ExtController@themeLayoutSave', ['csrf']);
 Router::post('/themes/default-layout', $C . 'ExtController@themeDefaultLayoutSave', ['csrf']);
 Router::post('/themes/diy', $C . 'ExtController@themeDiySave', ['csrf']);
+Router::post('/themes/colors', $C . 'ExtController@themeColorsSave', ['csrf']);
 Router::get('/medals', $C . 'MedalController@index');
 Router::post('/medals/save', $C . 'MedalController@save', ['csrf']);
 Router::post('/medals/delete/{id}', $C . 'MedalController@delete', ['csrf']);

@@ -18,6 +18,7 @@ $diyPos = (string)config('diy_position', 'top');
 $diyPos = in_array($diyPos, ['top', 'bottom', 'global'], true) ? $diyPos : 'top';
 $diyOpacity = max(0, min(100, (int)config('diy_opacity', 20))) / 100;
 $diyOpacityCss = number_format($diyOpacity, 2, '.', '');
+$diyFeather = max(0, min(300, (int)config('diy_feather', 60)));
 $theme = \App\Core\View::theme();
 $mainClass = 'container cb-main';
 if ($island) {
@@ -68,8 +69,33 @@ $primary = (string)config('theme_primary', '#4D698E');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $primary)) {
     $primary = '#4D698E';
 }
+$headerBg = (string)config('theme_header_bg', '#ffffff');
+$headerText = (string)config('theme_header_text', '#1f2329');
+$headerOpacity = max(0, min(100, (int)config('theme_header_opacity', 100)));
+$islandBg = (string)config('theme_island_bg', '#ffffff');
+$islandText = (string)config('theme_island_text', '#1f2329');
+$islandOpacity = max(0, min(100, (int)config('theme_island_opacity', 100)));
+$footerBg = (string)config('theme_footer_bg', '#ffffff');
+$footerText = (string)config('theme_footer_text', '#4e5969');
+$footerOpacity = max(0, min(100, (int)config('theme_footer_opacity', 100)));
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $headerBg)) { $headerBg = '#ffffff'; }
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $headerText)) { $headerText = '#1f2329'; }
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $islandBg)) { $islandBg = '#ffffff'; }
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $islandText)) { $islandText = '#1f2329'; }
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $footerBg)) { $footerBg = '#ffffff'; }
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $footerText)) { $footerText = '#4e5969'; }
 $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}px;"
-    . "--color-primary:{$primary};--color-link:{$primary}";
+    . "--color-primary:{$primary};--color-link:{$primary};";
+// 只在用户真正改过颜色时输出覆盖变量，避免默认白色把暗色模式顶栏/页脚刷白
+if ($headerBg !== '#ffffff' || $headerText !== '#1f2329' || $headerOpacity !== 100) {
+    $vars .= "--cb-header-bg:" . cb_hex_rgba($headerBg, $headerOpacity) . ";--cb-header-text:{$headerText};";
+}
+if ($islandBg !== '#ffffff' || $islandText !== '#1f2329' || $islandOpacity !== 100) {
+    $vars .= "--cb-island-bg:" . cb_hex_rgba($islandBg, $islandOpacity) . ";--cb-island-text:{$islandText};";
+}
+if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 100) {
+    $vars .= "--cb-footer-bg:" . cb_hex_rgba($footerBg, $footerOpacity) . ";--cb-footer-text:{$footerText};";
+}
 ?>
 <style>:root{<?= $vars ?>}html[data-theme="dark"]{<?= $vars ?>}</style>
 <script>
@@ -136,10 +162,26 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
                  value="<?= h(\App\Core\Request::get('q', '')) ?>">
         </form>
 
-        <button class="cb-icon-btn" data-theme-toggle title="<?= L('切换暗色模式') ?>">
-          <span class="ico-light"><?= cb_icon('sun') ?></span>
-          <span class="ico-dark"><?= cb_icon('moon') ?></span>
-        </button>
+        <div class="cb-dropdown cb-theme-menu">
+          <button class="cb-icon-btn" id="btn-theme" type="button" title="<?= L('外观 / 色调') ?>" aria-haspopup="true">
+            <?= cb_icon('shirt') ?>
+          </button>
+          <div class="cb-dropdown__menu" id="menu-theme">
+            <div class="head"><span><?= cb_icon('shirt') ?> <?= L('外观 / 色调') ?></span></div>
+            <div class="cb-theme-menu__list">
+              <div class="cb-theme-menu__label"><?= L('明暗') ?></div>
+              <button type="button" class="cb-theme-choice" data-theme-mode="light">☀ <?= L('明亮') ?></button>
+              <button type="button" class="cb-theme-choice" data-theme-mode="dark">☾ <?= L('暗色') ?></button>
+              <button type="button" class="cb-theme-choice" data-theme-mode="auto">◐ <?= L('跟随系统') ?></button>
+              <div class="cb-theme-menu__label"><?= L('色调') ?></div>
+              <button type="button" class="cb-theme-choice" data-palette="default"><?= L('默认') ?></button>
+              <button type="button" class="cb-theme-choice" data-palette="green"><?= L('绿色护眼纸') ?></button>
+              <button type="button" class="cb-theme-choice" data-palette="retro"><?= L('黄色复古') ?></button>
+              <button type="button" class="cb-theme-choice" data-palette="blackgold"><?= L('黑金') ?></button>
+              <button type="button" class="cb-theme-choice" data-palette="orange"><?= L('橙黄') ?></button>
+            </div>
+          </div>
+        </div>
 
         <?php
         // 语言切换：下拉列出可用语言，切换后回到当前页
@@ -235,7 +277,7 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
 <div class="cb-drawer-mask" id="cb-drawer-mask"></div>
 
 <?php if ($diyImage !== '' && $diyPos === 'top'): ?>
-<div class="cb-diy-banner cb-diy-banner--top" aria-hidden="true"><img src="<?= h($diyImage) ?>" alt="" style="opacity:<?= $diyOpacityCss ?>"></div>
+<div class="cb-diy-banner cb-diy-banner--top" aria-hidden="true" style="--diy-feather:<?= (int)$diyFeather ?>px"><img src="<?= h($diyImage) ?>" alt="" style="opacity:<?= $diyOpacityCss ?>"></div>
 <?php endif; ?>
 
 <?php $flashSuccess = flash('success'); $flashError = flash('error'); $flashErrors = flash('errors'); ?>
@@ -308,11 +350,8 @@ $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}p
   <?php endif; ?>
 </main>
 
-<?php if ($diyImage !== '' && $diyPos === 'bottom'): ?>
-<div class="cb-diy-banner cb-diy-banner--bottom" aria-hidden="true"><img src="<?= h($diyImage) ?>" alt="" style="opacity:<?= $diyOpacityCss ?>"></div>
-<?php endif; ?>
-
-<footer class="cb-footer">
+<footer class="cb-footer<?= ($diyImage !== '' && $diyPos === 'bottom') ? ' cb-footer--diy' : '' ?>"
+        <?php if ($diyImage !== '' && $diyPos === 'bottom'): ?>style="--diy-image:url('<?= h($diyImage) ?>');--diy-opacity:<?= $diyOpacityCss ?>;--diy-feather:<?= (int)$diyFeather ?>px"<?php endif; ?>>
   <div class="cb-footer__inner">
     <div>
       <div><?= h($siteName) ?> · ChatBBS v<?= CB_VERSION ?></div>

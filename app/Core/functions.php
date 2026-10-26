@@ -531,3 +531,21 @@ if (!function_exists('is_mobile')) {
         return (bool)preg_match('/(android|iphone|ipad|ipod|mobile|windows phone)/i', $ua);
     }
 }
+
+if (!function_exists('cb_hex_rgba')) {
+    /**
+     * 十六进制颜色 + 0-100 透明度 → rgba()。
+     */
+    function cb_hex_rgba(string $hex, int $alpha = 100): string
+    {
+        $hex = ltrim(trim($hex), '#');
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            $hex = 'ffffff';
+        }
+        $alpha = max(0, min(100, $alpha));
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+        return 'rgba(' . $r . ',' . $g . ',' . $b . ',' . number_format($alpha / 100, 2, '.', '') . ')';
+    }
+}

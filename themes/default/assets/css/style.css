@@ -39,6 +39,68 @@ html[data-theme="dark"] {
   --shadow: 0 4px 16px rgba(0, 0, 0, .4);
 }
 
+
+/* ---------- 内置色调主题 ---------- */
+html[data-palette="green"] {
+  --color-bg: #eef4e6; --color-surface: #fbfdf7; --color-surface-alt: #f3f8ed;
+  --color-border: #dde8d3; --color-border-strong: #cbd9bf;
+  --color-text: #25321f; --color-text-sub: #4d5c45; --color-text-muted: #7d8b74;
+  --color-primary: #4f7a35; --color-primary-dark: #3d6227; --color-primary-light: #e7f1dd; --color-link: #4f7a35;
+}
+html[data-theme="dark"][data-palette="green"] {
+  --color-bg: #151b12; --color-surface: #1d2518; --color-surface-alt: #232c1c;
+  --color-border: #33402b; --color-border-strong: #44543a;
+  --color-text: #e4ecd9; --color-text-sub: #b1c0a4; --color-text-muted: #7f8d75;
+  --color-primary: #8fbf6a; --color-primary-dark: #6f9c4f; --color-primary-light: #2a3a22; --color-link: #a8d48a;
+}
+html[data-palette="retro"] {
+  --color-bg: #f4ecd8; --color-surface: #fffaf0; --color-surface-alt: #faf3e4;
+  --color-border: #e8dcc4; --color-border-strong: #d9c9aa;
+  --color-text: #3e3527; --color-text-sub: #6b5c45; --color-text-muted: #94846c;
+  --color-primary: #a76b2d; --color-primary-dark: #835020; --color-primary-light: #f2e3c9; --color-link: #a76b2d;
+}
+html[data-theme="dark"][data-palette="retro"] {
+  --color-bg: #1d1913; --color-surface: #262016; --color-surface-alt: #2e271b;
+  --color-border: #443a2a; --color-border-strong: #5a4b35;
+  --color-text: #efe4ce; --color-text-sub: #c0b094; --color-text-muted: #8e7f68;
+  --color-primary: #d8a75a; --color-primary-dark: #b8863d; --color-primary-light: #3a2f1e; --color-link: #e0b76b;
+}
+html[data-palette="blackgold"] {
+  --color-bg: #0f0e0b; --color-surface: #181611; --color-surface-alt: #211e17;
+  --color-border: #332e23; --color-border-strong: #4a4130;
+  --color-text: #f3e7c9; --color-text-sub: #cfbea0; --color-text-muted: #9a8a6d;
+  --color-primary: #c9a227; --color-primary-dark: #a88418; --color-primary-light: #2c2517; --color-link: #d8b84a;
+}
+html[data-theme="dark"][data-palette="blackgold"] {
+  --color-bg: #0b0a08; --color-surface: #14120d; --color-surface-alt: #1c1913;
+  --color-border: #2e291f; --color-border-strong: #453c2a;
+  --color-text: #f7eccf; --color-text-sub: #d6c6a7; --color-text-muted: #a29171;
+  --color-primary: #d8b33c; --color-primary-dark: #b89424; --color-primary-light: #2e2818; --color-link: #e6c65a;
+}
+html[data-palette="orange"] {
+  --color-bg: #fff4e8; --color-surface: #fffaf4; --color-surface-alt: #fff1e2;
+  --color-border: #f2ddc9; --color-border-strong: #e4c7ac;
+  --color-text: #3a2a1e; --color-text-sub: #6f5340; --color-text-muted: #9c7f68;
+  --color-primary: #e05d2a; --color-primary-dark: #b8471c; --color-primary-light: #ffe6d6; --color-link: #d94f1f;
+}
+html[data-theme="dark"][data-palette="orange"] {
+  --color-bg: #1c130e; --color-surface: #261a12; --color-surface-alt: #2f2016;
+  --color-border: #463324; --color-border-strong: #5d4430;
+  --color-text: #f3e2d4; --color-text-sub: #c9ad99; --color-text-muted: #9b7b64;
+  --color-primary: #ff854f; --color-primary-dark: #e56732; --color-primary-light: #3d2417; --color-link: #ff9a6b;
+}
+
+/* 外观 / 色调下拉 */
+.cb-theme-menu .cb-dropdown__menu { width: 190px; }
+.cb-theme-menu__list { padding: 6px; }
+.cb-theme-menu__label { padding: 7px 8px 3px; font-size: 11px; color: var(--color-text-muted); }
+.cb-theme-choice {
+  display: block; width: 100%; padding: 7px 8px; border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--color-text-sub); text-align: left; cursor: pointer; font-size: 13px;
+}
+.cb-theme-choice:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.cb-theme-choice.on { color: var(--color-primary); background: var(--color-primary-light); font-weight: 600; }
+
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 /* 页脚常驻底部：body 用纵向 flex，主内容区自动撑满剩余高度 */
@@ -67,10 +129,17 @@ input, textarea, select, button { font-family: inherit; font-size: inherit; }
 /* ---------- 顶部导航 ---------- */
 .cb-header {
   position: sticky; top: 0; z-index: 100;
-  background: var(--color-surface);
+  background: var(--cb-header-bg, var(--color-surface));
+  color: var(--cb-header-text, var(--color-text));
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
 }
+.cb-header .cb-logo__text,
+.cb-header .cb-nav a,
+.cb-header .cb-icon-btn,
+.cb-header .cb-search input { color: var(--cb-header-text, var(--color-text)); }
+.cb-header .cb-nav a.active { color: var(--color-primary); }
 .cb-header__inner {
   max-width: 1200px; margin: 0 auto; padding: 0 16px;
   height: var(--header-height); display: flex; align-items: center; gap: 16px;
@@ -732,10 +801,10 @@ html[data-theme="dark"] .cb-alert { background: var(--color-surface-alt); }
 .cb-lang-menu__tick { flex: none; color: var(--color-primary); font-weight: 700; }
 
 /* ---------- 底部 ---------- */
-.cb-footer { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 24px 0; color: var(--color-text-muted); font-size: 13px; }
+.cb-footer { background: var(--cb-footer-bg, var(--color-surface)); border-top: 1px solid var(--color-border); padding: 24px 0; color: var(--cb-footer-text, var(--color-text-muted)); font-size: 13px; }
 .cb-footer__inner { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.cb-footer a { color: var(--color-text-sub); }
-.cb-footer__github { display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-sub); }
+.cb-footer a { color: var(--cb-footer-text, var(--color-text-sub)); }
+.cb-footer__github { display: inline-flex; align-items: center; gap: 4px; color: var(--cb-footer-text, var(--color-text-sub)); }
 .cb-footer__github:hover { color: var(--color-text); }
 .cb-footer__github .cb-ico, .cb-footer__rss .cb-ico { width: 15px; height: 15px; vertical-align: -3px; }
 
@@ -1500,6 +1569,7 @@ input[type="file"]::file-selector-button:hover { filter: brightness(.94); }
 
 .cb-island-nav {
   grid-area: nav;
+  color: var(--cb-island-text, var(--color-text));
   position: sticky;
   top: var(--header-height);
   align-self: start;
@@ -1507,7 +1577,7 @@ input[type="file"]::file-selector-button:hover { filter: brightness(.94); }
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 16px 14px 24px;
-  background: var(--color-surface);
+  background: var(--cb-island-bg, var(--color-surface));
   border: 0;
   border-radius: 0;
   scrollbar-width: thin;
@@ -1521,7 +1591,7 @@ input[type="file"]::file-selector-button:hover { filter: brightness(.94); }
   gap: 4px;
   margin-bottom: 6px;
   padding: 0 4px 10px;
-  background: var(--color-surface);
+  background: var(--cb-island-bg, var(--color-surface));
   border-bottom: 1px solid var(--color-border);
 }
 .cb-island-nav__title {
@@ -1542,6 +1612,12 @@ input[type="file"]::file-selector-button:hover { filter: brightness(.94); }
 .cb-island-tool:hover { background: var(--color-surface-alt); color: var(--color-text); }
 .cb-island-tool .cb-ico { width: 16px; height: 16px; }
 .cb-island-nav__inner { display: flex; flex-direction: column; gap: 2px; }
+.cb-island-nav .cb-island-group__title,
+.cb-island-nav .cb-island-link,
+.cb-island-nav .cb-island-forum-parent,
+.cb-island-nav__title { color: var(--cb-island-text, var(--color-text)); }
+.cb-island-nav .cb-island-link { opacity: .82; }
+.cb-island-nav .cb-island-link.active { color: var(--color-primary); opacity: 1; }
 .cb-island-group { padding: 8px 0; border-bottom: 1px solid var(--color-border); }
 .cb-island-group:first-child { padding-top: 0; }
 .cb-island-group:last-child { padding-bottom: 0; border-bottom: 0; }
@@ -1754,3 +1830,84 @@ body.island-resizing { user-select: none; cursor: col-resize; }
 
 /* 维护页只显示维护卡片 */
 .cb-maintenance .cb-header, .cb-maintenance .cb-island-nav, .cb-maintenance .cb-footer { display: none !important; }
+
+/* DIY 顶部横幅羽化 + 底部图片页脚 */
+.cb-diy-banner--top img {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--diy-feather, 60px)), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--diy-feather, 60px)), transparent 100%);
+}
+.cb-footer--diy {
+  position: relative;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+  background: transparent;
+}
+.cb-footer--diy::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background-image: var(--diy-image);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--diy-opacity, .2);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--diy-feather, 60px));
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--diy-feather, 60px));
+}
+.cb-footer--diy::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.42));
+  pointer-events: none;
+}
+.cb-footer--diy .cb-footer__inner { position: relative; z-index: 1; width: 100%; }
+.cb-footer--diy, .cb-footer--diy a, .cb-footer--diy .cb-footer__github,
+.cb-footer--diy .cb-footer__license { color: #fff; }
+.cb-footer--diy a:hover { color: #fff; opacity: .8; }
+@media (max-width: 640px) {
+  .cb-footer--diy { min-height: 150px; }
+}
+
+/* 发帖表单：提示词放入输入框 */
+.cb-thread-form .cb-form-item--compact { margin-bottom: 10px; }
+.cb-thread-form .cb-form-item--compact > label { display: none; }
+.cb-thread-form .cb-form-item--compact .cb-input,
+.cb-thread-form .cb-form-item--compact .cb-select { width: 100%; }
+
+/* 岛屿侧栏目录 */
+.cb-island-toc { padding: 4px 2px 12px; }
+.cb-island-toc__head { padding: 4px 8px 8px; font-size: 12px; font-weight: 600; color: var(--color-text-muted); letter-spacing: .04em; }
+.cb-island-toc__list { display: flex; flex-direction: column; gap: 1px; }
+.cb-island-toc__list a { display: block; padding: 6px 9px; border-radius: var(--radius-sm); font-size: 13px; color: var(--color-text-sub); line-height: 1.45; }
+.cb-island-toc__list a:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.cb-island-toc__list a.lv2 { padding-left: 20px; }
+.cb-island-toc__list a.lv3 { padding-left: 30px; font-size: 12px; }
+.cb-island-toc__list a.lv4, .cb-island-toc__list a.lv5, .cb-island-toc__list a.lv6 { padding-left: 40px; font-size: 12px; color: var(--color-text-muted); }
+.cb-island-toc__empty { padding: 8px; font-size: 12px; color: var(--color-text-muted); }
+.cb-island-tool.on { background: var(--color-primary-light); color: var(--color-primary); }
+
+/* 帖子列表更多操作 */
+.cb-thread { position: relative; }
+.cb-thread-list--plain { overflow: visible; }
+.cb-thread__more { flex: none; position: relative; align-self: center; }
+.cb-thread__more-btn { width: 28px; height: 28px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-text-muted); font-size: 20px; line-height: 1; cursor: pointer; }
+.cb-thread__more-btn:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.cb-thread-menu {
+  position: absolute; right: 0; top: 32px; z-index: 80;
+  min-width: 168px; padding: 5px; display: none;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.cb-thread__more.is-open .cb-thread-menu { display: block; }
+.cb-thread-menu > button, .cb-thread-menu > a {
+  display: flex; align-items: center; gap: 7px; width: 100%;
+  padding: 8px 9px; border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--color-text-sub); font-size: 13px; text-align: left; cursor: pointer;
+}
+.cb-thread-menu > button:hover, .cb-thread-menu > a:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.cb-thread-menu .cb-ico { width: 15px; height: 15px; }
+.cb-thread-menu__color { display: flex; align-items: center; gap: 6px; padding: 5px 7px; }
+.cb-thread-menu__color input { width: 30px; height: 28px; padding: 0; border: 1px solid var(--color-border); border-radius: 4px; background: none; }
+.cb-thread-menu__color button { flex: 1; padding: 6px 7px; border: 0; border-radius: 4px; background: var(--color-surface-alt); color: var(--color-text-sub); font-size: 12px; cursor: pointer; }
+.cb-card:has(.cb-thread-list--plain) { overflow: visible; }

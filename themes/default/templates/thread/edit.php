@@ -12,14 +12,14 @@ $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !==
 <div class="cb-card cb-card--editor">
   <div class="cb-card__header"><?= $isEdit ? L('编辑主题') : L('发布主题') ?></div>
   <div class="cb-card__body">
-    <form id="thread-form" method="post"
+    <form id="thread-form" class="cb-thread-form" method="post"
           action="<?= h($isEdit ? url('thread/' . $thread['id'] . '/edit') : url('thread/create')) ?>"
           data-thread-id="<?= $isEdit ? (int)$thread['id'] : 0 ?>">
       <?= csrf_field() ?>
 
-      <div class="cb-form-item">
-        <label for="f-forum"><?= L('所属板块') ?></label>
+      <div class="cb-form-item cb-form-item--compact">
         <select class="cb-select" id="f-forum" name="forum_id" required>
+          <option value="" disabled <?= (int)$forum_id === 0 ? 'selected' : '' ?>>请选择你发帖的板块…</option>
           <?php foreach ($forums as $cat): ?>
             <optgroup label="<?= h($cat['name']) ?>">
               <?php foreach ($cat['children'] as $b): ?>
@@ -33,10 +33,9 @@ $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !==
         </select>
       </div>
 
-      <div class="cb-form-item">
-        <label for="f-title"><?= L('标题') ?></label>
+      <div class="cb-form-item cb-form-item--compact">
         <input class="cb-input" id="f-title" name="title" required maxlength="100"
-               value="<?= h($thread['title'] ?? old('title')) ?>" placeholder="<?= L('一句话说明你的主题') ?>">
+               value="<?= h($thread['title'] ?? old('title')) ?>" placeholder="<?= L('请输入标题，一句话说明你的主题') ?>">
       </div>
 
       <div class="cb-form-item">
@@ -101,9 +100,8 @@ $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !==
         })();
       </script>
 
-      <div class="cb-form-item">
-        <label for="f-tags">标签（逗号分隔，最多 <?= (int)$max_tags ?> 个）</label>
-        <input class="cb-input" id="f-tags" name="tags" value="<?= h($tagNames ?: old('tags')) ?>" placeholder="<?= L('例如：讨论,求助') ?>">
+      <div class="cb-form-item cb-form-item--compact">
+        <input class="cb-input" id="f-tags" name="tags" value="<?= h($tagNames ?: old('tags')) ?>" placeholder="添加标签，用逗号分隔，最多 <?= (int)$max_tags ?> 个">
         <?php if (!(int)$allow_user_tag && !is_admin()): ?>
           <div class="cb-form-tip"><?= L('仅可使用管理员已创建的标签') ?></div>
         <?php endif; ?>
@@ -122,8 +120,7 @@ $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !==
         $titleColor = (string)($thread['title_color'] ?? '');
         $titlePick = preg_match('/^#[0-9a-fA-F]{6}$/', $titleColor) ? $titleColor : '#52c41a';
         ?>
-        <div class="cb-form-item">
-          <label for="f-title-color">标题颜色</label>
+        <div class="cb-form-item cb-form-item--compact">
           <div class="cb-color-field">
             <input type="color" id="f-title-color-pick" value="<?= h($titlePick) ?>" aria-label="<?= L('选择标题颜色') ?>">
             <input class="cb-input" id="f-title-color" name="title_color" value="<?= h($titleColor) ?>"
@@ -153,17 +150,16 @@ $editMode = ($contentFmt === 'markdown' || ($contentFmt === '' && $contentMd !==
         </label>
       </div>
 
-      <div class="cb-form-item">
-        <label for="f-fee">帖子附件售价（<?= h(currency_name()) ?>，0 为免费）</label>
+      <div class="cb-form-item cb-form-item--compact">
         <input class="cb-input" id="f-fee" name="attachment_fee" type="number" min="0" step="0.01"
-               value="<?= h((string)($thread['attachment_fee'] ?? 0)) ?>">
+               value="<?= h((string)($thread['attachment_fee'] ?? 0)) ?>" placeholder="帖子附件售价（<?= h(currency_name()) ?>，0 为免费）">
         <div class="cb-form-tip">设置后，本贴中上传的附件需付费才能下载</div>
       </div>
 
-      <div class="cb-form-item">
-        <label for="f-license"><?= L('版权许可证') ?></label>
+      <div class="cb-form-item cb-form-item--compact">
         <select class="cb-select" id="f-license" name="license">
           <?php $curLicense = (string)($thread['license'] ?? ''); ?>
+          <option value=""><?= L('版权许可证（可选）') ?></option>
           <?php foreach (\license_options() as $lk => $lo): ?>
             <option value="<?= h($lk) ?>" <?= $lk === $curLicense ? 'selected' : '' ?>><?= h(L($lo[0])) ?></option>
           <?php endforeach; ?>

@@ -34,17 +34,18 @@
     this.opts = opts || {};
     this.valueEl = this.opts.input ? document.getElementById(this.opts.input) : null;
     /* rich（默认，站点自带富文本） / markdown */
-    this.mode = this.opts.mode === 'markdown' ? 'markdown' : 'rich';
+    this.mode = ['markdown', 'bbcode'].indexOf(this.opts.mode) >= 0 ? this.opts.mode : 'rich';
     this.htmlBuf = '';   // 富文本缓冲（切到 Markdown 再切回来时不丢内容）
     this.mdBuf = '';     // Markdown 缓冲
+    this.bbBuf = '';     // BBCode 缓冲
     this.savedRange = null;
     this.build();
     this.bind();
     /* 初始内容 */
     var initial = this.opts.initial || (this.valueEl ? this.valueEl.value : '') || '';
     if (initial) {
-      if (this.mode === 'markdown') {
-        this.mdBuf = initial;
+      if (this.mode === 'markdown' || this.mode === 'bbcode') {
+        if (this.mode === 'markdown') this.mdBuf = initial; else this.bbBuf = initial;
         this.mdArea.value = initial;
       } else {
         this.htmlBuf = initial;
@@ -109,7 +110,8 @@
     bar.className = 'cb-editor__modes';
     bar.innerHTML =
       '<button type="button" class="cb-ed-mode" data-mode="rich" title="' + cbT('富文本模式（站点默认）') + '">' + ico('image') + cbT('富文本') + '</button>'
-      + '<button type="button" class="cb-ed-mode" data-mode="markdown" title="' + cbT('Markdown 模式') + '">' + ico('md') + 'Markdown</button>';
+      + '<button type="button" class="cb-ed-mode" data-mode="markdown" title="' + cbT('Markdown 模式') + '">' + ico('md') + 'Markdown</button>'
+      + '<button type="button" class="cb-ed-mode" data-mode="bbcode" title="' + cbT('BBCode 文本模式') + '">' + ico('code') + 'BBCode</button>';
     bar.addEventListener('mousedown', function (e) { e.preventDefault(); });
     bar.querySelectorAll('.cb-ed-mode').forEach(function (b) {
       b.addEventListener('click', function () { self.setMode(b.getAttribute('data-mode')); });
@@ -121,7 +123,7 @@
     var self = this;
     this.tb.innerHTML = '';
 
-    var btns = this.mode === 'markdown' ? [
+    var btns = this.mode === 'bbcode' ? [] : this.mode === 'markdown' ? [
       { icon: 'h', title: cbT('标题'), fn: 'mdHeading' },
       { icon: 'bold', title: cbT('加粗'), fn: 'mdWrap', arg: '**' },
       { icon: 'italic', title: cbT('斜体'), fn: 'mdWrap', arg: '*' },
@@ -283,44 +285,89 @@
   Editor.prototype.applyMode = function () {
     var rich = this.mode === 'rich';
     this.wrap.classList.toggle('cb-editor--rich', rich);
-    this.wrap.classList.toggle('cb-editor--md', !rich);
+    this.wrap.classList.toggle('cb-editor--md', this.mode === 'markdown');
+    this.wrap.classList.toggle('cb-editor--bb', this.mode === 'bbcode');
     this.area.classList.toggle('hide', !rich);
     this.mdArea.classList.toggle('hide', rich);
+    this.mdArea.setAttribute('placeholder', this.mode === 'bbcode'
+      ? '在此编写 BBCode…\n[b]加粗[/b] [i]斜体[/i] [u]下划线[/u]\n[quote]引用[/quote] [code]代码[/code]\n[url=https://…]链接[/url] [img]图片地址[/img]'
+      : '在此编写 Markdown…\n# 标题\n**加粗** *斜体* `代码`\n- 列表\n> 引用\n```\n代码块\n```\n[链接](https://…) 或 ![图片](图片地址)');
     if (this.hint) {
       this.hint.textContent = rich
         ? cbT('支持粘贴 / 拖拽图片自动上传；选中文字或图片可使用快捷工具条')
-        : cbT('Markdown 模式：保存后会按 Markdown 语法渲染');
+        : (this.mode === 'bbcode' ? cbT('BBCode 模式：保存后自动转换为排版') : cbT('Markdown 模式：保存后会按 Markdown 语法渲染'));
     }
     this.sync();
   };
 
   Editor.prototype.setMode = function (mode) {
-    mode = mode === 'markdown' ? 'markdown' : 'rich';
+    if (['rich', 'markdown', 'bbcode'].indexOf(mode) < 0) mode = 'rich';
     if (mode === this.mode) return;
-    if (mode === 'markdown') {
-      // 富文本 → Markdown：优先用已有 md 源码，其次把当前 HTML 转成 Markdown
-      if (!this.mdBuf) { this.mdBuf = this.htmlToMarkdown(this.area.innerHTML); }
+    if (this.mode === 'rich') {
       this.htmlBuf = this.area.innerHTML;
-    } else {
-      // Markdown → 富文本：优先还原原来的富文本内容
+    } else if (this.mode === 'markdown') {
       this.mdBuf = this.mdArea.value;
-      if (this.htmlBuf) {
-        this.area.innerHTML = this.htmlBuf;
-      } else if (this.mdBuf.trim()) {
+    } else {
+      this.bbBuf = this.mdArea.value;
+    }
+    if (mode === 'rich') {
+      if (this.mode === 'bbcode') {
+        this.htmlBuf = this.bbcodeToHtml(this.bbBuf);
+      } else if (this.mode === 'markdown') {
         this.mdToHtml(this.mdBuf);
+        this.htmlBuf = this.area.innerHTML;
       }
+      if (this.htmlBuf) this.area.innerHTML = this.htmlBuf;
+    } else if (mode === 'markdown') {
+      if (!this.mdBuf) this.mdBuf = this.htmlToMarkdown(this.htmlBuf || this.area.innerHTML);
+      this.mdArea.value = this.mdBuf;
+    } else {
+      if (!this.bbBuf) this.bbBuf = this.htmlToBbcode(this.htmlBuf || this.area.innerHTML);
+      this.mdArea.value = this.bbBuf;
     }
     this.mode = mode;
     this.buildToolbar();
     this.applyMode();
-    if (mode === 'markdown') {
-      this.mdArea.value = this.mdBuf;
-      this.mdArea.focus();
-    } else {
-      this.area.focus();
-    }
+    if (mode === 'rich') this.area.focus(); else this.mdArea.focus();
     this.clearImageSelection();
     this.hideFloatBar();
+  };
+
+  Editor.prototype.htmlToBbcode = function (html) {
+    var s = String(html || '');
+    s = s.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<p[^>]*>/gi, '');
+    s = s.replace(/<(strong|b)[^>]*>([\s\S]*?)<\/\1>/gi, '[b]$2[/b]');
+    s = s.replace(/<(em|i)[^>]*>([\s\S]*?)<\/\1>/gi, '[i]$2[/i]');
+    s = s.replace(/<u[^>]*>([\s\S]*?)<\/u>/gi, '[u]$1[/u]');
+    s = s.replace(/<(s|del)[^>]*>([\s\S]*?)<\/\1>/gi, '[s]$2[/s]');
+    s = s.replace(/<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi, function (m, n, t) { return '[' + 'h' + n + ']' + t + '[/h' + n + ']\n'; });
+    s = s.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, '[quote]$1[/quote]');
+    s = s.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, '[code]$1[/code]');
+    s = s.replace(/<a[^>]+href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)<\/a>/gi, '[url=$1]$2[/url]');
+    s = s.replace(/<img[^>]+src=["\']([^"\']+)["\'][^>]*>/gi, '[img]$1[/img]');
+    s = s.replace(/<[^>]+>/g, '');
+    return s.replace(/\n{3,}/g, '\n\n').trim();
+  };
+
+  Editor.prototype.bbcodeToHtml = function (text) {
+    var s = String(text || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    s = s.replace(/\[b\]([\s\S]*?)\[\/b\]/gi, '<strong>$1</strong>');
+    s = s.replace(/\[i\]([\s\S]*?)\[\/i\]/gi, '<em>$1</em>');
+    s = s.replace(/\[u\]([\s\S]*?)\[\/u\]/gi, '<u>$1</u>');
+    s = s.replace(/\[s\]([\s\S]*?)\[\/s\]/gi, '<s>$1</s>');
+    s = s.replace(/\[h([1-6])\]([\s\S]*?)\[\/h\1\]/gi, '<h$1>$2</h$1>');
+    s = s.replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<blockquote>$1</blockquote>');
+    s = s.replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<pre><code>$1</code></pre>');
+    s = s.replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, function (m, u, t) {
+      var uu = u.replace(/"/g, '&quot;');
+      return /^https?:\/\//i.test(u) || u.charAt(0) === '/' ? '<a href="' + uu + '" rel="nofollow noopener">' + t + '</a>' : t;
+    });
+    s = s.replace(/\[img\]([\s\S]*?)\[\/img\]/gi, function (m, u) {
+      var uu = u.replace(/"/g, '&quot;');
+      return /^https?:\/\//i.test(u) || u.charAt(0) === '/' ? '<img src="' + uu + '" alt="">' : '';
+    });
+    return s.replace(/\r?\n/g, '<br>');
   };
 
   /* HTML → Markdown（尽力而为的简化转换，供切换模式使用） */
@@ -718,16 +765,18 @@
 
   /* ---------------- 同步到表单字段 ---------------- */
   Editor.prototype.sync = function () {
-    var html = this.mode === 'rich' ? this.area.innerHTML : '';
+    var html = this.mode === 'rich' ? this.area.innerHTML : (this.mode === 'bbcode' ? this.bbcodeToHtml(this.mdArea.value) : '');
     var text = this.mode === 'rich' ? (this.area.textContent || '') : this.mdArea.value;
     if (this.mode === 'rich') {
       this.htmlBuf = html;
-    } else {
+    } else if (this.mode === 'markdown') {
       this.mdBuf = this.mdArea.value;
+    } else {
+      this.bbBuf = this.mdArea.value;
     }
-    if (this.valueEl) { this.valueEl.value = this.mode === 'rich' ? html : this.mdArea.value; }
+    if (this.valueEl) { this.valueEl.value = this.mode === 'rich' ? html : (this.mode === 'bbcode' ? html : this.mdArea.value); }
     var fmt = document.getElementById(this.opts.input ? this.opts.input + '_format' : '');
-    if (fmt) { fmt.value = this.mode; }
+    if (fmt) { fmt.value = this.mode === 'markdown' ? 'markdown' : 'rich'; }
     if (this.counter) { this.counter.textContent = text.length + cbT(' 字'); }
   };
 

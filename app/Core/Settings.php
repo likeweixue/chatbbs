@@ -118,6 +118,17 @@ class Settings
         'diy_image' => '',
         'diy_position' => 'top',
         'diy_opacity' => '20',
+        'diy_feather' => '60',
+        // 全局颜色（顶栏 / 岛屿侧栏 / 页脚）
+        'theme_header_bg' => '#ffffff',
+        'theme_header_text' => '#1f2329',
+        'theme_header_opacity' => '100',
+        'theme_island_bg' => '#ffffff',
+        'theme_island_text' => '#1f2329',
+        'theme_island_opacity' => '100',
+        'theme_footer_bg' => '#ffffff',
+        'theme_footer_text' => '#4e5969',
+        'theme_footer_opacity' => '100',
         // 网站导航页
         'nav_title' => '网站导航',
         'nav_slug' => 'nav',
