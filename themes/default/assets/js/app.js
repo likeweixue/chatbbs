@@ -986,3 +986,33 @@
     });
   });
 })();
+
+/* 全局通知横幅：手动关闭 / 定时自动关闭 */
+(function () {
+  document.querySelectorAll('[data-notice-banner]').forEach(function (banner) {
+    var close = banner.querySelector('[data-notice-close]');
+    var timer = null;
+    function dismiss() {
+      if (banner.classList.contains('is-closing')) return;
+      banner.classList.add('is-closing');
+      if (timer) clearTimeout(timer);
+      setTimeout(function () { banner.remove(); }, 360);
+    }
+    if (close) close.addEventListener('click', dismiss);
+    var sec = parseInt(banner.getAttribute('data-auto-close') || '0', 10);
+    if (sec > 0) timer = setTimeout(dismiss, sec * 1000);
+  });
+})();
+
+/* 移动端抽屉内发帖 / 回复按钮：回复锚点点击后自动收起抽屉 */
+(function () {
+  document.querySelectorAll('.cb-drawer__island .cb-island-publish').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var header = document.getElementById('cb-header');
+      if (header) header.classList.remove('open');
+      document.body.classList.remove('cb-drawer-open');
+      var burger = document.getElementById('cb-burger');
+      if (burger) burger.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();

@@ -101,6 +101,22 @@ class SettingController extends BaseAdmin
                 ],
             ]) . '</div></div>';
 
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">全局通知横幅</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('settings/notice'),
+                'data' => Settings::all(),
+                'submit' => '保存通知横幅',
+                'fields' => [
+                    ['name' => 'notice_banner_enable', 'label' => '启用横幅', 'type' => 'switch'],
+                    ['name' => 'notice_banner_title', 'label' => '标题', 'tip' => '留空且正文为空时不显示横幅'],
+                    ['name' => 'notice_banner_text', 'label' => '正文', 'type' => 'textarea'],
+                    ['name' => 'notice_banner_auto_close', 'label' => '自动关闭（秒）', 'type' => 'number',
+                        'tip' => '0 表示只允许手动关闭；例如 8 表示 8 秒后自动收起'],
+                ],
+            ])
+            . '<div class="adm-form-tip">横幅显示在顶栏下方（移动端在抽屉面板内），关闭时向上滑动收起。</div>'
+            . '</div></div>';
+
         $forumOpts = [0 => '全部板块'] + Forum::options(false);
         $tagOpts = [0 => '全部标签'];
         foreach (Database::fetchAll('SELECT id, name FROM ' . Database::table('tags') . ' ORDER BY threads DESC, id ASC LIMIT 100') as $tg) {
@@ -129,6 +145,19 @@ class SettingController extends BaseAdmin
             . '</div></div>';
 
         return $this->pageView('站点设置', 'settings', $html);
+    }
+
+    public function saveNotice(): void
+    {
+        Settings::setMany([
+            'notice_banner_enable' => Request::bool('notice_banner_enable') ? 1 : 0,
+            'notice_banner_title' => $this->pure('notice_banner_title', 120),
+            'notice_banner_text' => $this->pure('notice_banner_text', 2000),
+            'notice_banner_auto_close' => (string)max(0, min(3600, Request::int('notice_banner_auto_close', 0))),
+        ]);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改全局通知横幅');
+        $this->back('通知横幅已保存');
     }
 
     /**

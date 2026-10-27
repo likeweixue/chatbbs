@@ -11,6 +11,8 @@ if (!$island_menu) {
 }
 $island_forums = $island_forums ?? [];
 $island_tags = $island_tags ?? [];
+$islandNavDrawer = $island_nav_drawer ?? false;
+$isViewingThread = isset($thread) && empty($editing_page);
 
 $currentTagId = isset($tag) && is_array($tag) ? (int)($tag['id'] ?? 0) : 0;
 $isThread = isset($thread);
@@ -36,22 +38,28 @@ $typeIcon = [
     'link' => 'link',
 ];
 ?>
-<aside class="cb-island-nav" aria-label="<?= L('论坛导航') ?>">
+<aside class="cb-island-nav<?= $islandNavDrawer ? ' cb-island-nav--drawer' : '' ?>" aria-label="<?= L('论坛导航') ?>">
   <div class="cb-island-nav__tools">
     <span class="cb-island-nav__title"><?= L('论坛导航') ?></span>
-    <?php if (!empty($show_toc)): ?>
-      <button type="button" class="cb-island-tool" id="island-toc-toggle" data-island-toc title="<?= L('目录') ?>" aria-label="<?= L('目录') ?>">
-        <?= cb_icon('ul') ?>
+    <?php if (!$islandNavDrawer): ?>
+      <?php if (!empty($show_toc)): ?>
+        <button type="button" class="cb-island-tool" id="island-toc-toggle" data-island-toc title="<?= L('目录') ?>" aria-label="<?= L('目录') ?>">
+          <?= cb_icon('ul') ?>
+        </button>
+      <?php endif; ?>
+      <button type="button" class="cb-island-tool" data-island-hide title="<?= L('隐藏侧栏') ?>" aria-label="<?= L('隐藏侧栏') ?>">
+        <?= cb_icon('panel-left') ?>
+      </button>
+      <button type="button" class="cb-island-tool" data-island-side title="<?= L('切换侧栏位置') ?>" aria-label="<?= L('切换侧栏位置') ?>">
+        <?= cb_icon('panel-right') ?>
       </button>
     <?php endif; ?>
-    <button type="button" class="cb-island-tool" data-island-hide title="<?= L('隐藏侧栏') ?>" aria-label="<?= L('隐藏侧栏') ?>">
-      <?= cb_icon('panel-left') ?>
-    </button>
-    <button type="button" class="cb-island-tool" data-island-side title="<?= L('切换侧栏位置') ?>" aria-label="<?= L('切换侧栏位置') ?>">
-      <?= cb_icon('panel-right') ?>
-    </button>
   </div>
-  <?php if (!empty($show_toc)): ?>
+  <a class="cb-island-publish" href="<?= h($isViewingThread ? '#reply-card' : url('thread/create')) ?>">
+    <?= cb_icon($isViewingThread ? 'comment' : 'edit') ?>
+    <span><?= $isViewingThread ? L('回复') : L('发布主题') ?></span>
+  </a>
+  <?php if (!empty($show_toc) && !$islandNavDrawer): ?>
     <div class="cb-island-toc hide" id="island-toc">
       <div class="cb-island-toc__head"><?= L('目录') ?></div>
       <div class="cb-island-toc__list" id="island-toc-list"></div>

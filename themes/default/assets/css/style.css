@@ -1911,3 +1911,62 @@ body.island-resizing { user-select: none; cursor: col-resize; }
 .cb-thread-menu__color input { width: 30px; height: 28px; padding: 0; border: 1px solid var(--color-border); border-radius: 4px; background: none; }
 .cb-thread-menu__color button { flex: 1; padding: 6px 7px; border: 0; border-radius: 4px; background: var(--color-surface-alt); color: var(--color-text-sub); font-size: 12px; cursor: pointer; }
 .cb-card:has(.cb-thread-list--plain) { overflow: visible; }
+
+/* ===================== 全局通知横幅 ===================== */
+.cb-notice-banner {
+  overflow: hidden;
+  max-height: 320px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  transition: max-height .32s ease, opacity .28s ease, transform .32s ease;
+}
+.cb-notice-banner.is-closing { max-height: 0 !important; opacity: 0; transform: translateY(-100%); }
+.cb-notice-banner__inner {
+  max-width: 1200px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: center; gap: 16px;
+}
+.cb-notice-banner__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cb-notice-banner__text b { font-size: 15px; line-height: 1.4; }
+.cb-notice-banner__text span { font-size: 13px; line-height: 1.55; opacity: .9; }
+.cb-notice-banner__close {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(255,255,255,.16); color: #fff; cursor: pointer;
+}
+.cb-notice-banner__close:hover { background: rgba(255,255,255,.3); }
+.cb-notice-banner__close .cb-ico { width: 16px; height: 16px; }
+.cb-island .cb-notice-banner__inner { max-width: none; }
+.cb-notice-banner--drawer { display: none; }
+.cb-drawer__island { display: none; }
+
+/* 岛屿侧栏发帖 / 回复按钮 */
+.cb-island-publish {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; height: 38px; margin: 0 0 12px; padding: 0 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary); color: #fff;
+  font-size: 14px; font-weight: 600;
+}
+.cb-island-publish:hover { background: var(--color-primary-dark); color: #fff; }
+.cb-island-publish .cb-ico { width: 16px; height: 16px; }
+
+@media (max-width: 860px) {
+  .cb-notice-banner--desktop { display: none; }
+  .cb-notice-banner--drawer { display: block; }
+  .cb-notice-banner--drawer .cb-notice-banner__inner { padding: 10px 14px; }
+  .cb-main--island > .cb-island-nav { display: none; }
+  #island-nav-toggle, #island-nav-side { display: none; }
+  .cb-drawer__island { display: block; order: 3; border-top: 1px solid var(--color-border); }
+  .cb-header__right { order: 4; }
+  .cb-drawer__island .cb-island-nav {
+    position: static; height: auto; max-height: none;
+    padding: 0; border: 0; background: transparent;
+  }
+  .cb-drawer__island .cb-island-nav__tools {
+    position: static; padding: 10px 16px 6px; border: 0; background: transparent;
+  }
+  .cb-drawer__island .cb-island-publish { width: calc(100% - 32px); margin: 2px 16px 10px; }
+  .cb-drawer__island .cb-island-nav__inner { padding: 0 12px 18px; }
+  /* 抽屉固定在视口上，不能被顶栏的 backdrop-filter 变成 56px 高 */
+  .cb-header { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}

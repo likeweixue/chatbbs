@@ -123,6 +123,7 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::get('/settings', $C . 'SettingController@settings');
     Router::post('/settings/save', $C . 'SettingController@save', ['csrf']);
 Router::post('/settings/rss', $C . 'SettingController@saveRss', ['csrf']);
+Router::post('/settings/notice', $C . 'SettingController@saveNotice', ['csrf']);
 Router::get('/nav-links', $C . 'NavLinkController@index');
 Router::post('/nav-links/save', $C . 'NavLinkController@save', ['csrf']);
 Router::post('/nav-links/delete/{id}', $C . 'NavLinkController@delete', ['csrf']);

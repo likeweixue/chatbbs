@@ -19,6 +19,10 @@ $diyPos = in_array($diyPos, ['top', 'bottom', 'global'], true) ? $diyPos : 'top'
 $diyOpacity = max(0, min(100, (int)config('diy_opacity', 20))) / 100;
 $diyOpacityCss = number_format($diyOpacity, 2, '.', '');
 $diyFeather = max(0, min(300, (int)config('diy_feather', 60)));
+$noticeTitle = trim((string)config('notice_banner_title', ''));
+$noticeText = trim((string)config('notice_banner_text', ''));
+$noticeOn = (int)config('notice_banner_enable', 1) === 1 && ($noticeTitle !== '' || $noticeText !== '');
+$noticeAuto = max(0, min(3600, (int)config('notice_banner_auto_close', 0)));
 $theme = \App\Core\View::theme();
 $mainClass = 'container cb-main';
 if ($island) {
@@ -146,6 +150,18 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
         <button class="cb-drawer__close" id="cb-drawer-close" type="button" aria-label="<?= L('关闭菜单') ?>"><?= cb_icon('close') ?></button>
       </div>
 
+      <?php if ($noticeOn): ?>
+        <div class="cb-notice-banner cb-notice-banner--drawer" data-notice-banner data-auto-close="<?= (int)$noticeAuto ?>">
+          <div class="cb-notice-banner__inner">
+            <div class="cb-notice-banner__text">
+              <?php if ($noticeTitle !== ''): ?><b><?= h($noticeTitle) ?></b><?php endif; ?>
+              <?php if ($noticeText !== ''): ?><span><?= nl2br(h($noticeText)) ?></span><?php endif; ?>
+            </div>
+            <button type="button" class="cb-notice-banner__close" data-notice-close aria-label="<?= L('关闭通知') ?>"><?= cb_icon('close') ?></button>
+          </div>
+        </div>
+      <?php endif; ?>
+
       <nav class="cb-nav">
         <?php foreach ($menus as $m): ?>
           <a href="<?= h(str_starts_with((string)$m['url'], 'http') ? $m['url'] : url(ltrim((string)$m['url'], '/'))) ?>"
@@ -155,6 +171,12 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
           <a href="<?= h(url('admin')) ?>"><?= L('管理后台') ?></a>
         <?php endif; ?>
       </nav>
+
+      <?php if ($island): ?>
+        <div class="cb-drawer__island">
+          <?= \App\Core\View::partial('partials/island_nav', array_merge(get_defined_vars(), ['island_nav_drawer' => true])) ?>
+        </div>
+      <?php endif; ?>
 
       <div class="cb-header__right">
         <form class="cb-search" action="<?= h(url('search')) ?>" method="get">
@@ -275,6 +297,18 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
   </div>
 </header>
 <div class="cb-drawer-mask" id="cb-drawer-mask"></div>
+
+<?php if ($noticeOn): ?>
+<div class="cb-notice-banner cb-notice-banner--desktop" data-notice-banner data-auto-close="<?= (int)$noticeAuto ?>">
+  <div class="cb-notice-banner__inner">
+    <div class="cb-notice-banner__text">
+      <?php if ($noticeTitle !== ''): ?><b><?= h($noticeTitle) ?></b><?php endif; ?>
+      <?php if ($noticeText !== ''): ?><span><?= nl2br(h($noticeText)) ?></span><?php endif; ?>
+    </div>
+    <button type="button" class="cb-notice-banner__close" data-notice-close aria-label="<?= L('关闭通知') ?>"><?= cb_icon('close') ?></button>
+  </div>
+</div>
+<?php endif; ?>
 
 <?php if ($diyImage !== '' && $diyPos === 'top'): ?>
 <div class="cb-diy-banner cb-diy-banner--top" aria-hidden="true" style="--diy-feather:<?= (int)$diyFeather ?>px"><img src="<?= h($diyImage) ?>" alt="" style="opacity:<?= $diyOpacityCss ?>"></div>

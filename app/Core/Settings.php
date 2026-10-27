@@ -114,6 +114,11 @@ class Settings
         'forum_layout' => 'list',
         // 网格布局每行显示的板块数（2 - 6）
         'forum_grid_cols' => '4',
+        // 全局通知横幅
+        'notice_banner_enable' => '1',
+        'notice_banner_title' => '',
+        'notice_banner_text' => '',
+        'notice_banner_auto_close' => '0',
         // 主题 DIY 装饰图
         'diy_image' => '',
         'diy_position' => 'top',
