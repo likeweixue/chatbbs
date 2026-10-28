@@ -25,17 +25,29 @@
         ['key' => 'essence', 'title' => L('精华'), 'link' => false],
       ];
       $curTab = (string)($tab ?? '');
+      $rankBase = url('?tab=rank&sort=');
+      $rankSort = (string)\App\Core\Request::get('sort', 'replies');
       foreach ($tabs as $tb):
         $href = $tb['link']
           ? (string)$tb['url']
-          : url('?tab=' . rawurlencode((string)$tb['key']));
+          : url(($tb['key'] === 'rank' ? '?tab=rank&sort=replies' : '?tab=' . rawurlencode((string)$tb['key'])));
         $active = !$tb['link'] && $curTab === (string)$tb['key'];
+        if (($tb['key'] ?? '') === 'rank'):
       ?>
+        <div class="cb-tab-rank" data-tab-rank>
+          <button type="button" class="cb-tab <?= $active ? 'active' : '' ?>"><?= h($tb['title']) ?> <span class="cb-tab-rank__caret">▾</span></button>
+          <div class="cb-tab-rank__menu">
+            <a class="<?= $rankSort === 'replies' ? 'on' : '' ?>" href="<?= h($rankBase . 'replies') ?>"><?= L('最多回复') ?></a>
+            <a class="<?= $rankSort === 'likes' ? 'on' : '' ?>" href="<?= h($rankBase . 'likes') ?>"><?= L('最多点赞') ?></a>
+            <a class="<?= $rankSort === 'views' ? 'on' : '' ?>" href="<?= h($rankBase . 'views') ?>"><?= L('最多浏览') ?></a>
+          </div>
+        </div>
+      <?php else: ?>
         <a class="cb-tab <?= $active ? 'active' : '' ?>" href="<?= h($href) ?>"
            <?php if ($tb['link'] && !str_starts_with((string)$tb['url'], site_base())): ?>target="_blank" rel="noopener"<?php endif; ?>>
           <?= h($tb['title']) ?>
         </a>
-      <?php endforeach; ?>
+      <?php endif; endforeach; ?>
     </div>
     <div class="cb-header-actions">
       <a class="cb-btn cb-btn-newthread cb-newthread--action" href="<?= h(url('thread/create')) ?>">

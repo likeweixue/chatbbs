@@ -67,7 +67,6 @@ class SettingController extends BaseAdmin
                 ['name' => 'closed_reason', 'label' => '关闭原因', 'type' => 'textarea'],
                 ['name' => 'threads_per_page', 'label' => '每页主题数', 'type' => 'number'],
                 ['name' => 'posts_per_page', 'label' => '每页回复数', 'type' => 'number'],
-                ['name' => 'sidebar_enable', 'label' => '启用侧边栏', 'type' => 'switch'],
                 ['name' => 'sidebar_default_hidden', 'label' => '默认隐藏侧边栏', 'type' => 'switch',
                     'tip' => '开启后，首页、板块页与个人中心默认只显示内容区；访客可点顶栏的侧栏按钮展开，选择会记录在浏览器中'],
                 ['name' => 'lang_switch', 'label' => '顶栏语言切换', 'type' => 'switch',
@@ -100,22 +99,6 @@ class SettingController extends BaseAdmin
                         'tip' => '支持换行与常见 HTML（加粗、列表、链接等）；留空则注册页只显示勾选框不出弹窗'],
                 ],
             ]) . '</div></div>';
-
-        $html .= '<div class="adm-panel"><div class="adm-panel-head">全局通知横幅</div><div class="adm-panel-body">'
-            . AdminUI::form([
-                'action' => admin_url('settings/notice'),
-                'data' => Settings::all(),
-                'submit' => '保存通知横幅',
-                'fields' => [
-                    ['name' => 'notice_banner_enable', 'label' => '启用横幅', 'type' => 'switch'],
-                    ['name' => 'notice_banner_title', 'label' => '标题', 'tip' => '留空且正文为空时不显示横幅'],
-                    ['name' => 'notice_banner_text', 'label' => '正文', 'type' => 'textarea'],
-                    ['name' => 'notice_banner_auto_close', 'label' => '自动关闭（秒）', 'type' => 'number',
-                        'tip' => '0 表示只允许手动关闭；例如 8 表示 8 秒后自动收起'],
-                ],
-            ])
-            . '<div class="adm-form-tip">横幅显示在顶栏下方（移动端在抽屉面板内），关闭时向上滑动收起。</div>'
-            . '</div></div>';
 
         $forumOpts = [0 => '全部板块'] + Forum::options(false);
         $tagOpts = [0 => '全部标签'];
@@ -153,6 +136,8 @@ class SettingController extends BaseAdmin
             'notice_banner_enable' => Request::bool('notice_banner_enable') ? 1 : 0,
             'notice_banner_title' => $this->pure('notice_banner_title', 120),
             'notice_banner_text' => $this->pure('notice_banner_text', 2000),
+            'notice_banner_bg' => $this->colorOrEmpty('notice_banner_bg'),
+            'notice_banner_color' => $this->colorOrEmpty('notice_banner_color'),
             'notice_banner_auto_close' => (string)max(0, min(3600, Request::int('notice_banner_auto_close', 0))),
         ]);
         \App\Core\Cache::forget('settings');
@@ -277,7 +262,7 @@ class SettingController extends BaseAdmin
                 $data[$k] = $this->pure($k, 0);
             }
             $data['site_footer'] = Security::cleanHtml(Request::raw('site_footer'));
-            foreach (['allow_guest_view', 'site_closed', 'sidebar_enable', 'sidebar_default_hidden', 'list_compact', 'lang_switch'] as $k) {
+            foreach (['allow_guest_view', 'site_closed', 'sidebar_default_hidden', 'list_compact', 'lang_switch'] as $k) {
                 $data[$k] = Request::bool($k) ? 1 : 0;
             }
             // Logo / 站点图标上传（保存到 data/uploads/site 下）
@@ -318,7 +303,6 @@ class SettingController extends BaseAdmin
             'fields' => [
                 ['name' => 'thread_audit', 'label' => '主题需审核', 'type' => 'switch'],
                 ['name' => 'allow_user_tag', 'label' => '允许用户自建标签', 'type' => 'switch'],
-                ['name' => 'max_tags', 'label' => '每帖最多标签数', 'type' => 'number'],
                 ['name' => 'say_enable', 'label' => '启用说说', 'type' => 'switch'],
                 ['name' => 'say_audit', 'label' => '说说需审核', 'type' => 'switch'],
                 ['name' => 'say_allow_image', 'label' => '说说支持图片', 'type' => 'switch'],
@@ -357,7 +341,6 @@ class SettingController extends BaseAdmin
         foreach ($switches as $k) {
             $data[$k] = Request::bool($k) ? 1 : 0;
         }
-        $data['max_tags'] = max(0, Request::int('max_tags', 5));
         $data['reply_preview_count'] = max(1, Request::int('reply_preview_count', 5));
         $data['editor_default_mode'] = Request::post('editor_default_mode', 'rich') === 'markdown' ? 'markdown' : 'rich';
         $data['chat_poll_interval'] = max(2000, min(30000, Request::int('chat_poll_interval', 5000) ?: 5000));
@@ -371,7 +354,8 @@ class SettingController extends BaseAdmin
     /* ================== 货币规则 ================== */
     public function currency(): string
     {
-        $html = AdminUI::form([
+        $html = '<div class="adm-panel"><div class="adm-panel-head">货币规则</div><div class="adm-panel-body">'
+            . AdminUI::form([
             'action' => admin_url('settings/currency/save'),
             'data' => Settings::all(),
             'submit' => '保存货币规则',
@@ -389,7 +373,7 @@ class SettingController extends BaseAdmin
                 ['name' => 'reward_register', 'label' => '注册赠送', 'type' => 'number', 'step' => '0.01'],
                 ['name' => 'say_reward', 'label' => '发布说说奖励', 'type' => 'number', 'step' => '0.01'],
             ],
-        ]);
+        ]) . '</div></div>';
         $html .= '<div class="adm-panel"><div class="adm-panel-head">连续签到奖励预览</div><div class="adm-panel-body tight">'
             . '<table class="adm-table"><thead><tr><th>连续天数</th><th>当日奖励</th><th>额外奖励</th><th>合计</th></tr></thead><tbody>';
         foreach ([1, 3, 7, 15, 30] as $c) {
@@ -562,6 +546,7 @@ class SettingController extends BaseAdmin
             'essence' => '精华帖',
             'recommend' => '推荐帖（被推荐过的帖子）',
             'avoid' => '避雷帖（被标记避雷的帖子）',
+            'rank' => '排行榜（下拉：最多回复 / 点赞 / 浏览）',
             'digest' => '首页推荐帖',
             'link' => '自定义链接（跳转到任意地址）',
         ];
@@ -593,7 +578,18 @@ class SettingController extends BaseAdmin
         $items = self::parseTabs();
         $types = self::tabTypes();
 
-        $html = '<div class="adm-alert info">'
+        $html = '<div class="adm-panel"><div class="adm-panel-head">排行榜入口</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('list-tabs/rank'),
+                'data' => Settings::all(),
+                'submit' => '保存排行榜开关',
+                'fields' => [
+                    ['name' => 'rank_tabs_enable', 'label' => '显示排行榜标签', 'type' => 'switch',
+                        'tip' => '开启后筛选栏末尾出现「排行榜」，点击可选择最多回复 / 点赞 / 浏览'],
+                ],
+            ]) . '</div></div>';
+
+        $html .= '<div class="adm-alert info">'
             . '控制首页与板块页顶部的筛选标签：可勾选显示、用 ↑↓ 调整顺序、修改标题，也可以新增自定义分类。'
             . '<br>「帖子标记」类型请在「内容管理 → 帖子标记」里先创建标记（例如：公告、归档、过时），这里就能把它作为筛选分类。'
             . '<br>「推荐帖 / 避雷帖」按帖子收到的推荐 / 避雷记录筛选，已替代原来独立的推荐页面。'
@@ -680,6 +676,14 @@ class SettingController extends BaseAdmin
         </script>';
 
         return $this->pageView('列表筛选管理', 'list_tabs', $html);
+    }
+
+    public function saveRankTabs(): void
+    {
+        Settings::set('rank_tabs_enable', Request::bool('rank_tabs_enable') ? 1 : 0);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改排行榜入口');
+        $this->back('排行榜设置已保存');
     }
 
     public function saveListTabs(): void
@@ -918,6 +922,24 @@ class SettingController extends BaseAdmin
                 ],
             ]) . '</div></div>';
 
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">全局通知横幅</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('settings/notice'),
+                'data' => Settings::all(),
+                'submit' => '保存通知横幅',
+                'fields' => [
+                    ['name' => 'notice_banner_enable', 'label' => '启用横幅', 'type' => 'switch'],
+                    ['name' => 'notice_banner_title', 'label' => '标题', 'tip' => '留空且正文为空时不显示横幅'],
+                    ['name' => 'notice_banner_text', 'label' => '正文', 'type' => 'textarea'],
+                    ['name' => 'notice_banner_bg', 'label' => '背景色', 'tip' => '留空跟随主题色渐变；填写十六进制颜色，如 #4D698E'],
+                    ['name' => 'notice_banner_color', 'label' => '字体颜色', 'tip' => '留空使用白色'],
+                    ['name' => 'notice_banner_auto_close', 'label' => '自动关闭（秒）', 'type' => 'number',
+                        'tip' => '0 表示永久显示、只能手动关闭；例如 3 表示 3 秒后自动收起'],
+                ],
+            ])
+            . '<div class="adm-form-tip">横幅显示在桌面端顶栏下方；移动端在汉堡抽屉内。关闭时向上滑动收起。</div>'
+            . '</div></div>';
+
         $html .= AdminUI::table([
             'primary' => 'id',
             'rows' => $p['items'],
@@ -973,6 +995,12 @@ class SettingController extends BaseAdmin
     }
 
     /* ================== 辅助 ================== */
+    private function colorOrEmpty(string $key): string
+    {
+        $v = trim((string)Request::post($key, ''));
+        return preg_match('/^#[0-9a-fA-F]{6}$/', $v) ? strtolower($v) : '';
+    }
+
     public static function scanThemes(): array
     {
         $out = [];

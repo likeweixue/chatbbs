@@ -40,6 +40,7 @@ Router::get('/thread/{id}/edit', \App\Controllers\ThreadController::class . '@ed
 Router::post('/thread/{id}/edit', \App\Controllers\ThreadController::class . '@update', ['auth', 'csrf']);
 Router::post('/thread/{id}/reply', \App\Controllers\ThreadController::class . '@reply', ['auth', 'csrf']);
 Router::post('/thread/{id}/quick', \App\Controllers\ThreadController::class . '@quick', ['auth', 'csrf']);
+Router::get('/thread/{id}/quick-options', \App\Controllers\ThreadController::class . '@quickOptions', ['auth']);
 Router::post('/thread/{id}/delete', \App\Controllers\ThreadController::class . '@delete', ['auth', 'csrf']);
 Router::post('/post/{id}/delete', \App\Controllers\ThreadController::class . '@deletePost', ['auth', 'csrf']);
 Router::post('/thread/{id}/report', \App\Controllers\ThreadController::class . '@report', ['auth', 'csrf']);

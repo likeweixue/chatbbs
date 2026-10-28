@@ -23,6 +23,11 @@ $noticeTitle = trim((string)config('notice_banner_title', ''));
 $noticeText = trim((string)config('notice_banner_text', ''));
 $noticeOn = (int)config('notice_banner_enable', 1) === 1 && ($noticeTitle !== '' || $noticeText !== '');
 $noticeAuto = max(0, min(3600, (int)config('notice_banner_auto_close', 0)));
+$noticeBg = trim((string)config('notice_banner_bg', ''));
+$noticeColor = trim((string)config('notice_banner_color', ''));
+$noticeStyle = '';
+if (preg_match('/^#[0-9a-fA-F]{6}$/', $noticeBg)) { $noticeStyle .= 'background:' . $noticeBg . ';'; }
+if (preg_match('/^#[0-9a-fA-F]{6}$/', $noticeColor)) { $noticeStyle .= 'color:' . $noticeColor . ';'; }
 $theme = \App\Core\View::theme();
 $mainClass = 'container cb-main';
 if ($island) {
@@ -151,7 +156,7 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
       </div>
 
       <?php if ($noticeOn): ?>
-        <div class="cb-notice-banner cb-notice-banner--drawer" data-notice-banner data-auto-close="<?= (int)$noticeAuto ?>">
+        <div class="cb-notice-banner cb-notice-banner--drawer" data-notice-banner data-auto-close="<?= (int)$noticeAuto ?>"<?= $noticeStyle !== '' ? ' style="' . h($noticeStyle) . '"' : '' ?>>
           <div class="cb-notice-banner__inner">
             <div class="cb-notice-banner__text">
               <?php if ($noticeTitle !== ''): ?><b><?= h($noticeTitle) ?></b><?php endif; ?>
@@ -299,7 +304,7 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
 <div class="cb-drawer-mask" id="cb-drawer-mask"></div>
 
 <?php if ($noticeOn): ?>
-<div class="cb-notice-banner cb-notice-banner--desktop" data-notice-banner data-auto-close="<?= (int)$noticeAuto ?>">
+<div class="cb-notice-banner cb-notice-banner--desktop" data-notice-banner data-auto-close="<?= (int)$noticeAuto ?>"<?= $noticeStyle !== '' ? ' style="' . h($noticeStyle) . '"' : '' ?>>
   <div class="cb-notice-banner__inner">
     <div class="cb-notice-banner__text">
       <?php if ($noticeTitle !== ''): ?><b><?= h($noticeTitle) ?></b><?php endif; ?>

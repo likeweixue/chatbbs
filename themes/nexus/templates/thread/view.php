@@ -65,9 +65,6 @@ $show_toc = true;
     <?php endif; ?>
   </div>
 
-  <div class="cb-postlist__bar">
-    <b><?= L('最新回复') ?></b> <span class="muted">(<?= (int)$thread['replies'] ?>)</span>
-  </div>
 
   <?php foreach ($posts as $i => $p): ?>
     <?php

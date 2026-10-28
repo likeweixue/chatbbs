@@ -78,6 +78,18 @@ class Schema
             }
             Settings::set('migration_beta24_primary', 1);
         }
+
+        if ((int)Settings::get('migration_rc5_stats', 0) !== 1) {
+            try {
+                foreach (Database::fetchAll('SELECT id FROM ' . Database::table('forums')) as $f) {
+                    \App\Models\Forum::syncStats((int)$f['id']);
+                }
+                \App\Core\Cache::forget('stats_forum');
+            } catch (\Throwable $e) {
+                \App\Core\Logger::error('RC5 统计修复失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc5_stats', 1);
+        }
     }
 
     /**

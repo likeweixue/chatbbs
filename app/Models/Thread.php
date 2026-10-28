@@ -102,8 +102,10 @@ class Thread
             'new' => 't.created_at DESC',
             'hot' => 't.views DESC, t.replies DESC',
             'replies' => 't.replies DESC',
-            'essence' => 't.is_top DESC, t.topped_at DESC, t.last_reply_at DESC, t.id DESC',
-            default => 't.is_top DESC, t.topped_at DESC, t.last_reply_at DESC, t.id DESC',
+            'essence' => 't.is_top DESC, t.topped_at DESC, (t.replies > 0) DESC, t.last_reply_at DESC, t.id DESC',
+            default => 't.is_top DESC, t.topped_at DESC, (t.replies > 0) DESC, t.last_reply_at DESC, t.id DESC',
+            'likes' => 't.likes DESC, t.replies DESC, t.id DESC',
+            'views' => 't.views DESC, t.replies DESC, t.id DESC',
         };
 
         $total = (int)Database::value(

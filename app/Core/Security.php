@@ -52,6 +52,8 @@ class Security
         'sup' => [],
         'sub' => [],
         'mark' => [],
+        'video' => ['src', 'poster', 'controls', 'width', 'height', 'style', 'class', 'preload', 'loop', 'muted', 'playsinline'],
+        'source' => ['src', 'type'],
     ];
 
     /**
@@ -114,7 +116,10 @@ class Security
         if ($tag === 'a' && !in_array('rel', array_column(array_map(fn($a) => ['n' => explode('=', $a)[0]], $out), 'n'), true)) {
             $out[] = 'rel="nofollow noopener"';
         }
-        $void = in_array($tag, ['br', 'hr', 'img'], true);
+        if ($tag === 'video' && !in_array('controls', array_column(array_map(fn($a) => ['n' => explode('=', $a)[0]], $out), 'n'), true)) {
+            $out[] = 'controls';
+        }
+        $void = in_array($tag, ['br', 'hr', 'img', 'source'], true);
         return '<' . $tag . ($out ? ' ' . implode(' ', $out) : '') . ($void ? ' />' : '>');
     }
 

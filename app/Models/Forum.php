@@ -199,7 +199,7 @@ class Forum
     public static function syncStats(int $forumId): void
     {
         $threads = (int)Database::value('SELECT COUNT(*) FROM ' . Database::table('threads') . ' WHERE forum_id = ? AND status = 1', [$forumId], 0);
-        $posts = (int)Database::value('SELECT COUNT(*) FROM ' . Database::table('posts') . ' WHERE thread_id IN (SELECT id FROM ' . Database::table('threads') . ' WHERE forum_id = ?)', [$forumId], 0);
+        $posts = (int)Database::value('SELECT COUNT(*) FROM ' . Database::table('posts') . ' WHERE is_first = 0 AND thread_id IN (SELECT id FROM ' . Database::table('threads') . ' WHERE forum_id = ? AND status = 1)', [$forumId], 0);
         $last = Database::fetch(
             'SELECT t.id,t.title,t.last_reply_user,t.last_reply_at FROM ' . Database::table('threads') . ' t WHERE t.forum_id = ? AND t.status = 1 ORDER BY t.last_reply_at DESC LIMIT 1',
             [$forumId]

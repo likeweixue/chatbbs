@@ -53,7 +53,7 @@ abstract class BaseController
             // 顶栏「聊天」角标 = 单聊未读 + 群聊未读
             'unread_messages' => $user ? (\App\Models\Message::unreadTotal((int)$user['id']) + self::chatUnread((int)$user['id'])) : 0,
             'menus' => self::menus(),
-            'sidebar_enable' => (int)Settings::get('sidebar_enable', 1),
+            'sidebar_enable' => 1,
             'sidebar_side' => Settings::get('sidebar_side', 'right'),
         ];
         return $cached;
@@ -113,6 +113,15 @@ abstract class BaseController
                 $out[] = ['key' => $t, 'title' => $title, 'url' => '', 'link' => false];
             }
         }
+        if ((int)Settings::get('rank_tabs_enable', 0) === 1) {
+            $hasRank = false;
+            foreach ($out as $o) {
+                if (($o['key'] ?? '') === 'rank') { $hasRank = true; break; }
+            }
+            if (!$hasRank) {
+                $out[] = ['key' => 'rank', 'title' => '排行榜', 'url' => '', 'link' => false];
+            }
+        }
         return $out;
     }
 
@@ -137,7 +146,10 @@ abstract class BaseController
             $tab = (string)$tabs[0]['key'];
         }
 
-        if (str_starts_with($tab, 'mark:')) {
+        if ($tab === 'rank') {
+            $sort = (string)Request::get('sort', 'replies');
+            $res['order'] = in_array($sort, ['replies', 'likes', 'views'], true) ? $sort : 'replies';
+        } elseif (str_starts_with($tab, 'mark:')) {
             $res['mark_id'] = (int)substr($tab, 5);
         } elseif ($tab === 'essence') {
             $res['essence'] = 1;

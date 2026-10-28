@@ -139,6 +139,7 @@ Router::post('/nav-links/settings', $C . 'NavLinkController@saveSettings', ['csr
 
     Router::get('/list-tabs', $C . 'SettingController@listTabs');
     Router::post('/list-tabs/save', $C . 'SettingController@saveListTabs', ['csrf']);
+Router::post('/list-tabs/rank', $C . 'SettingController@saveRankTabs', ['csrf']);
 
     Router::get('/sidebar', $C . 'SettingController@sidebar');
     Router::post('/sidebar/save', $C . 'SettingController@saveSidebar', ['csrf']);

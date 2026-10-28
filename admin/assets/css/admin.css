@@ -327,7 +327,7 @@ html[data-adm-theme="dark"] .adm-theme-toggle .ico-light { display: none; }
 .adm-tag.gray { background: #eef0f2; color: #7a828e; }
 
 /* 表单 ----------------------------------------------------------------- */
-.adm-form { max-width: 860px; }
+.adm-form { max-width: none; }
 .adm-form-item {
     display: flex;
     gap: 14px;

@@ -790,3 +790,4 @@ input[type="file"]::file-selector-button:hover { filter: brightness(1.08); }
 
 /* 维护页只显示维护卡片 */
 .cb-maintenance .cb-header, .cb-maintenance .cb-island-nav, .cb-maintenance .cb-footer { display: none !important; }
+.cb-content-html video { display: block; max-width: 100%; height: auto; margin: 10px 0; border-radius: 4px; background: #000; }

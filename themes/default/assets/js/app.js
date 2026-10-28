@@ -954,35 +954,97 @@
     }
   });
 
+  var quickModal = document.createElement('div');
+  quickModal.className = 'cb-quick-dialog';
+  quickModal.hidden = true;
+  quickModal.innerHTML = '<div class="cb-quick-dialog__mask" data-quick-close></div>'
+    + '<div class="cb-quick-dialog__box" role="dialog" aria-modal="true">'
+    + '<div class="cb-quick-dialog__head"><b data-quick-title>快捷操作</b><button type="button" data-quick-close aria-label="关闭">×</button></div>'
+    + '<div class="cb-quick-dialog__body">'
+    + '<div data-quick-pane="move"><label class="cb-quick-dialog__label">目标板块</label><select class="cb-select" data-quick-forum></select></div>'
+    + '<div data-quick-pane="tags" class="hide"><label class="cb-quick-dialog__label">标签</label><input class="cb-input" data-quick-tags placeholder="用逗号分隔，留空清除"><div class="cb-quick-dialog__tip">会保留当前选中的标签，也可以直接修改；输入不存在的标签会自动创建。</div></div>'
+    + '</div>'
+    + '<div class="cb-quick-dialog__foot"><button type="button" class="cb-btn" data-quick-close>取消</button><button type="button" class="cb-btn primary" data-quick-ok>保存</button></div>'
+    + '</div>';
+  document.body.appendChild(quickModal);
+  var quickState = { id: 0, action: '' };
+  function closeQuick() {
+    quickModal.hidden = true;
+    document.body.style.overflow = '';
+    quickState = { id: 0, action: '' };
+  }
+  function openQuick(id, action) {
+    document.querySelectorAll('.cb-thread__more.is-open').forEach(function (x) { x.classList.remove('is-open'); });
+    quickState = { id: id, action: action };
+    quickModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    quickModal.querySelector('[data-quick-title]').textContent = action === 'move' ? '移动板块' : '编辑标签';
+    quickModal.querySelectorAll('[data-quick-pane]').forEach(function (pane) {
+      pane.classList.toggle('hide', pane.getAttribute('data-quick-pane') !== action);
+    });
+    var select = quickModal.querySelector('[data-quick-forum]');
+    var tags = quickModal.querySelector('[data-quick-tags]');
+    select.innerHTML = '<option value="">加载中…</option>';
+    tags.value = '';
+    fetch((window.CB_API_BASE || '') + 'thread/' + encodeURIComponent(id) + '/quick-options', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res.ok === false) { alert(res.msg || '加载失败'); closeQuick(); return; }
+      select.innerHTML = '';
+      (res.forums || []).forEach(function (f) {
+        var opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.label;
+        select.appendChild(opt);
+      });
+      select.value = String(res.forum_id || '');
+      tags.value = res.tags_text || '';
+    }).catch(function () { alert('网络异常'); closeQuick(); });
+  }
+  function submitQuick(data) {
+    fetch((window.CB_API_BASE || '') + 'thread/' + encodeURIComponent(quickState.id) + '/quick', {
+      method: 'POST', body: data,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (!res.ok) { alert(res.msg || '操作失败'); return; }
+      location.reload();
+    }).catch(function () { alert('网络异常'); });
+  }
+  quickModal.querySelectorAll('[data-quick-close]').forEach(function (b) { b.addEventListener('click', closeQuick); });
+  quickModal.querySelector('[data-quick-ok]').addEventListener('click', function () {
+    var data = new FormData();
+    data.append('action', quickState.action);
+    data.append('_csrf', window.CB_CSRF || '');
+    if (quickState.action === 'move') {
+      data.append('forum_id', quickModal.querySelector('[data-quick-forum]').value);
+    } else {
+      data.append('tags', quickModal.querySelector('[data-quick-tags]').value);
+    }
+    submitQuick(data);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !quickModal.hidden) closeQuick();
+  });
+
   document.querySelectorAll('[data-thread-quick]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var id = btn.getAttribute('data-id');
       var action = btn.getAttribute('data-thread-quick');
+      if (action === 'move' || action === 'tags') {
+        openQuick(id, action);
+        return;
+      }
+      quickState = { id: id, action: action };
       var data = new FormData();
       data.append('action', action);
       data.append('_csrf', window.CB_CSRF || '');
       if (action === 'color') {
         var color = btn.closest('.cb-thread-menu').querySelector('[data-thread-color]');
         data.append('title_color', color ? color.value : '');
-      } else if (action === 'move') {
-        var forum = prompt('输入目标板块 ID：');
-        if (!forum) return;
-        data.append('forum_id', forum);
-      } else if (action === 'tags') {
-        var tags = prompt('输入标签，用逗号分隔：');
-        if (tags === null) return;
-        data.append('tags', tags);
       } else if (action === 'hide') {
         if (!confirm('确定隐藏该主题？隐藏后前台不再显示，但不会删除。')) return;
       }
-      fetch((window.CB_API_BASE || '') + 'thread/' + encodeURIComponent(id) + '/quick', {
-        method: 'POST',
-        body: data,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }).then(function (r) { return r.json(); }).then(function (res) {
-        if (!res.ok) { alert(res.msg || '操作失败'); return; }
-        location.reload();
-      }).catch(function () { alert('网络异常'); });
+      submitQuick(data);
     });
   });
 })();
@@ -1014,5 +1076,24 @@
       var burger = document.getElementById('cb-burger');
       if (burger) burger.setAttribute('aria-expanded', 'false');
     });
+  });
+})();
+
+/* 排行榜筛选下拉 */
+(function () {
+  document.querySelectorAll('[data-tab-rank]').forEach(function (wrap) {
+    var btn = wrap.querySelector('.cb-tab');
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = !wrap.classList.contains('is-open');
+      document.querySelectorAll('[data-tab-rank].is-open').forEach(function (x) { if (x !== wrap) x.classList.remove('is-open'); });
+      wrap.classList.toggle('is-open', open);
+    });
+  });
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-tab-rank]')) {
+      document.querySelectorAll('[data-tab-rank].is-open').forEach(function (x) { x.classList.remove('is-open'); });
+    }
   });
 })();

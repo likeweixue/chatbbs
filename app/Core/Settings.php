@@ -118,6 +118,8 @@ class Settings
         'notice_banner_enable' => '1',
         'notice_banner_title' => '',
         'notice_banner_text' => '',
+        'notice_banner_bg' => '',
+        'notice_banner_color' => '',
         'notice_banner_auto_close' => '0',
         // 主题 DIY 装饰图
         'diy_image' => '',
@@ -164,6 +166,7 @@ class Settings
         // [{t:'类型', title:'标题', url:'链接（仅 link 类型）', on:1|0}]
         // 类型：new(最新发布) default(最新回复) hot(热门) replies(最多回复) essence(精华)
         //       recommend(推荐帖) avoid(避雷帖) digest(首页推荐) mark:{id}(按帖子标记筛选) link(自定义链接)
+        'rank_tabs_enable' => '0',
         'thread_tabs' => '[{"t":"new","title":"最新发布","on":1},{"t":"default","title":"最新回复","on":1},{"t":"hot","title":"热门","on":1},{"t":"replies","title":"最多回复","on":0},{"t":"essence","title":"精华","on":1},{"t":"recommend","title":"推荐","on":1},{"t":"avoid","title":"避雷","on":1}]',
         // 侧边栏"关于本站"面板（留空则不显示）
         'about_title' => 'ChatBBS',

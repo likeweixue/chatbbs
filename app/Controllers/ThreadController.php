@@ -108,7 +108,6 @@ class ThreadController extends BaseController
             'reply_preview' => $replyPreview,
             // 帖子页侧边栏只保留「发布主题 + 目录」
             'show_toc' => true,
-            'island_tabs' => self::listTabs(),
             'back_url' => $forum ? url('forum/' . (int)$forum['id']) : url('forums'),
             'liked' => $liked,
             'liked_posts' => $likedPosts,
@@ -422,6 +421,36 @@ class ThreadController extends BaseController
     /**
      * 列表「更多」快捷操作（管理员）
      */
+    public function quickOptions(int $id): void
+    {
+        $this->requireLogin();
+        if (!\App\Core\Auth::isAdmin()) {
+            $this->fail('没有权限');
+        }
+        $thread = Thread::find($id);
+        if (!$thread) {
+            $this->fail('主题不存在');
+        }
+        $forums = [];
+        foreach (Forum::options(false) as $fid => $label) {
+            $forums[] = ['id' => (int)$fid, 'label' => (string)$label];
+        }
+        $tags = [];
+        foreach (Tag::all() as $tg) {
+            $tags[] = ['id' => (int)$tg['id'], 'name' => (string)$tg['name'], 'color' => (string)($tg['color'] ?? '')];
+        }
+        $current = [];
+        foreach (Thread::tags($id) as $tg) {
+            $current[] = (string)$tg['name'];
+        }
+        $this->json([
+            'forums' => $forums,
+            'tags' => $tags,
+            'forum_id' => (int)$thread['forum_id'],
+            'tags_text' => implode(',', $current),
+        ]);
+    }
+
     public function quick(int $id): void
     {
         $this->requireLogin();
