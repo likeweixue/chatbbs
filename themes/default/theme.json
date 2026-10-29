@@ -1,9 +1,9 @@
 {
     "name": "默认主题",
     "slug": "default",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "ChatBBS",
-    "description": "ChatBBS 官方默认主题：白色 + 浅灰配色，右侧边栏，支持暗色模式与移动端适配。",
+    "description": "ChatBBS 官方默认主题：4px 圆角、白色 + 浅灰配色，支持经典两栏、岛屿工作台与单栏面板布局，带暗色模式和移动端适配。",
     "screenshot": "screenshot.png",
-    "supports": ["dark-mode", "responsive", "sidebar-right"]
+    "supports": ["dark-mode", "responsive", "sidebar-right", "island", "single-column"]
 }

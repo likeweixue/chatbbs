@@ -62,4 +62,4 @@ INSERT INTO `__PREFIX__tags` (`id`,`name`,`slug`,`color`,`description`,`status`)
 
 -- 插件 / 主题占位
 INSERT INTO `__PREFIX__themes` (`id`,`name`,`slug`,`version`,`author`,`description`,`enabled`) VALUES
-(1,'默认主题','default','1.0.0','ChatBBS','官方默认主题，白色 + 浅灰风格',1);
+(1,'默认主题','default','1.1.0','ChatBBS','默认主题：4px 圆角，支持经典 / 岛屿 / 单栏布局',1);

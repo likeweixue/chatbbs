@@ -79,6 +79,28 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        if ((int)Settings::get('migration_rc7_single_layout', 0) !== 1) {
+            try {
+                $activeTheme = (string)Settings::get('theme', 'default');
+                if (in_array($activeTheme, ['nexus', 'flarum'], true)) {
+                    Settings::set('theme', 'default');
+                    Settings::set('site_layout', 'single');
+                }
+                Database::query('DELETE FROM ' . Database::table('themes') . " WHERE slug IN ('nexus', 'flarum')");
+                Database::query(
+                    'UPDATE ' . Database::table('themes') . ' SET version = ?, description = ? WHERE slug = ?',
+                    ['1.1.0', '默认主题：4px 圆角，支持经典 / 岛屿 / 单栏布局', 'default']
+                );
+                $radius = (string)Settings::get('theme_radius', '4');
+                if (!in_array($radius, ['1', '2', '3', '4', '5', '6'], true)) {
+                    Settings::set('theme_radius', '4');
+                }
+            } catch (\Throwable $e) {
+                Logger::error('RC6 单栏布局迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc7_single_layout', 1);
+        }
+
         if ((int)Settings::get('migration_rc5_stats', 0) !== 1) {
             try {
                 foreach (Database::fetchAll('SELECT id FROM ' . Database::table('forums')) as $f) {

@@ -17,8 +17,8 @@
   --color-danger: #d93026;
   --color-link: #4D698E;
   --radius-sm: 4px;
-  --radius: 8px;
-  --radius-lg: 12px;
+  --radius: 4px;
+  --radius-lg: 4px;
   --shadow-sm: 0 1px 2px rgba(20, 30, 50, .05);
   --shadow: 0 4px 16px rgba(20, 30, 50, .08);
   --header-height: 56px;
@@ -2023,3 +2023,111 @@ body.island-resizing { user-select: none; cursor: col-resize; }
   .cb-card__header--tabs .cb-tabs { flex-wrap: wrap; overflow: visible; white-space: normal; }
   .cb-card__header--tabs .cb-tabs::-webkit-scrollbar { display: none; }
 }
+
+/* ==========================================================================
+   单栏布局（site_layout = single）
+   默认主题的配色 / 圆角 / 色调全部继续生效，只去掉侧栏并把整站收进一块面板
+   ========================================================================== */
+body.cb-single { background: var(--color-bg); }
+body.cb-single .cb-header {
+  max-width: 1200px; margin: 0 auto;
+  border: 1px solid var(--color-border); border-bottom: 0;
+  box-shadow: none;
+}
+body.cb-single .cb-header__inner { max-width: none; }
+body.cb-single .cb-main--single {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 0 10px;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+body.cb-single .cb-main--single .cb-content { width: 100%; }
+body.cb-single .cb-main--single > .cb-content > .cb-card:first-child { margin-top: 0; border-top: 0; }
+body.cb-single .cb-main--single .cb-card { border-radius: 0; margin-bottom: 10px; }
+body.cb-single .cb-footer {
+  max-width: 1200px; margin: 0 auto;
+  border: 1px solid var(--color-border); border-top: 0;
+}
+body.cb-single .cb-footer__inner { max-width: none; }
+
+/* 单栏的卡片标题：使用主题强调色 */
+body.cb-single .cb-card__header,
+body.cb-single .cb-forum-block__head {
+  color: #fff;
+  background: var(--color-primary);
+  border-bottom-color: var(--color-primary-dark);
+}
+body.cb-single .cb-card__header a,
+body.cb-single .cb-card__header .more,
+body.cb-single .cb-card__header button,
+body.cb-single .cb-forum-block__head a,
+body.cb-single .cb-forum-block__head .more,
+body.cb-single .cb-forum-block__head button { color: #fff; }
+body.cb-single .cb-card__header .more { opacity: .82; }
+
+/* 筛选标签：去掉白色分隔线，和标题融成一条 */
+body.cb-single .cb-card__header--tabs { border-bottom: 0; padding: 0; }
+body.cb-single .cb-card__header--tabs .cb-tabs { border-bottom: 0; margin-bottom: 0; }
+body.cb-single .cb-card__header--tabs .cb-tab,
+body.cb-single .cb-tabs .cb-tab {
+  height: auto; min-height: 40px; padding: 0 14px;
+  border: 0; border-right: 0; background: transparent; color: rgba(255,255,255,.86);
+  margin-bottom: 0;
+}
+body.cb-single .cb-card__header--tabs .cb-tab.active,
+body.cb-single .cb-tabs .cb-tab.active {
+  color: #fff; background: rgba(0,0,0,.16); border: 0;
+}
+body.cb-single .cb-card__header--tabs .cb-tab:hover,
+body.cb-single .cb-tabs .cb-tab:hover { color: #fff; background: rgba(255,255,255,.1); }
+body.cb-single .cb-card__header--tabs .cb-header-actions .cb-btn {
+  background: #fff; color: var(--color-primary); border-color: #fff;
+}
+body.cb-single .cb-card__header--tabs .cb-header-actions .cb-btn:hover {
+  background: var(--color-primary-light); color: var(--color-primary-dark); border-color: #fff;
+}
+
+/* 板块表的行高统一，长标题 / 长描述用省略号 */
+body.cb-single .cb-forum-table { table-layout: fixed; }
+body.cb-single .cb-forum-table .fl_row { height: 52px; overflow: hidden; }
+body.cb-single .cb-forum-table td { height: 52px; vertical-align: middle; }
+body.cb-single .cb-forum-table .fl_i { width: 96px; text-align: center; }
+body.cb-single .cb-forum-table .fl_by { width: 270px; }
+body.cb-single .cb-forum-table .fl_ct { overflow: hidden; }
+body.cb-single .cb-forum-table .fl_ct h2,
+body.cb-single .cb-forum-table .fl_desc,
+body.cb-single .cb-forum-table .fl_by > div,
+body.cb-single .cb-forum-table .fl_by a {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+body.cb-single .cb-forum-table .fl_desc { max-width: 100%; }
+body.cb-single .cb-forum-table .fl_by cite { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.cb-single .cb-forum-table .fl_mod { display: none; }
+
+@media (max-width: 900px) {
+  body.cb-single .cb-header,
+  body.cb-single .cb-main--single,
+  body.cb-single .cb-footer {
+    max-width: none; border-left: 0; border-right: 0;
+  }
+  body.cb-single .cb-main--single { padding-bottom: 6px; }
+}
+
+/* 让快速色调真正覆盖布局内联的主色（否则强调色仍是后台主色） */
+html[data-palette="green"] { --color-primary: #4f7a35 !important; --color-primary-dark: #3d6227 !important; --color-primary-light: #e7f1dd !important; --color-link: #4f7a35 !important; }
+html[data-theme="dark"][data-palette="green"] { --color-primary: #8fbf6a !important; --color-primary-dark: #6f9c4f !important; --color-primary-light: #2a3a22 !important; --color-link: #a8d48a !important; }
+html[data-palette="retro"] { --color-primary: #a76b2d !important; --color-primary-dark: #835020 !important; --color-primary-light: #f2e3c9 !important; --color-link: #a76b2d !important; }
+html[data-theme="dark"][data-palette="retro"] { --color-primary: #d8a75a !important; --color-primary-dark: #b8863d !important; --color-primary-light: #3a2f1e !important; --color-link: #e0b76b !important; }
+html[data-palette="blackgold"] { --color-primary: #c9a227 !important; --color-primary-dark: #a88418 !important; --color-primary-light: #2c2517 !important; --color-link: #d8b84a !important; }
+html[data-theme="dark"][data-palette="blackgold"] { --color-primary: #d8b33c !important; --color-primary-dark: #b89424 !important; --color-primary-light: #2e2818 !important; --color-link: #e6c65a !important; }
+html[data-palette="orange"] { --color-primary: #e05d2a !important; --color-primary-dark: #b8471c !important; --color-primary-light: #ffe6d6 !important; --color-link: #d94f1f !important; }
+html[data-theme="dark"][data-palette="orange"] { --color-primary: #ff854f !important; --color-primary-dark: #e56732 !important; --color-primary-light: #3d2417 !important; --color-link: #ff9a6b !important; }
+body.cb-single .cb-header,
+body.cb-single .cb-footer { width: 100%; }
+body.cb-single .cb-notice-banner,
+body.cb-single .cb-diy-banner { width: 100%; max-width: 1200px; margin-left: auto; margin-right: auto; }
+body.cb-single .cb-card__header--tabs .cb-header-actions { margin-right: 10px; }

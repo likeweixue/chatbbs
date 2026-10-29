@@ -102,7 +102,7 @@ class Settings
         'home_seo_title' => '',
         'allow_guest_view' => '1',
         // 外观微调
-        'theme_radius' => '8',
+        'theme_radius' => '4',
         'theme_primary' => '#4D698E',
         // URL 模式：auto（自动探测，默认，未配置伪静态也不会 404）
         //            rewrite（伪静态，需先在服务器配置 rewrite 规则）

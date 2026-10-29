@@ -6,15 +6,9 @@
         <h1 style="margin:0;font-size:20px"><?= h($forum['name']) ?></h1>
         <p class="text-sm text-muted" style="margin:4px 0 0"><?= h($forum['description'] ?? '') ?></p>
       </div>
-      <div class="flex gap-8">
-        <?php if ($can_post ?? false): ?>
-          <a class="cb-btn cb-btn-newthread cb-newthread--action" href="<?= h(url('thread/create?forum=' . $forum['id'])) ?>">
-            <span class="cb-newthread-ico"><?= cb_icon('edit') ?></span><span class="cb-newthread-label"><?= L('发布主题') ?></span>
-          </a>
-        <?php else: ?>
-          <span class="text-sm text-muted"><?= L('本板块暂无发帖权限') ?></span>
-        <?php endif; ?>
-      </div>
+      <?php if (!($can_post ?? false)): ?>
+        <span class="text-sm text-muted"><?= L('本板块暂无发帖权限') ?></span>
+      <?php endif; ?>
     </div>
     <div class="text-xs text-muted" style="margin-top:10px">
       <?= (int)$forum['threads'] ?> 主题 · <?= (int)$forum['posts'] ?> 回复
@@ -60,6 +54,13 @@
         </a>
       <?php endif; endforeach; ?>
     </div>
+    <?php if ($can_post ?? false): ?>
+      <div class="cb-header-actions">
+        <a class="cb-btn cb-btn-newthread cb-newthread--action" href="<?= h(url('thread/create?forum=' . $forum['id'])) ?>">
+          <span class="cb-newthread-ico"><?= cb_icon('edit') ?></span><span class="cb-newthread-label"><?= L('发布主题') ?></span>
+        </a>
+      </div>
+    <?php endif; ?>
   </div>
   <?= \App\Core\View::partial('partials/thread_list', ['threads' => $threads, 'marks' => $marks, 'boxed' => false]) ?>
 </div>

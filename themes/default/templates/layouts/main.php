@@ -5,11 +5,15 @@ $unread = $unread_notifications ?? 0;
 $unreadMsg = $unread_messages ?? 0;
 $menus = $menus ?? [];
 $sidebarOn = ($sidebar_enable ?? 1) && (!isset($hide_sidebar) || !$hide_sidebar);
+// 单栏布局不渲染侧栏
+if (($site_layout ?? config('site_layout', 'classic')) === 'single') { $sidebarOn = false; }
 $side = $sidebar_side ?? 'right';
 // 侧边栏默认折叠：未手动切换过的访客先看到完整内容区
 $sidebarDefaultHidden = (int)config('sidebar_default_hidden', 1) === 1;
 $sidebarCollapsed = !$sidebarOn || $sidebarDefaultHidden;
-$island = (($site_layout ?? config('site_layout', 'classic')) === 'island' && \App\Core\View::theme() === 'default');
+$layoutMode = (string)($site_layout ?? config('site_layout', 'classic'));
+$island = $layoutMode === 'island';
+$single = $layoutMode === 'single';
 $islandSide = (string)config('island_sidebar_side', 'left') === 'right' ? 'right' : 'left';
 $islandWidth = max(200, min(360, (int)config('island_sidebar_width', 240)));
 $islandDefaultHidden = (int)config('island_sidebar_default_hidden', 0) === 1;
@@ -30,7 +34,9 @@ if (preg_match('/^#[0-9a-fA-F]{6}$/', $noticeBg)) { $noticeStyle .= 'background:
 if (preg_match('/^#[0-9a-fA-F]{6}$/', $noticeColor)) { $noticeStyle .= 'color:' . $noticeColor . ';'; }
 $theme = \App\Core\View::theme();
 $mainClass = 'container cb-main';
-if ($island) {
+if ($single) {
+    $mainClass = 'container cb-main cb-main--single';
+} elseif ($island) {
     $mainClass .= ' cb-main--island';
     if ($islandSide === 'right') {
         $mainClass .= ' island-side-right';
@@ -70,10 +76,10 @@ $favicon = (string)config('site_favicon', '');
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
 <?php
 // 外观微调：圆角大小 / 主题主色（后台「扩展管理 → 主题 → 外观微调」设置）
-$radius = (int)config('theme_radius', 8);
+$radius = (int)config('theme_radius', 4);
 $radius = max(0, min(24, $radius));
-$radiusSm = (int)round($radius * 0.5);
-$radiusLg = (int)round($radius * 1.5);
+$radiusSm = $radius;
+$radiusLg = $radius;
 $primary = (string)config('theme_primary', '#4D698E');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $primary)) {
     $primary = '#4D698E';
@@ -124,7 +130,7 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
   };
 </script>
 </head>
-<body class="cb-body<?= $island ? ' cb-island' : '' ?><?= $diyImage !== '' ? ' cb-has-diy' : '' ?>">
+<body class="cb-body<?= $island ? ' cb-island' : '' ?><?= $single ? ' cb-single' : '' ?><?= $diyImage !== '' ? ' cb-has-diy' : '' ?>">
 <?php if ($diyImage !== '' && $diyPos === 'global'): ?>
 <div class="cb-diy-global" style="background-image:url('<?= h($diyImage) ?>');opacity:<?= $diyOpacityCss ?>" aria-hidden="true"></div>
 <?php endif; ?>

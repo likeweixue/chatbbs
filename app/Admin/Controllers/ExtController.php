@@ -154,7 +154,7 @@ class ExtController extends BaseAdmin
             . AdminUI::form([
                 'action' => admin_url('themes/appearance'),
                 'data' => [
-                    'theme_radius' => (string)Settings::get('theme_radius', '8'),
+                    'theme_radius' => (string)Settings::get('theme_radius', '4'),
                     'theme_primary' => (string)Settings::get('theme_primary', '#4D698E'),
                 ],
                 'submit' => '保存外观设置',
@@ -193,8 +193,9 @@ class ExtController extends BaseAdmin
 
         // 站点布局：默认 / 岛屿（参考 OpenIsle 的交互方向）
         $islandWidth = max(200, min(360, (int)Settings::get('island_sidebar_width', 240)));
+        $curLayout = (string)Settings::get('site_layout', 'classic');
         $layoutData = [
-            'site_layout' => (string)Settings::get('site_layout', 'classic') === 'island' ? 'island' : 'classic',
+            'site_layout' => in_array($curLayout, ['classic', 'island', 'single'], true) ? $curLayout : 'classic',
             'island_sidebar_side' => (string)Settings::get('island_sidebar_side', 'left') === 'right' ? 'right' : 'left',
             'island_sidebar_width' => $islandWidth,
             'island_sidebar_default_hidden' => (int)Settings::get('island_sidebar_default_hidden', 0),
@@ -208,7 +209,8 @@ class ExtController extends BaseAdmin
                     ['name' => 'site_layout', 'label' => '布局样式', 'type' => 'select', 'options' => [
                         'classic' => '默认布局（经典两栏）',
                         'island' => '岛屿布局（侧栏工作台）',
-                    ], 'tip' => '岛屿布局目前只在默认主题下生效；切回默认布局即可恢复原样'],
+                        'single' => '单栏布局（无侧边栏，整站一块面板）',
+                    ], 'tip' => '单栏布局使用默认主题的配色和组件，不再显示侧边栏'],
                     ['name' => 'island_sidebar_side', 'label' => '侧栏默认位置', 'type' => 'select', 'options' => [
                         'left' => '左侧', 'right' => '右侧',
                     ], 'tip' => '访客也可以在前台顶栏自行切换，选择会记录在浏览器中'],
@@ -267,7 +269,7 @@ class ExtController extends BaseAdmin
           var panel = document.querySelector(".js-default-layout");
           if (!sel || !panel) return;
           function sync() {
-            var off = sel.value === "island";
+            var off = sel.value !== "classic";
             panel.classList.toggle("adm-layout-disabled", off);
             panel.querySelectorAll("input, textarea, select, button").forEach(function (el) {
               el.disabled = off;
@@ -286,7 +288,7 @@ class ExtController extends BaseAdmin
      */
     public function themeAppearance(): void
     {
-        $radius = Request::int('theme_radius', 8);
+        $radius = Request::int('theme_radius', 4);
         $radius = max(0, min(24, $radius));
         $primary = trim((string)Request::post('theme_primary', '#4D698E'));
         if (!preg_match('/^#[0-9a-fA-F]{6}$/i', $primary)) {
@@ -306,7 +308,10 @@ class ExtController extends BaseAdmin
      */
     public function themeLayoutSave(): void
     {
-        $layout = (string)Request::post('site_layout', 'classic') === 'island' ? 'island' : 'classic';
+        $layout = (string)Request::post('site_layout', 'classic');
+        if (!in_array($layout, ['classic', 'island', 'single'], true)) {
+            $layout = 'classic';
+        }
         $side = (string)Request::post('island_sidebar_side', 'left') === 'right' ? 'right' : 'left';
         $width = max(200, min(360, Request::int('island_sidebar_width', 240)));
         Settings::setMany([
