@@ -57,6 +57,7 @@ class Thread
         $markId = (int)($opt['mark_id'] ?? 0);
         $digest = (int)($opt['digest'] ?? 0);
         $announce = (int)($opt['announce'] ?? 0);
+        $positive = (string)($opt['positive'] ?? '');
 
         $where = 't.status = ?';
         $params = [$status];
@@ -96,6 +97,14 @@ class Thread
         }
         if ($digest) {
             $where .= ' AND t.is_digest = 1';
+        }
+        // 排行榜 / 最新回复只展示真正有对应数据的主题，0 回复 / 0 赞 / 0 浏览不占位
+        if ($positive === 'replies') {
+            $where .= ' AND t.replies > 0';
+        } elseif ($positive === 'likes') {
+            $where .= ' AND t.likes > 0';
+        } elseif ($positive === 'views') {
+            $where .= ' AND t.views > 0';
         }
 
         $orderBy = match ($order) {

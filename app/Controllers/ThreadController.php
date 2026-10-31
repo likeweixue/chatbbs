@@ -239,6 +239,13 @@ class ThreadController extends BaseController
     {
         $this->requireLogin();
         $forumId = Request::int('forum', 0);
+        $draft = Database::fetch(
+            'SELECT * FROM ' . Database::table('drafts') . ' WHERE user_id = ? AND thread_id = 0 AND (forum_id = ? OR forum_id = 0) ORDER BY updated_at DESC LIMIT 1',
+            [(int)$this->userId(), $forumId]
+        );
+        if ($draft && $forumId === 0) {
+            $forumId = (int)$draft['forum_id'];
+        }
         $forums = Forum::tree();
         $user = $this->user();
         foreach ($forums as &$cat) {
@@ -255,6 +262,7 @@ class ThreadController extends BaseController
             'forums' => $forums,
             'forum_id' => $forumId,
             'thread' => null,
+            'draft' => $draft,
             'tags' => Tag::all(50),
             'max_tags' => (int)Settings::get('max_tags', 5),
             'allow_user_tag' => (int)Settings::get('allow_user_tag', 0),
@@ -316,6 +324,7 @@ class ThreadController extends BaseController
         ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads') + self::titleFields('threads'));
         Thread::setTags($id, $tagIds);
         Content::bindAttachments($html, $id, (int)$user['id']);
+        Database::delete('drafts', 'user_id = ? AND thread_id = 0 AND forum_id = ?', ['uid' => (int)$user['id'], 'fid' => $forumId]);
 
         Currency::reward((int)$user['id'], 'thread');
         Level::addExp((int)$user['id'], Level::EXP_THREAD);
@@ -410,9 +419,11 @@ class ThreadController extends BaseController
         ], 'thread_id = ? AND is_first = 1', ['tid' => $id]);
 
         $tagNames = array_filter(array_map('trim', explode(',', (string)Request::post('tags', ''))));
-        $tagIds = Tag::resolve(array_slice($tagNames, 0, (int)Settings::get('max_tags', 5)), \App\Core\Auth::isAdmin());
+        $allowCreateTag = (int)Settings::get('allow_user_tag', 0) === 1 || \App\Core\Auth::isAdmin();
+        $tagIds = Tag::resolve(array_slice($tagNames, 0, (int)Settings::get('max_tags', 5)), $allowCreateTag);
         Thread::setTags($id, $tagIds);
         Content::bindAttachments($html, $id, (int)$user['id']);
+        Database::delete('drafts', 'user_id = ? AND thread_id = ?', ['uid' => (int)$user['id'], 'tid' => $id]);
 
         Session::flash('success', '已保存');
         \redirect('thread/' . $id);

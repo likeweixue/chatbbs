@@ -242,6 +242,8 @@
   document.addEventListener('click', function (e) {
     var img = e.target.closest('.cb-say__images img, .cb-content-html img');
     if (!img || img.dataset.lightbox === '0') return;
+    // 编辑器里的图片用于选中 / 调整大小，不触发前台灯箱
+    if (img.closest('.cb-editor__area')) return;
     e.preventDefault();
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
@@ -286,6 +288,8 @@
       clearTimeout(timer);
       timer = setTimeout(saveDraft, 3000);
     });
+    // 即使长时间不输入，也每分钟落一次草稿
+    setInterval(saveDraft, 60000);
     var draftBtn = document.getElementById('btn-save-draft');
     if (draftBtn) draftBtn.addEventListener('click', function (e) { e.preventDefault(); saveDraft(); });
 

@@ -51,6 +51,12 @@ class ForumController extends BaseController
         $page = max(1, Request::int('page', 1));
         $perPage = max(5, (int)Settings::get('threads_per_page', 20));
         $tabRes = $this->resolveTab();
+        $positive = '';
+        if (in_array($tabRes['tab'], ['default', 'replies'], true)) {
+            $positive = 'replies';
+        } elseif ($tabRes['tab'] === 'rank') {
+            $positive = $tabRes['order'];
+        }
         $result = Thread::list([
             'forum_id' => $id,
             'page' => $page,
@@ -60,6 +66,7 @@ class ForumController extends BaseController
             'mark_id' => $tabRes['mark_id'],
             'digest' => $tabRes['digest'],
             'recommend_kind' => $tabRes['recommend_kind'],
+            'positive' => $positive,
         ]);
         $baseUrl = url('forum/' . $id . '?tab=' . rawurlencode($tabRes['tab']));
 

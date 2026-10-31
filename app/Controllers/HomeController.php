@@ -17,6 +17,12 @@ class HomeController extends BaseController
         $perPage = max(5, (int)Settings::get('threads_per_page', 20));
         $page = max(1, (int)\App\Core\Request::int('page', 1));
         $tabRes = $this->resolveTab();
+        $positive = '';
+        if (in_array($tabRes['tab'], ['default', 'replies'], true)) {
+            $positive = 'replies';
+        } elseif ($tabRes['tab'] === 'rank') {
+            $positive = $tabRes['order'];
+        }
         $result = Thread::list([
             'page' => $page,
             'per_page' => $perPage,
@@ -25,6 +31,7 @@ class HomeController extends BaseController
             'mark_id' => $tabRes['mark_id'],
             'digest' => $tabRes['digest'],
             'recommend_kind' => $tabRes['recommend_kind'],
+            'positive' => $positive,
         ]);
         $tabQuery = '?tab=' . rawurlencode($tabRes['tab']);
         $baseUrl = url($tabQuery);

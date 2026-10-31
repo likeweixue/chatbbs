@@ -53,6 +53,8 @@
       }
       this.sync();
     }
+    var self = this;
+    this.area.querySelectorAll('[data-img-ph]').forEach(function (ph) { self.bindImagePlaceholder(ph); });
   }
 
   Editor.prototype.build = function () {
@@ -101,6 +103,7 @@
 
     this.buildToolbar();
     this.applyMode();
+    this.initImageTools();
   };
 
   /* ---------------- 工具栏 ---------------- */
@@ -695,6 +698,20 @@
 
     this.mdArea.addEventListener('blur', function () { self.mdBuf = self.mdArea.value; self.sync(); });
 
+    /* 图片：点击出现尺寸框，悬停显示替换 */
+    this.area.addEventListener('click', function (e) {
+      var img = e.target.closest ? e.target.closest('img') : null;
+      if (img && self.area.contains(img)) { self.selectImage(img); return; }
+    });
+    this.area.addEventListener('mouseover', function (e) {
+      var img = e.target.closest ? e.target.closest('img') : null;
+      if (img && self.area.contains(img)) { self.showReplace(img); }
+    });
+    this.area.addEventListener('mouseout', function (e) {
+      var img = e.target.closest ? e.target.closest('img') : null;
+      if (img) { self.scheduleHideReplace(); }
+    });
+
     /* 违禁词：初始化时拉取词表，之后输入时实时检测 */
     this.loadForbidden();
 
@@ -756,7 +773,8 @@
     window.addEventListener('scroll', schedule, { passive: true, capture: true });
     window.addEventListener('resize', schedule, { passive: true });
     document.addEventListener('mousedown', function (e) {
-      if (self.imgBox && !self.imgBox.contains(e.target) && e.target !== self.activeImg) {
+      if (self.imgBox && !self.imgBox.contains(e.target) && e.target !== self.activeImg
+          && !(e.target.closest && e.target.closest('.cb-img-replace, .cb-img-replace-menu'))) {
         self.clearImageSelection();
       }
       if (self.floatBar && !self.floatBar.contains(e.target)) { self.hideFloatBar(); }
@@ -1419,62 +1437,238 @@
   };
 
   Editor.prototype.image = function () {
+    if (this.mode !== 'rich') { this.mdImage(); return; }
+    this.insertImagePlaceholder();
+  };
+
+  /* ---------------- 图片占位框 / 上传 / 附件库 / 链接 ---------------- */
+  Editor.prototype.insertImagePlaceholder = function () {
+    var self = this;
+    this.restoreRange();
+    var id = 'ph' + Date.now() + Math.floor(Math.random() * 1000);
+    var html = '<div class="cb-img-ph" contenteditable="false" data-img-ph="' + id + '">'
+      + '<div class="cb-img-ph__icon">' + ico('image') + '</div>'
+      + '<div class="cb-img-ph__hint">' + cbT('插入图片') + '：' + cbT('上传 / 附件库 / 输入链接') + '</div>'
+      + '<div class="cb-img-ph__actions">'
+      + '<button type="button" class="cb-btn sm" data-ph-upload>' + cbT('上传') + '</button>'
+      + '<button type="button" class="cb-btn sm" data-ph-library>' + cbT('附件库') + '</button>'
+      + '<button type="button" class="cb-btn sm" data-ph-linkbtn>' + cbT('输入链接') + '</button>'
+      + '<button type="button" class="cb-btn sm" data-ph-cancel>' + cbT('取消') + '</button>'
+      + '</div>'
+      + '<div class="cb-img-ph__link hide"><input class="cb-input" data-ph-link placeholder="' + cbT('粘贴图片链接，按回车插入') + '"><button type="button" class="cb-btn sm" data-ph-link-ok>' + cbT('插入') + '</button></div>'
+      + '<input type="file" accept="image/*" class="hide" data-ph-file>'
+      + '</div>';
+    document.execCommand('insertHTML', false, html);
+    this.sync();
+    var ph = this.area.querySelector('[data-img-ph="' + id + '"]');
+    if (ph) {
+      this.bindImagePlaceholder(ph);
+      var input = ph.querySelector('[data-ph-link]');
+      if (input) { setTimeout(function () { input.focus(); }, 30); }
+    }
+  };
+
+  Editor.prototype.bindImagePlaceholder = function (ph) {
+    var self = this;
+    var file = ph.querySelector('[data-ph-file]');
+    var linkWrap = ph.querySelector('[data-ph-link]') ? ph.querySelector('[data-ph-link]').parentNode : null;
+    function stop(e) { e.preventDefault(); e.stopPropagation(); }
+    var uploadBtn = ph.querySelector('[data-ph-upload]');
+    if (uploadBtn) uploadBtn.addEventListener('click', function (e) { stop(e); file.click(); });
+    file.addEventListener('change', function () {
+      var f = file.files && file.files[0];
+      if (!f) return;
+      self.upload(f, null, false, function (d) {
+        if (!d || !d.is_image) { alert(cbT('请选择图片文件')); return; }
+        self.insertImageFromPlaceholder(ph, d.url, d.name, d.id);
+      });
+    });
+    var libBtn = ph.querySelector('[data-ph-library]');
+    if (libBtn) libBtn.addEventListener('click', function (e) {
+      stop(e);
+      self.pickLibrary(function (url, name) {
+        self.insertImageFromPlaceholder(ph, url, name, 0);
+      });
+    });
+    var linkBtn = ph.querySelector('[data-ph-linkbtn]');
+    var linkBox = ph.querySelector('[data-ph-link]');
+    if (linkBtn && linkBox) linkBtn.addEventListener('click', function (e) {
+      stop(e);
+      linkWrap.classList.toggle('hide');
+      if (!linkWrap.classList.contains('hide')) { linkBox.focus(); }
+    });
+    function insertLink() {
+      if (!linkBox) return;
+      var url = (linkBox.value || '').trim();
+      if (!/^(https?:\/\/|\/)/i.test(url)) { alert(cbT('请输入有效的图片链接')); return; }
+      self.insertImageFromPlaceholder(ph, url, '', 0);
+    }
+    if (linkBox) {
+      linkBox.addEventListener('keydown', function (e) {
+        e.stopPropagation();
+        if (e.key === 'Enter') { e.preventDefault(); insertLink(); }
+        if (e.key === 'Escape') { linkWrap.classList.add('hide'); }
+      });
+      var ok = ph.querySelector('[data-ph-link-ok]');
+      if (ok) ok.addEventListener('click', function (e) { stop(e); insertLink(); });
+    }
+    var cancel = ph.querySelector('[data-ph-cancel]');
+    if (cancel) cancel.addEventListener('click', function (e) {
+      stop(e); ph.remove(); self.sync();
+    });
+  };
+
+  Editor.prototype.insertImageFromPlaceholder = function (ph, url, name, uploadId) {
+    if (!ph || !ph.parentNode) return;
+    var self = this;
+    var p = document.createElement('p');
+    var img = document.createElement('img');
+    img.src = url;
+    img.alt = name || '';
+    img.style.maxWidth = '100%';
+    if (uploadId) img.setAttribute('data-upload-id', String(parseInt(uploadId, 10)));
+    p.appendChild(img);
+    ph.parentNode.replaceChild(p, ph);
+    this.sync();
+    this.selectImage(img);
+  };
+
+  Editor.prototype.cleanupPlaceholders = function () {
+    this.area.querySelectorAll('[data-img-ph]').forEach(function (ph) { ph.remove(); });
+  };
+
+  Editor.prototype.pickLibrary = function (cb) {
     var self = this;
     var dlg = this.dialog({
-      title: cbT('插入图片'),
-      okText: cbT('插入'),
+      title: cbT('附件库'),
+      okText: cbT('关闭'),
+      width: 640,
       render: function (body) {
-        body.innerHTML =
-          '<div class="cb-ed-tabs">'
-          + '<button type="button" class="cb-ed-tab active" data-tab="upload">' + cbT('本地上传') + '</button>'
-          + '<button type="button" class="cb-ed-tab" data-tab="url">' + cbT('图片链接') + '</button>'
-          + '<button type="button" class="cb-ed-tab" data-tab="library">' + cbT('附件库') + '</button>'
-          + '</div>'
-          + '<div class="cb-ed-pane" data-pane="upload">'
-          + '<div class="cb-ed-drop" data-drop>' + cbT('点击选择图片，或将图片拖拽到此处')
-          + '<div class="text-xs text-muted" style="margin-top:6px">' + cbT('支持多选，上传后自动插入') + '</div></div>'
-          + '<input type="file" data-file accept="image/*" multiple class="hide">'
-          + '</div>'
-          + '<div class="cb-ed-pane hide" data-pane="url">'
-          + '<div class="cb-ed-field"><label>图片地址</label>'
-          + '<input class="cb-input" data-fname="imgurl" placeholder="https://example.com/a.png"></div>'
-          + '<div class="cb-ed-field"><label>替代文字（可选）</label>'
-          + '<input class="cb-input" data-fname="imgalt" placeholder="图片描述"></div>'
-          + '</div>'
-          + '<div class="cb-ed-pane hide" data-pane="library">'
-          + '<div class="cb-ed-library" data-library><div class="cb-ed-library__tip">加载中…</div></div>'
-          + '</div>';
-        self.bindTabs(body);
+        body.innerHTML = '<div class="cb-ed-library" data-library><div class="cb-ed-library__tip">' + cbT('加载中…') + '</div></div>';
         self.bindLibrary(body.querySelector('[data-library]'), function (url, name) {
-          self.insertHTML('<p><img src="' + esc(url) + '" alt="' + esc(name || '图片') + '" style="max-width:100%"></p>');
+          cb(url, name);
           dlg.close();
         });
-        var file = body.querySelector('[data-file]');
-        var drop = body.querySelector('[data-drop]');
-        drop.addEventListener('click', function () { file.click(); });
-        file.addEventListener('change', function () {
-          Array.prototype.forEach.call(file.files, function (f) { self.upload(f); });
-          dlg.close();
-        });
-        ['dragover', 'dragenter'].forEach(function (ev) {
-          drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
-        });
-        ['dragleave', 'drop'].forEach(function (ev) {
-          drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
-        });
-        drop.addEventListener('drop', function (e) {
-          e.preventDefault();
-          Array.prototype.forEach.call(e.dataTransfer.files, function (f) { self.upload(f); });
-          dlg.close();
-        });
-      },
-      onOk: function (v) {
-        var u = (v.imgurl || '').trim();
-        if (u) {
-          self.insertHTML('<p><img src="' + esc(u) + '" alt="' + esc(v.imgalt || '图片') + '" style="max-width:100%"></p>');
-        }
       }
     });
+  };
+
+  /* ---------------- 图片尺寸框 / 悬停替换 ---------------- */
+  Editor.prototype.initImageTools = function () {
+    if (this.imgReplaceBtn) return;
+    var self = this;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cb-img-replace hide';
+    btn.textContent = cbT('替换');
+    document.body.appendChild(btn);
+    this.imgReplaceBtn = btn;
+    var menu = document.createElement('div');
+    menu.className = 'cb-img-replace-menu hide';
+    menu.innerHTML = '<button type="button" data-replace="upload">' + cbT('上传') + '</button>'
+      + '<button type="button" data-replace="library">' + cbT('附件库') + '</button>'
+      + '<button type="button" data-replace="link">' + cbT('输入链接') + '</button>';
+    document.body.appendChild(menu);
+    this.imgReplaceMenu = menu;
+    btn.addEventListener('mouseenter', function () { clearTimeout(self.imgHideTimer); });
+    btn.addEventListener('mouseleave', function () { self.scheduleHideReplace(); });
+    menu.addEventListener('mouseenter', function () { clearTimeout(self.imgHideTimer); });
+    menu.addEventListener('mouseleave', function () { self.scheduleHideReplace(); });
+    btn.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      self.openReplaceMenu();
+    });
+    menu.querySelectorAll('[data-replace]').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var act = b.getAttribute('data-replace');
+        var img = self.replaceTarget;
+        self.hideReplaceMenu();
+        if (!img) return;
+        if (act === 'upload') {
+          var file = document.createElement('input');
+          file.type = 'file'; file.accept = 'image/*'; file.style.display = 'none';
+          document.body.appendChild(file);
+          file.addEventListener('change', function () {
+            var f = file.files && file.files[0];
+            if (f) {
+              self.upload(f, null, false, function (d) {
+                if (d && d.is_image) self.setImageSrc(img, d.url, d.id);
+              });
+            }
+            file.remove();
+          });
+          file.click();
+        } else if (act === 'library') {
+          self.pickLibrary(function (url) { self.setImageSrc(img, url); });
+        } else if (act === 'link') {
+          var url = prompt(cbT('输入新的图片链接'));
+          if (url && /^(https?:\/\/|\/)/i.test(url.trim())) { self.setImageSrc(img, url.trim()); }
+        }
+      });
+    });
+    document.addEventListener('mousedown', function (e) {
+      if (btn.contains(e.target) || menu.contains(e.target)) return;
+      if (e.target.closest && e.target.closest('.cb-editor__area img')) return;
+      self.hideReplace();
+    });
+    window.addEventListener('scroll', function () { self.positionReplace(); }, true);
+    window.addEventListener('resize', function () { self.positionReplace(); });
+  };
+
+  Editor.prototype.showReplace = function (img) {
+    if (!this.imgReplaceBtn || this.mode !== 'rich') return;
+    this.replaceTarget = img;
+    this.imgReplaceBtn.classList.remove('hide');
+    this.positionReplace();
+  };
+
+  Editor.prototype.positionReplace = function () {
+    if (!this.imgReplaceBtn || this.imgReplaceBtn.classList.contains('hide') || !this.replaceTarget) return;
+    var r = this.replaceTarget.getBoundingClientRect();
+    if (!r.width || !r.height) { this.hideReplace(); return; }
+    this.imgReplaceBtn.style.left = Math.max(4, r.right - 62) + 'px';
+    this.imgReplaceBtn.style.top = Math.max(4, r.top + 6) + 'px';
+  };
+
+  Editor.prototype.scheduleHideReplace = function () {
+    var self = this;
+    clearTimeout(this.imgHideTimer);
+    this.imgHideTimer = setTimeout(function () {
+      if (self.imgReplaceMenu && !self.imgReplaceMenu.classList.contains('hide')) return;
+      self.hideReplace();
+    }, 160);
+  };
+
+  Editor.prototype.hideReplace = function () {
+    clearTimeout(this.imgHideTimer);
+    this.replaceTarget = null;
+    if (this.imgReplaceBtn) this.imgReplaceBtn.classList.add('hide');
+    this.hideReplaceMenu();
+  };
+
+  Editor.prototype.openReplaceMenu = function () {
+    if (!this.replaceTarget || !this.imgReplaceMenu) return;
+    var r = this.imgReplaceBtn.getBoundingClientRect();
+    this.imgReplaceMenu.style.left = Math.max(4, r.left) + 'px';
+    this.imgReplaceMenu.style.top = (r.bottom + 4) + 'px';
+    this.imgReplaceMenu.classList.remove('hide');
+  };
+
+  Editor.prototype.hideReplaceMenu = function () {
+    if (this.imgReplaceMenu) this.imgReplaceMenu.classList.add('hide');
+  };
+
+  Editor.prototype.setImageSrc = function (img, url, uploadId) {
+    if (!img || !url) return;
+    var self = this;
+    img.removeAttribute('data-upload-id');
+    if (uploadId) img.setAttribute('data-upload-id', String(parseInt(uploadId, 10)));
+    img.src = url;
+    img.style.height = 'auto';
+    img.style.maxWidth = '100%';
+    this.sync();
+    this.selectImage(img);
   };
 
   Editor.prototype.attachment = function () {
@@ -1614,7 +1808,7 @@
    * - 其他（zip / gz / pdf…）→ 插入下载链接，避免渲染成裂图
    * markdown=true 时插入 Markdown 语法
    */
-  Editor.prototype.upload = function (file, space, markdown) {
+  Editor.prototype.upload = function (file, space, markdown, onDone) {
     var self = this;
     var isMd = markdown === true || this.mode === 'markdown';
     var fd = new FormData();
@@ -1635,6 +1829,11 @@
       }
       var d = res.data || {};
       var size = fileSize(d.size);
+      if (typeof onDone === 'function') {
+        if (!d.is_image) { alert(cbT('请选择图片文件')); return; }
+        onDone(d);
+        return;
+      }
       if (d.is_image) {
         if (isMd) {
           self.mdInsert('![' + (d.name || cbT('图片')) + '](' + d.url + ')\n');
@@ -1672,7 +1871,7 @@
       if (inputId) {
         var form = el.closest('form');
         if (form) {
-          form.addEventListener('submit', function () { ed.sync(); });
+          form.addEventListener('submit', function () { ed.cleanupPlaceholders(); ed.sync(); });
         }
       }
     });

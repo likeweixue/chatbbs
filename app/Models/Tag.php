@@ -29,7 +29,19 @@ class Tag
 
     public static function create(string $name, array $extra = []): int
     {
-        $slug = urlencode(mb_substr($name, 0, 40));
+        $name = mb_substr(trim($name), 0, 50);
+        // slug 列只有 50 字符：中文 / 特殊字符不能直接 urlencode 后截断，
+        // 否则 %E5%... 会把字段撑爆（SQLSTATE 1406）。
+        $base = strtolower(trim((string)preg_replace('/[^a-zA-Z0-9_-]+/', '-', $name), '-'));
+        if ($base === '' || strlen($base) > 40) {
+            $base = 'tag-' . substr(md5($name . '|' . microtime(true)), 0, 10);
+        }
+        $slug = $base;
+        $i = 2;
+        while (Database::value('SELECT id FROM ' . Database::table('tags') . ' WHERE slug = ?', [$slug])) {
+            $suffix = '-' . $i++;
+            $slug = substr($base, 0, 49 - strlen($suffix)) . $suffix;
+        }
         return Database::insert('tags', array_merge([
             'name' => $name,
             'slug' => $slug,
@@ -56,7 +68,7 @@ class Tag
     {
         $ids = [];
         foreach ($names as $name) {
-            $name = trim((string)$name);
+            $name = mb_substr(trim((string)$name), 0, 50);
             if ($name === '') {
                 continue;
             }
