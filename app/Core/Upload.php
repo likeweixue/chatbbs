@@ -120,7 +120,9 @@ class Upload
 
     public static function url(string $space, string $path): string
     {
-        return url('data/uploads/' . $space . '/' . ltrim($path, '/'));
+        // 上传文件是静态资源，不能走 ?r= 路由，否则图片地址会被当成页面路由。
+        $path = implode('/', array_map('rawurlencode', explode('/', ltrim($path, '/'))));
+        return site_base() . '/data/uploads/' . rawurlencode($space) . '/' . $path;
     }
 
     /**

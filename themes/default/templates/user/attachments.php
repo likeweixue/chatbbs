@@ -32,7 +32,10 @@
         <div class="cb-att-card">
           <div class="cb-att-card__thumb">
             <?php if ((int)$a['is_image']): ?>
-              <img src="<?= h(\App\Core\Upload::url($a['space'], $a['path'])) ?>" alt="">
+              <?php $previewUrl = url('attachment/' . (int)$a['id'] . '/preview'); ?>
+              <a href="<?= h($previewUrl) ?>" target="_blank" rel="noopener" title="<?= L('查看图片') ?>">
+                <img src="<?= h($previewUrl) ?>" alt="<?= h($a['name']) ?>" loading="lazy">
+              </a>
             <?php else: ?>
               <span><?= h(strtoupper($a['ext'])) ?></span>
             <?php endif; ?>
@@ -40,8 +43,14 @@
           <div class="cb-att-card__info">
             <div class="cb-att-card__name" title="<?= h($a['name']) ?>"><?= h($a['name']) ?></div>
             <div class="text-xs text-muted"><?= h(format_size($a['size'])) ?> · <?= (int)$a['downloads'] ?> 次下载</div>
-            <div class="flex gap-8" style="margin-top:6px">
+            <?php
+            $copyUrl = (string)$a['space'] === 'shared'
+                ? \App\Core\Upload::url($a['space'], $a['path'])
+                : url('attachment/' . (int)$a['id'] . '/preview');
+            ?>
+            <div class="flex gap-8" style="margin-top:6px;flex-wrap:wrap">
               <a class="cb-btn sm" href="<?= h(url('attachment/' . $a['id'] . '/download')) ?>"><?= L('下载') ?></a>
+              <button class="cb-btn sm" type="button" data-copy-url="<?= h($copyUrl) ?>"><?= L('复制链接') ?></button>
               <form method="post" action="<?= h(url('user/attachments/' . $a['id'] . '/delete')) ?>" style="display:inline">
                 <?= csrf_field() ?>
                 <button class="cb-btn sm" type="submit" onclick="return confirm('确定删除？')"><?= L('删除') ?></button>
@@ -66,4 +75,31 @@
         if (res.ok) setTimeout(function () { location.reload(); }, 500);
       });
   }
+
+  /* 复制附件直链 */
+  document.querySelectorAll('[data-copy-url]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy-url') || '';
+      var old = btn.textContent;
+      function done() {
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = old; }, 1500);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        ta.remove();
+      }
+    });
+  });
 </script>

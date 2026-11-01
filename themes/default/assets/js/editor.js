@@ -865,16 +865,18 @@
     this.area.addEventListener('keydown', submit);
     this.mdArea.addEventListener('keydown', submit);
 
-    /* 粘贴 / 拖拽图片自动上传 */
-    this.area.addEventListener('paste', function (e) {
-      var items = (e.clipboardData || e.originalEvent.clipboardData || {}).items;
-      if (!items) return;
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') === 0) {
-          e.preventDefault();
-          self.upload(items[i].getAsFile());
+    /* 粘贴 / 拖拽图片自动上传：富文本直接显示，其它模式生成对应语法 */
+    [this.area, this.mdArea].forEach(function (zone) {
+      zone.addEventListener('paste', function (e) {
+        var items = (e.clipboardData || e.originalEvent.clipboardData || {}).items;
+        if (!items) return;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') === 0) {
+            e.preventDefault();
+            self.upload(items[i].getAsFile(), null, false);
+          }
         }
-      }
+      });
     });
     [this.area, this.mdArea].forEach(function (zone) {
       zone.addEventListener('drop', function (e) {
@@ -1952,7 +1954,7 @@
    */
   Editor.prototype.upload = function (file, space, markdown, onDone) {
     var self = this;
-    var isMd = markdown === true || this.mode === 'markdown';
+    var mode = this.mode;
     var fd = new FormData();
     fd.append('file', file);
     if (CSRF) fd.append('_csrf', CSRF);
@@ -1976,17 +1978,26 @@
         onDone(d);
         return;
       }
+      var name = d.name || cbT('图片');
       if (d.is_image) {
-        if (isMd) {
-          self.mdInsert('![' + (d.name || cbT('图片')) + '](' + d.url + ')\n');
+        if (mode === 'markdown') {
+          self.mdInsert('![' + name + '](' + d.url + ')\n');
+        } else if (mode === 'bbcode') {
+          self.mdInsert('[img]' + d.url + '[/img]\n');
+        } else if (mode === 'easytext') {
+          self.mdInsert('tplj ' + name.replace(/\|/g, ' ') + '|' + d.url + '\n');
         } else {
-          self.insertHTML('<p><img src="' + esc(d.url) + '" alt="' + esc(d.name || cbT('图片')) + '"'
+          self.insertHTML('<p><img src="' + esc(d.url) + '" alt="' + esc(name) + '"'
             + (d.id ? ' data-upload-id="' + parseInt(d.id, 10) + '"' : '') + ' style="max-width:100%"></p>');
         }
       } else {
         var download = d.download || (d.url || '');
-        if (isMd) {
+        if (mode === 'markdown') {
           self.mdInsert('[' + (d.name || cbT('附件')) + '](' + download + ')\n');
+        } else if (mode === 'bbcode') {
+          self.mdInsert('[url=' + download + ']' + (d.name || cbT('附件')) + '[/url]\n');
+        } else if (mode === 'easytext') {
+          self.mdInsert('fjlj ' + (d.name || cbT('附件')).replace(/\|/g, ' ') + '|' + download + '\n');
         } else {
           // 用纯文本前缀（正文清洗会移除内联 svg，保证编辑区与保存后显示一致）
           self.insertHTML('<p><a class="cb-attachment" href="' + esc(download) + '" target="_blank" rel="noopener"'

@@ -63,6 +63,43 @@ class AttachmentController extends BaseController
     }
 
     /**
+     * 图片预览：走权限校验，私人空间不暴露静态地址
+     */
+    public function preview(int $id): void
+    {
+        $att = Attachment::find($id);
+        if (!$att || (int)$att['is_image'] !== 1) {
+            http_response_code(404);
+            echo '图片不存在';
+            exit;
+        }
+        $user = $this->user();
+        $isAdmin = Auth::isAdmin();
+        if ((string)$att['space'] === 'private'
+            && (!$user || ((int)$att['user_id'] !== (int)$user['id'] && !$isAdmin))) {
+            http_response_code(403);
+            echo '无权访问该图片';
+            exit;
+        }
+        $file = Upload::filePath((string)$att['space'], (string)$att['path']);
+        if (!is_file($file)) {
+            http_response_code(404);
+            echo '图片已被清理';
+            exit;
+        }
+        $mime = (string)($att['mime'] ?? '');
+        if ($mime === '' || !str_starts_with($mime, 'image/')) {
+            $detected = @mime_content_type($file);
+            $mime = $detected && str_starts_with($detected, 'image/') ? $detected : 'application/octet-stream';
+        }
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . (string)filesize($file));
+        header('Cache-Control: private, max-age=86400');
+        readfile($file);
+        exit;
+    }
+
+    /**
      * 付费附件购买页
      */
     public function buyForm(int $id): string

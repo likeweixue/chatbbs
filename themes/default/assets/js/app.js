@@ -240,7 +240,7 @@
 
   /* ---------- 图片灯箱 ---------- */
   document.addEventListener('click', function (e) {
-    var img = e.target.closest('.cb-say__images img, .cb-content-html img');
+    var img = e.target.closest('.cb-say__images img, .cb-content-html img, .cb-att-card__thumb img');
     if (!img || img.dataset.lightbox === '0') return;
     // 编辑器里的图片用于选中 / 调整大小，不触发前台灯箱
     if (img.closest('.cb-editor__area')) return;

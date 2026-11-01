@@ -119,6 +119,7 @@ Router::get('/u/{id}', \App\Controllers\UserController::class . '@profile');
 // 附件
 Router::get('/attachments', \App\Controllers\AttachmentController::class . '@library');
 Router::get('/attachment/{id}/download', \App\Controllers\AttachmentController::class . '@download');
+Router::get('/attachment/{id}/preview', \App\Controllers\AttachmentController::class . '@preview');
 Router::get('/attachment/{id}/buy', \App\Controllers\AttachmentController::class . '@buyForm', ['auth']);
 Router::post('/attachment/{id}/buy', \App\Controllers\AttachmentController::class . '@buy', ['auth', 'csrf']);
 

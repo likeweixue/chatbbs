@@ -2310,3 +2310,5 @@ body.cb-editor-fullscreen { overflow: hidden; }
 .cb-editor-fs-exit:hover { color: var(--color-primary); border-color: var(--color-primary); }
 .cb-editor-fs-exit .cb-ico { width: 17px; height: 17px; }
 .cb-editor.is-resizing, .cb-editor.is-resizing * { cursor: col-resize !important; user-select: none !important; }
+.cb-att-card__thumb a { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; }
+.cb-att-card__thumb img { cursor: zoom-in; }
