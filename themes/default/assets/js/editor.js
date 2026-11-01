@@ -34,18 +34,21 @@
     this.opts = opts || {};
     this.valueEl = this.opts.input ? document.getElementById(this.opts.input) : null;
     /* rich（默认，站点自带富文本） / markdown */
-    this.mode = ['markdown', 'bbcode'].indexOf(this.opts.mode) >= 0 ? this.opts.mode : 'rich';
+    this.mode = ['markdown', 'bbcode', 'easytext'].indexOf(this.opts.mode) >= 0 ? this.opts.mode : 'rich';
     this.htmlBuf = '';   // 富文本缓冲（切到 Markdown 再切回来时不丢内容）
     this.mdBuf = '';     // Markdown 缓冲
     this.bbBuf = '';     // BBCode 缓冲
+    this.easyBuf = '';   // 易文本缓冲
+    this.split = false;  // 实时预览分栏
+    this.previewSeq = 0;
     this.savedRange = null;
     this.build();
     this.bind();
     /* 初始内容 */
     var initial = this.opts.initial || (this.valueEl ? this.valueEl.value : '') || '';
     if (initial) {
-      if (this.mode === 'markdown' || this.mode === 'bbcode') {
-        if (this.mode === 'markdown') this.mdBuf = initial; else this.bbBuf = initial;
+      if (this.mode === 'markdown' || this.mode === 'bbcode' || this.mode === 'easytext') {
+        if (this.mode === 'markdown') this.mdBuf = initial; else if (this.mode === 'bbcode') this.bbBuf = initial; else this.easyBuf = initial;
         this.mdArea.value = initial;
       } else {
         this.htmlBuf = initial;
@@ -84,6 +87,15 @@
 
     body.appendChild(this.area);
     body.appendChild(this.mdArea);
+    this.splitter = document.createElement('div');
+    this.splitter.className = 'cb-editor__splitter';
+    this.splitter.setAttribute('role', 'separator');
+    this.splitter.setAttribute('aria-orientation', 'vertical');
+    this.splitter.setAttribute('aria-label', cbT('拖动调整预览宽度'));
+    body.appendChild(this.splitter);
+    this.preview = document.createElement('div');
+    this.preview.className = 'cb-editor__preview hide';
+    body.appendChild(this.preview);
     wrap.appendChild(body);
 
     /* 底部状态栏 */
@@ -104,6 +116,7 @@
     this.buildToolbar();
     this.applyMode();
     this.initImageTools();
+    this.initSplitter();
   };
 
   /* ---------------- 工具栏 ---------------- */
@@ -112,13 +125,17 @@
     var bar = document.createElement('div');
     bar.className = 'cb-editor__modes';
     bar.innerHTML =
-      '<button type="button" class="cb-ed-mode" data-mode="rich" title="' + cbT('富文本模式（站点默认）') + '">' + ico('image') + cbT('富文本') + '</button>'
+      '<button type="button" class="cb-ed-preview-toggle" data-preview-toggle title="' + cbT('分栏实时预览') + '" aria-label="' + cbT('分栏实时预览') + '">' + ico('columns') + '</button>'
+      + '<button type="button" class="cb-ed-mode" data-mode="rich" title="' + cbT('富文本模式（站点默认）') + '">' + ico('image') + cbT('富文本') + '</button>'
       + '<button type="button" class="cb-ed-mode" data-mode="markdown" title="' + cbT('Markdown 模式') + '">' + ico('md') + 'Markdown</button>'
-      + '<button type="button" class="cb-ed-mode" data-mode="bbcode" title="' + cbT('BBCode 文本模式') + '">' + ico('code') + 'BBCode</button>';
+      + '<button type="button" class="cb-ed-mode" data-mode="bbcode" title="' + cbT('BBCode 文本模式') + '">' + ico('code') + 'BBCode</button>'
+      + '<button type="button" class="cb-ed-mode" data-mode="easytext" title="' + cbT('易文本模式（拼音首字母）') + '">' + ico('code') + cbT('易文本') + '</button>';
     bar.addEventListener('mousedown', function (e) { e.preventDefault(); });
     bar.querySelectorAll('.cb-ed-mode').forEach(function (b) {
       b.addEventListener('click', function () { self.setMode(b.getAttribute('data-mode')); });
     });
+    var previewBtn = bar.querySelector('[data-preview-toggle]');
+    if (previewBtn) previewBtn.addEventListener('click', function () { self.toggleSplit(); });
     return bar;
   };
 
@@ -126,7 +143,7 @@
     var self = this;
     this.tb.innerHTML = '';
 
-    var btns = this.mode === 'bbcode' ? [] : this.mode === 'markdown' ? [
+    var btns = (this.mode === 'bbcode' || this.mode === 'easytext') ? [] : this.mode === 'markdown' ? [
       { icon: 'h', title: cbT('标题'), fn: 'mdHeading' },
       { icon: 'bold', title: cbT('加粗'), fn: 'mdWrap', arg: '**' },
       { icon: 'italic', title: cbT('斜体'), fn: 'mdWrap', arg: '*' },
@@ -282,6 +299,8 @@
     this.tb.querySelectorAll('.cb-ed-mode').forEach(function (b) {
       b.classList.toggle('on', b.getAttribute('data-mode') === self.mode);
     });
+    var pv = this.tb.querySelector('[data-preview-toggle]');
+    if (pv) { pv.classList.toggle('on', !!self.split); }
   };
 
   /* ---------------- 模式切换 ---------------- */
@@ -290,26 +309,136 @@
     this.wrap.classList.toggle('cb-editor--rich', rich);
     this.wrap.classList.toggle('cb-editor--md', this.mode === 'markdown');
     this.wrap.classList.toggle('cb-editor--bb', this.mode === 'bbcode');
+    this.wrap.classList.toggle('cb-editor--easy', this.mode === 'easytext');
     this.area.classList.toggle('hide', !rich);
     this.mdArea.classList.toggle('hide', rich);
     this.mdArea.setAttribute('placeholder', this.mode === 'bbcode'
       ? '在此编写 BBCode…\n[b]加粗[/b] [i]斜体[/i] [u]下划线[/u]\n[quote]引用[/quote] [code]代码[/code]\n[url=https://…]链接[/url] [img]图片地址[/img]'
-      : '在此编写 Markdown…\n# 标题\n**加粗** *斜体* `代码`\n- 列表\n> 引用\n```\n代码块\n```\n[链接](https://…) 或 ![图片](图片地址)');
+      : (this.mode === 'easytext'
+        ? '在此编写易文本…\nyi 一级标题\ner 二级标题\njc 加粗\nxt 斜体\nyy 引用\nwxlb 列表\ntplj 图片说明|图片地址'
+        : '在此编写 Markdown…\n# 标题\n**加粗** *斜体* `代码`\n- 列表\n> 引用\n```\n代码块\n```\n[链接](https://…) 或 ![图片](图片地址)'));
     if (this.hint) {
       this.hint.textContent = rich
         ? cbT('支持粘贴 / 拖拽图片自动上传；选中文字或图片可使用快捷工具条')
-        : (this.mode === 'bbcode' ? cbT('BBCode 模式：保存后自动转换为排版') : cbT('Markdown 模式：保存后会按 Markdown 语法渲染'));
+        : (this.mode === 'bbcode' ? cbT('BBCode 模式：保存后自动转换为排版')
+          : (this.mode === 'easytext' ? cbT('易文本模式：拼音首字母 + 空格，保存后自动排版') : cbT('Markdown 模式：保存后会按 Markdown 语法渲染')));
     }
     this.sync();
+    if (this.split) { this.renderPreview(); }
+  };
+
+  Editor.prototype.easyToHtml = function (text) {
+    var src = String(text || '');
+    if (window.YiText && typeof window.YiText.parse === 'function') {
+      try { return '<div class="yi-doc">' + window.YiText.parse(src) + '</div>'; } catch (e) {}
+    }
+    return '<div class="yi-doc"><p>' + esc(src).replace(/\n/g, '<br>') + '</p></div>';
+  };
+
+  Editor.prototype.initSplitter = function () {
+    var self = this;
+    if (!this.splitter) return;
+    this.splitter.addEventListener('pointerdown', function (e) { self.startSplitter(e); });
+    window.addEventListener('resize', function () {
+      if (!self.split) return;
+      clearTimeout(self.splitResizeTimer);
+      self.splitResizeTimer = setTimeout(function () { self.clampSplit(); }, 80);
+    });
+  };
+
+  Editor.prototype.clampSplit = function () {
+    if (!this.split || !this.bodyWrap) return;
+    var left = parseFloat(this.bodyWrap.style.getPropertyValue('--split-left'));
+    if (!isFinite(left)) return;
+    var width = this.bodyWrap.clientWidth;
+    var min = Math.max(180, width * 0.22);
+    var max = width - min - 8;
+    left = Math.max(min, Math.min(max, left));
+    this.bodyWrap.style.setProperty('--split-left', Math.round(left) + 'px');
+  };
+
+  Editor.prototype.startSplitter = function (e) {
+    if (!this.split) return;
+    e.preventDefault();
+    var self = this;
+    var body = this.bodyWrap;
+    var rect = body.getBoundingClientRect();
+    var splitter = 8;
+    var min = Math.max(180, rect.width * 0.22);
+    var max = rect.width - min - splitter;
+    function move(ev) {
+      var left = Math.max(min, Math.min(max, ev.clientX - rect.left));
+      body.style.setProperty('--split-left', Math.round(left) + 'px');
+    }
+    function up() {
+      document.removeEventListener('pointermove', move);
+      self.wrap.classList.remove('is-resizing');
+    }
+    this.wrap.classList.add('is-resizing');
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up, { once: true });
+  };
+
+  Editor.prototype.toggleSplit = function () {
+    this.split = !this.split;
+    this.wrap.classList.toggle('cb-editor--split', this.split);
+    if (this.preview) this.preview.classList.toggle('hide', !this.split);
+    this.updateModeButtons();
+    if (this.split) { this.clampSplit(); this.renderPreview(); }
+  };
+
+  Editor.prototype.schedulePreview = function () {
+    if (!this.split) return;
+    var self = this;
+    clearTimeout(this.previewTimer);
+    this.previewTimer = setTimeout(function () { self.renderPreview(); }, 160);
+  };
+
+  Editor.prototype.renderPreview = function () {
+    if (!this.split || !this.preview) return;
+    var self = this;
+    var seq = ++this.previewSeq;
+    var show = function (html) {
+      if (seq !== self.previewSeq) return;
+      self.preview.innerHTML = '<div class="cb-content-html">' + (html || '<p class="text-muted">' + cbT('预览空') + '</p>') + '</div>';
+    };
+    if (this.mode === 'rich') {
+      show(this.area.innerHTML);
+      return;
+    }
+    var src = this.mdArea.value;
+    if (this.mode === 'easytext') {
+      show(this.easyToHtml(src));
+      return;
+    }
+    if (this.mode === 'bbcode') {
+      show(this.bbcodeToHtml(src));
+      return;
+    }
+    // Markdown 使用服务端同一个解析器，预览和发布后一致
+    var fd = new FormData();
+    fd.append('content', src);
+    if (CSRF) fd.append('_csrf', CSRF);
+    fetch(API + 'api/markdown', {
+      method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (seq !== self.previewSeq) return;
+      show(res && res.ok && res.data ? res.data.html : '<p class="text-muted">' + cbT('预览失败，请稍后重试') + '</p>');
+    }).catch(function () {
+      if (seq === self.previewSeq) show('<p class="text-muted">' + cbT('预览失败，请稍后重试') + '</p>');
+    });
   };
 
   Editor.prototype.setMode = function (mode) {
-    if (['rich', 'markdown', 'bbcode'].indexOf(mode) < 0) mode = 'rich';
+    if (['rich', 'markdown', 'bbcode', 'easytext'].indexOf(mode) < 0) mode = 'rich';
     if (mode === this.mode) return;
     if (this.mode === 'rich') {
       this.htmlBuf = this.area.innerHTML;
     } else if (this.mode === 'markdown') {
       this.mdBuf = this.mdArea.value;
+    } else if (this.mode === 'easytext') {
+      this.easyBuf = this.mdArea.value;
+      this.htmlBuf = this.easyToHtml(this.easyBuf);
     } else {
       this.bbBuf = this.mdArea.value;
     }
@@ -319,12 +448,23 @@
       } else if (this.mode === 'markdown') {
         this.mdToHtml(this.mdBuf);
         this.htmlBuf = this.area.innerHTML;
+      } else if (this.mode === 'easytext') {
+        this.htmlBuf = this.easyToHtml(this.easyBuf);
       }
       if (this.htmlBuf) this.area.innerHTML = this.htmlBuf;
     } else if (mode === 'markdown') {
+      if (this.mode === 'easytext') { this.htmlBuf = this.easyToHtml(this.easyBuf); this.mdBuf = ''; }
       if (!this.mdBuf) this.mdBuf = this.htmlToMarkdown(this.htmlBuf || this.area.innerHTML);
       this.mdArea.value = this.mdBuf;
+    } else if (mode === 'easytext') {
+      if (!this.easyBuf) {
+        if (this.mode === 'rich') this.easyBuf = this.area.innerText || '';
+        else if (this.mode === 'markdown') this.easyBuf = this.mdBuf;
+        else this.easyBuf = this.bbBuf;
+      }
+      this.mdArea.value = this.easyBuf;
     } else {
+      if (this.mode === 'easytext') { this.htmlBuf = this.easyToHtml(this.easyBuf); this.bbBuf = ''; }
       if (!this.bbBuf) this.bbBuf = this.htmlToBbcode(this.htmlBuf || this.area.innerHTML);
       this.mdArea.value = this.bbBuf;
     }
@@ -683,10 +823,10 @@
   Editor.prototype.bind = function () {
     var self = this;
 
-    this.area.addEventListener('input', function () { self.sync(); self.scheduleForbiddenCheck(); });
+    this.area.addEventListener('input', function () { self.sync(); self.scheduleForbiddenCheck(); self.schedulePreview(); });
     this.area.addEventListener('blur', function () { self.sync(); });
     this.mdArea.addEventListener('input', function () {
-      self.mdBuf = self.mdArea.value; self.sync(); self.scheduleForbiddenCheck();
+      self.mdBuf = self.mdArea.value; self.sync(); self.scheduleForbiddenCheck(); self.schedulePreview();
     });
     ['keyup', 'mouseup', 'touchend'].forEach(function (ev) {
       self.area.addEventListener(ev, function () {
@@ -783,16 +923,18 @@
 
   /* ---------------- 同步到表单字段 ---------------- */
   Editor.prototype.sync = function () {
-    var html = this.mode === 'rich' ? this.area.innerHTML : (this.mode === 'bbcode' ? this.bbcodeToHtml(this.mdArea.value) : '');
+    var html = this.mode === 'rich' ? this.area.innerHTML : (this.mode === 'bbcode' ? this.bbcodeToHtml(this.mdArea.value) : (this.mode === 'easytext' ? this.easyToHtml(this.mdArea.value) : ''));
     var text = this.mode === 'rich' ? (this.area.textContent || '') : this.mdArea.value;
     if (this.mode === 'rich') {
       this.htmlBuf = html;
     } else if (this.mode === 'markdown') {
       this.mdBuf = this.mdArea.value;
+    } else if (this.mode === 'easytext') {
+      this.easyBuf = this.mdArea.value;
     } else {
       this.bbBuf = this.mdArea.value;
     }
-    if (this.valueEl) { this.valueEl.value = this.mode === 'rich' ? html : (this.mode === 'bbcode' ? html : this.mdArea.value); }
+    if (this.valueEl) { this.valueEl.value = (this.mode === 'rich' || this.mode === 'bbcode' || this.mode === 'easytext') ? html : this.mdArea.value; }
     var fmt = document.getElementById(this.opts.input ? this.opts.input + '_format' : '');
     if (fmt) { fmt.value = this.mode === 'markdown' ? 'markdown' : 'rich'; }
     if (this.counter) { this.counter.textContent = text.length + cbT(' 字'); }

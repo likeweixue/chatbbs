@@ -74,6 +74,7 @@ $favicon = (string)config('site_favicon', '');
 <link rel="alternate" type="application/rss+xml" title="<?= h($siteName) ?> RSS" href="<?= h(url('rss')) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
+<link rel="stylesheet" href="<?= h(theme_asset('css/yitext.css') . '?v=' . CB_VERSION) ?>">
 <?php
 // 外观微调：圆角大小 / 主题主色（后台「扩展管理 → 主题 → 外观微调」设置）
 $radius = (int)config('theme_radius', 4);
@@ -424,6 +425,7 @@ $needEditor = !empty($load_editor) || str_contains((string)($content ?? ''), 'da
 ?>
 <?php if ($needEditor): ?>
 <?php cb_icon_preload(cb_editor_icons()); ?>
+<script src="<?= h(theme_asset('js/yitext.js') . '?v=' . CB_VERSION) ?>"></script>
 <script src="<?= h(theme_asset('js/editor.js') . '?v=' . CB_VERSION) ?>"></script>
 <?php endif; ?>
 <?= config('footer_code', '') ?>

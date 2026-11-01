@@ -1,0 +1,51 @@
+.yi-doc{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;color:#1f2328;}
+.yi-doc .yi-h{margin:1.2em 0 .6em;line-height:1.3;}
+.yi-doc .yi-h1{font-size:2em;}.yi-doc .yi-h2{font-size:1.6em;}.yi-doc .yi-h3{font-size:1.35em;}.yi-doc .yi-h4{font-size:1.15em;}.yi-doc .yi-h5{font-size:1em;}.yi-doc .yi-h6{font-size:.95em;}
+.yi-doc p{margin:.6em 0;}
+.yi-doc .yi-quote{border-left:4px solid #c9d1d9;padding:.4em 1em;color:#57606a;background:#f6f8fa;margin:.8em 0;}
+.yi-doc .yi-em em{font-style:italic;}
+.yi-doc .yi-u u{text-decoration:underline;}
+.yi-doc .yi-mark mark{background:#fff3a3;padding:0 .2em;}
+.yi-doc .yi-s s{text-decoration:line-through;color:#8b949e;}
+.yi-doc .yi-tip{border-radius:8px;padding:.6em .9em;margin:.8em 0;border-left:4px solid #0969da;background:#ddf4ff;}
+.yi-doc .yi-tip-warn{border-color:#bf8700;background:#fff8c5;}
+.yi-doc .yi-tip-success{border-color:#1a7f37;background:#dafbe1;}
+.yi-doc .yi-tip-danger{border-color:#cf222e;background:#ffebe9;}
+.yi-doc .yi-tip .tip-label{font-weight:700;margin-right:.5em;}
+.yi-doc .yi-code code,.yi-doc .yi-inline-code{background:#f6f8fa;border:1px solid #d0d7de;border-radius:4px;padding:.1em .4em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;}
+.yi-doc .yi-codeblock{background:#0d1117;color:#e6edf3;border-radius:8px;padding:1em;overflow:auto;}
+.yi-doc .yi-codeblock code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;}
+.yi-doc .yi-sup sup,.yi-doc .yi-sub sub{font-size:.75em;}
+.yi-doc .yi-align{margin:.6em 0;}.yi-doc .yi-center{text-align:center;}.yi-doc .yi-left{text-align:left;}.yi-doc .yi-right{text-align:right;}
+.yi-doc .yi-link{color:#0969da;text-decoration:none;}.yi-doc .yi-link:hover{text-decoration:underline;}
+.yi-doc .yi-figure{margin:.8em 0;}.yi-doc .yi-figure img{max-width:100%;border-radius:8px;}.yi-doc .yi-figure figcaption{font-size:.85em;color:#57606a;text-align:center;margin-top:.3em;}
+.yi-doc .yi-media{margin:.8em 0;}.yi-doc .yi-media video,.yi-doc .yi-media audio{max-width:100%;}
+.yi-doc .yi-file{display:inline-block;background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:.4em .8em;color:#1f2328;text-decoration:none;}
+.yi-doc .yi-list{padding-left:1.6em;margin:.6em 0;}
+.yi-doc .yi-table{border-collapse:collapse;width:100%;margin:.8em 0;font-size:.95em;}
+.yi-doc .yi-table th,.yi-doc .yi-table td{border:1px solid #d0d7de;padding:.5em .7em;text-align:left;}
+.yi-doc .yi-table thead th{background:#f6f8fa;font-weight:700;}
+.yi-doc .yi-table tbody tr:nth-child(even){background:#f6f8fa;}
+.yi-doc .yi-hr{border:none;border-top:1px solid #d0d7de;margin:1.2em 0;}
+.yi-doc .yi-page-break{border-top:1px dashed #d0d7de;text-align:center;color:#8b949e;margin:1.2em 0;}
+.yi-doc .yi-page-break span{background:#fff;padding:0 .5em;position:relative;top:-.8em;}
+.yi-doc .yi-time{color:#57606a;font-size:.85em;}
+.yi-doc .yi-details{border:1px solid #d0d7de;border-radius:8px;padding:.4em .8em;margin:.8em 0;}
+.yi-doc .yi-details summary{cursor:pointer;font-weight:600;}
+.yi-doc .yi-details .details-body{margin-top:.5em;}
+.yi-doc .yi-color,.yi-doc .yi-size{margin:.6em 0;}
+.yi-doc .yi-footnotes{margin-top:2em;font-size:.9em;color:#57606a;}.yi-doc .yi-footnotes ol{padding-left:1.4em;}.yi-doc .yi-fn a{color:#0969da;}
+.yi-doc .toc{background:#f6f8fa;border:1px solid #d0d7de;border-radius:8px;padding:.6em 1em;margin:.8em 0;}
+.yi-doc .toc-title{font-weight:700;margin-bottom:.3em;}.yi-doc .toc-list{list-style:none;padding-left:0;margin:0;}
+.yi-doc .toc-list li{margin:.2em 0;}.yi-doc .toc-lvl-2{padding-left:1em;}.yi-doc .toc-lvl-3{padding-left:2em;}.yi-doc .toc-lvl-4{padding-left:3em;}.yi-doc .toc-lvl-5{padding-left:4em;}.yi-doc .toc-lvl-6{padding-left:5em;}
+/* ChatBBS 暗色适配 */
+html[data-theme="dark"] .yi-doc { color: var(--color-text); }
+html[data-theme="dark"] .yi-doc .yi-quote,
+html[data-theme="dark"] .yi-doc .yi-tip { background: var(--color-surface-alt); border-color: var(--color-border); color: var(--color-text-sub); }
+html[data-theme="dark"] .yi-doc .yi-code code,
+html[data-theme="dark"] .yi-doc .yi-inline-code,
+html[data-theme="dark"] .yi-doc .yi-file { background: var(--color-surface-alt); border-color: var(--color-border); color: var(--color-text); }
+html[data-theme="dark"] .yi-doc .yi-table th,
+html[data-theme="dark"] .yi-doc .yi-table td { border-color: var(--color-border); }
+html[data-theme="dark"] .yi-doc .yi-table thead th,
+html[data-theme="dark"] .yi-doc .yi-table tbody tr:nth-child(even) { background: var(--color-surface-alt); }

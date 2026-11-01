@@ -44,10 +44,13 @@ $draftText = $draftContent !== '' ? \App\Services\Content::toText($draftContent)
                value="<?= h($thread['title'] ?? ($draft['title'] ?? old('title'))) ?>" placeholder="<?= L('请输入标题，一句话说明你的主题') ?>">
       </div>
 
-      <div class="cb-form-item">
+      <div class="cb-form-item cb-form-item--editor">
         <div class="flex justify-between items-center" style="margin-bottom:6px">
           <label style="margin:0"><?= L('正文') ?></label>
-          <a class="cb-btn sm" id="btn-thread-mode" href="javascript:void(0)"><?= L('高级模式') ?></a>
+          <div class="flex gap-8 items-center">
+            <button class="cb-btn sm" id="btn-editor-fullscreen" type="button" title="<?= L('全屏编辑') ?>" aria-label="<?= L('全屏编辑') ?>"><?= cb_icon('expand') ?></button>
+            <a class="cb-btn sm" id="btn-thread-mode" href="javascript:void(0)"><?= L('高级模式') ?></a>
+          </div>
         </div>
 
         <!-- 简洁模式 -->
@@ -187,7 +190,7 @@ $draftText = $draftContent !== '' ? \App\Services\Content::toText($draftContent)
                   placeholder="<?= L('写上你的自定义版权说明，如：转载需注明出处并私信告知作者') ?>"><?= h((string)($thread['license_custom'] ?? '')) ?></textarea>
       </div>
 
-      <div class="flex gap-8 items-center">
+      <div class="cb-form-actions flex gap-8 items-center">
         <button class="cb-btn primary lg" type="submit"><?= $isEdit ? L('保存修改') : L('发布主题') ?></button>
         <button class="cb-btn" id="btn-save-draft" type="button"><?= L('保存草稿') ?></button>
         <span class="text-xs text-muted" id="draft-tip"></span>
@@ -355,5 +358,34 @@ $draftText = $draftContent !== '' ? \App\Services\Content::toText($draftContent)
   drawChips();
   drawMenu();
   menu.classList.add('hide');
+})();
+</script>
+<script>
+/* 编辑器全屏：隐藏发帖元信息，只保留编辑器 */
+(function () {
+  var card = document.querySelector('.cb-card--editor');
+  var btn = document.getElementById('btn-editor-fullscreen');
+  if (!card || !btn) return;
+  var exit = document.createElement('button');
+  exit.type = 'button';
+  exit.className = 'cb-editor-fs-exit';
+  exit.title = '<?= L('退出全屏') ?>';
+  exit.setAttribute('aria-label', '<?= L('退出全屏') ?>');
+  exit.innerHTML = '<?= cb_icon('collapse') ?>';
+  card.appendChild(exit);
+  function setFull(on) {
+    card.classList.toggle('is-fullscreen', on);
+    document.body.classList.toggle('cb-editor-fullscreen', on);
+    window.dispatchEvent(new Event('resize'));
+    btn.title = on ? '<?= L('退出全屏') ?>' : '<?= L('全屏编辑') ?>';
+    btn.setAttribute('aria-label', btn.title);
+    btn.innerHTML = on ? '<?= cb_icon('collapse') ?>' : '<?= cb_icon('expand') ?>';
+    exit.classList.toggle('show', on);
+  }
+  btn.addEventListener('click', function () { setFull(!card.classList.contains('is-fullscreen')); });
+  exit.addEventListener('click', function () { setFull(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && card.classList.contains('is-fullscreen')) { setFull(false); }
+  });
 })();
 </script>
