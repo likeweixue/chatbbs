@@ -143,7 +143,48 @@
     var self = this;
     this.tb.innerHTML = '';
 
-    var btns = (this.mode === 'bbcode' || this.mode === 'easytext') ? [] : this.mode === 'markdown' ? [
+    var btns;
+    if (this.mode === 'bbcode') {
+      btns = [
+        { icon: 'h', title: cbT('标题'), fn: 'bbHeading' },
+        { icon: 'bold', title: cbT('加粗'), fn: 'bbWrap', arg: 'b' },
+        { icon: 'italic', title: cbT('斜体'), fn: 'bbWrap', arg: 'i' },
+        { icon: 'underline', title: cbT('下划线'), fn: 'bbWrap', arg: 'u' },
+        { icon: 'strike', title: cbT('删除线'), fn: 'bbWrap', arg: 's' },
+        { icon: 'quote', title: cbT('引用'), fn: 'bbWrap', arg: 'quote' },
+        { icon: 'code', title: cbT('代码块'), fn: 'bbCode' },
+        { sep: true },
+        { icon: 'ul', title: cbT('无序列表'), fn: 'bbList', arg: 'ul' },
+        { icon: 'ol', title: cbT('有序列表'), fn: 'bbList', arg: 'ol' },
+        { icon: 'hr', title: cbT('分割线'), fn: 'bbInsert', arg: '\n[hr]\n' },
+        { sep: true },
+        { icon: 'link', title: cbT('插入链接'), fn: 'bbLink' },
+        { icon: 'image', title: cbT('插入图片'), fn: 'bbImage' }
+      ];
+    } else if (this.mode === 'easytext') {
+      btns = [
+        { icon: 'h', title: cbT('标题'), fn: 'easyHeading' },
+        { icon: 'bold', title: cbT('加粗'), fn: 'mdPrefix', arg: 'jc ' },
+        { icon: 'italic', title: cbT('斜体'), fn: 'mdPrefix', arg: 'xt ' },
+        { icon: 'underline', title: cbT('下划线'), fn: 'mdPrefix', arg: 'xhx ' },
+        { icon: 'strike', title: cbT('删除线'), fn: 'mdPrefix', arg: 'sc ' },
+        { icon: 'sup', title: cbT('上标'), fn: 'mdPrefix', arg: 'sb ' },
+        { icon: 'sub', title: cbT('下标'), fn: 'mdPrefix', arg: 'xb ' },
+        { icon: 'quote', title: cbT('引用'), fn: 'mdPrefix', arg: 'yy ' },
+        { icon: 'code', title: cbT('代码块'), fn: 'easyCode' },
+        { sep: true },
+        { icon: 'link', title: cbT('插入链接'), fn: 'easyLink' },
+        { icon: 'image', title: cbT('插入图片'), fn: 'easyImage' },
+        { icon: 'table', title: cbT('插入表格'), fn: 'mdTable' },
+        { icon: 'ul', title: cbT('无序列表'), fn: 'mdPrefix', arg: 'wxlb ' },
+        { icon: 'ol', title: cbT('有序列表'), fn: 'mdPrefix', arg: 'yxlb ' },
+        { icon: 'task', title: cbT('任务列表'), fn: 'mdPrefix', arg: 'rw ' },
+        { icon: 'toc', title: cbT('目录'), fn: 'easyInsert', arg: '\nml\n' },
+        { sep: true },
+        { icon: 'sample', title: cbT('载入示例'), fn: 'easySample' }
+      ];
+    } else if (this.mode === 'markdown') {
+      btns = [
       { icon: 'h', title: cbT('标题'), fn: 'mdHeading' },
       { icon: 'bold', title: cbT('加粗'), fn: 'mdWrap', arg: '**' },
       { icon: 'italic', title: cbT('斜体'), fn: 'mdWrap', arg: '*' },
@@ -160,7 +201,9 @@
       { icon: 'image', title: cbT('插入图片'), fn: 'mdImage' },
       { icon: 'attach', title: cbT('插入附件'), fn: 'attachment' },
       { icon: 'preview', title: cbT('预览排版效果'), fn: 'mdPreview' }
-    ] : [
+      ];
+    } else {
+      btns = [
       { icon: 'h', title: cbT('标题'), cmd: 'heading', arg: 'h2' },
       { icon: 'bold', title: cbT('加粗'), cmd: 'bold' },
       { icon: 'italic', title: cbT('斜体'), cmd: 'italic' },
@@ -187,7 +230,8 @@
       { icon: 'undo', title: cbT('撤销'), cmd: 'undo' },
       { icon: 'redo', title: cbT('恢复'), cmd: 'redo' },
       { icon: 'clear', title: cbT('清除格式'), cmd: 'removeFormat' }
-    ];
+      ];
+    }
 
     btns.forEach(function (b) {
       if (b.sep) {
@@ -476,6 +520,144 @@
     this.hideFloatBar();
   };
 
+  /* ---------------- BBCode 快捷语法 ---------------- */
+  Editor.prototype.bbHeading = function () {
+    var self = this;
+    this.dialog({
+      title: cbT('插入标题'), okText: cbT('插入'),
+      fields: [
+        { name: 'level', label: cbT('级别'), type: 'select', value: '2', options: [1,2,3,4,5,6].map(function (i) { return { value: String(i), label: 'H' + i }; }) },
+        { name: 'text', label: cbT('标题文字'), value: cbT('标题'), autofocus: true }
+      ],
+      onOk: function (v) {
+        var n = parseInt(v.level, 10) || 2;
+        self.mdInsert('\n[h' + n + ']' + (v.text || cbT('标题')).trim() + '[/h' + n + ']\n');
+      }
+    });
+  };
+
+  Editor.prototype.bbWrap = function (tag) {
+    var self = this;
+    this.mdAreaEdit(function (sel, val, s, e) {
+      var text = sel || cbT('文字');
+      var open = '[' + tag + ']', close = '[/' + tag + ']';
+      return { value: val.slice(0, s) + open + text + close + val.slice(e), selStart: s + open.length, selEnd: s + open.length + text.length };
+    });
+  };
+
+  Editor.prototype.bbCode = function () {
+    var ta = this.mdArea;
+    var sel = ta.value.slice(ta.selectionStart, ta.selectionEnd);
+    this.mdInsert(sel ? '\n[code]' + sel + '[/code]\n' : '\n[code]代码[/code]\n');
+  };
+
+  Editor.prototype.bbList = function (tag) {
+    var ta = this.mdArea;
+    var sel = ta.value.slice(ta.selectionStart, ta.selectionEnd);
+    var items = sel ? sel.split(/\r?\n/).filter(function (x) { return x.trim() !== ''; }) : [cbT('项目')];
+    var block = '[' + tag + ']\n' + items.map(function (x) { return '[*]' + x.trim(); }).join('\n') + '\n[/' + tag + ']\n';
+    this.mdInsert(block);
+  };
+
+  Editor.prototype.bbInsert = function (text) {
+    this.mdInsert(text);
+  };
+
+  Editor.prototype.bbLink = function () {
+    var self = this;
+    var sel = this.mdArea.value.slice(this.mdArea.selectionStart, this.mdArea.selectionEnd);
+    this.dialog({
+      title: cbT('插入链接'), okText: cbT('插入'),
+      fields: [
+        { name: 'text', label: cbT('显示文字'), value: sel || cbT('链接文字'), autofocus: true },
+        { name: 'url', label: cbT('链接地址'), value: 'https://' }
+      ],
+      onOk: function (v) {
+        var url = (v.url || '').trim();
+        if (!url || url === 'https://') return;
+        self.mdInsert('[url=' + url + ']' + (v.text || url) + '[/url]');
+      }
+    });
+  };
+
+  Editor.prototype.bbImage = function () {
+    var self = this;
+    this.dialog({
+      title: cbT('插入图片'), okText: cbT('插入'),
+      fields: [
+        { name: 'url', label: cbT('图片地址'), placeholder: 'https://example.com/a.png', autofocus: true },
+        { name: 'alt', label: cbT('替代文字（可选）') }
+      ],
+      onOk: function (v) {
+        var url = (v.url || '').trim();
+        if (url) self.mdInsert('[img]' + url + '[/img]');
+      }
+    });
+  };
+
+  /* ---------------- 易文本快捷语法 ---------------- */
+  Editor.prototype.easyHeading = function () {
+    var self = this;
+    var words = ['yi', 'er', 'san', 'si', 'wu', 'liu'];
+    this.dialog({
+      title: cbT('插入标题'), okText: cbT('插入'),
+      fields: [
+        { name: 'level', label: cbT('级别'), type: 'select', value: '1', options: words.map(function (w, i) { return { value: String(i + 1), label: 'H' + (i + 1) }; }) },
+        { name: 'text', label: cbT('标题文字'), value: cbT('标题'), autofocus: true }
+      ],
+      onOk: function (v) {
+        var n = Math.max(1, Math.min(6, parseInt(v.level, 10) || 1));
+        self.mdInsert('\n' + words[n - 1] + ' ' + (v.text || cbT('标题')).trim() + '\n');
+      }
+    });
+  };
+
+  Editor.prototype.easyCode = function () {
+    var ta = this.mdArea;
+    var sel = ta.value.slice(ta.selectionStart, ta.selectionEnd);
+    this.mdInsert(sel ? '\ndmk\n' + sel + '\ndmk\n' : '\ndmk\n代码\ndmk\n');
+  };
+
+  Editor.prototype.easyLink = function () {
+    var self = this;
+    var sel = this.mdArea.value.slice(this.mdArea.selectionStart, this.mdArea.selectionEnd);
+    this.dialog({
+      title: cbT('插入链接'), okText: cbT('插入'),
+      fields: [
+        { name: 'text', label: cbT('显示文字'), value: sel || cbT('链接文字'), autofocus: true },
+        { name: 'url', label: cbT('链接地址'), value: 'https://' }
+      ],
+      onOk: function (v) {
+        var url = (v.url || '').trim();
+        if (!url || url === 'https://') return;
+        self.mdInsert('lj ' + (v.text || url) + '|' + url + '\n');
+      }
+    });
+  };
+
+  Editor.prototype.easyImage = function () {
+    var self = this;
+    this.dialog({
+      title: cbT('插入图片'), okText: cbT('插入'),
+      fields: [
+        { name: 'url', label: cbT('图片地址'), placeholder: 'https://example.com/a.png', autofocus: true },
+        { name: 'alt', label: cbT('替代文字（可选）') }
+      ],
+      onOk: function (v) {
+        var url = (v.url || '').trim();
+        if (url) self.mdInsert('tplj ' + ((v.alt || cbT('图片')).replace(/\|/g, ' ')) + '|' + url + '\n');
+      }
+    });
+  };
+
+  Editor.prototype.easyInsert = function (text) {
+    this.mdInsert(text);
+  };
+
+  Editor.prototype.easySample = function () {
+    this.mdInsert('\nyi 易文本示例\njc 加粗文字\nxt 斜体文字\nxhx 下划线\nsc 删除线\nyy 引用内容\nwxlb 列表项\nrw 任务项\ntplj 图片说明|https://example.com/a.png\n| 列1 | 列2 |\n| --- | --- |\n| 内容 | 内容 |\n');
+  };
+
   Editor.prototype.htmlToBbcode = function (html) {
     var s = String(html || '');
     s = s.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<p[^>]*>/gi, '');
@@ -502,6 +684,11 @@
     s = s.replace(/\[h([1-6])\]([\s\S]*?)\[\/h\1\]/gi, '<h$1>$2</h$1>');
     s = s.replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<blockquote>$1</blockquote>');
     s = s.replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<pre><code>$1</code></pre>');
+    s = s.replace(/\[(ul|ol)\]([\s\S]*?)\[\/\1\]/gi, function (m, tag, inner) {
+      var items = inner.split(/\[\*\]/).map(function (x) { return x.trim(); }).filter(function (x) { return x !== ''; });
+      return '<' + tag + '>' + items.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</' + tag + '>';
+    });
+    s = s.replace(/\[hr\]/gi, '<hr>');
     s = s.replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, function (m, u, t) {
       var uu = u.replace(/"/g, '&quot;');
       return /^https?:\/\//i.test(u) || u.charAt(0) === '/' ? '<a href="' + uu + '" rel="nofollow noopener">' + t + '</a>' : t;
