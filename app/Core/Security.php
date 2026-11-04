@@ -53,6 +53,8 @@ class Security
         'sub' => [],
         'mark' => [],
         'font' => ['color', 'face', 'size'],
+        // 易文本任务列表：只放行复选框所需属性
+        'input' => ['type', 'checked', 'disabled'],
         'video' => ['src', 'poster', 'controls', 'width', 'height', 'style', 'class', 'preload', 'loop', 'muted', 'playsinline'],
         'audio' => ['src', 'controls', 'preload', 'loop', 'muted', 'style', 'class'],
         'source' => ['src', 'type'],
@@ -121,7 +123,7 @@ class Security
         if (in_array($tag, ['video', 'audio'], true) && !in_array('controls', array_column(array_map(fn($a) => ['n' => explode('=', $a)[0]], $out), 'n'), true)) {
             $out[] = 'controls';
         }
-        $void = in_array($tag, ['br', 'hr', 'img', 'source'], true);
+        $void = in_array($tag, ['br', 'hr', 'img', 'source', 'input'], true);
         return '<' . $tag . ($out ? ' ' . implode(' ', $out) : '') . ($void ? ' />' : '>');
     }
 

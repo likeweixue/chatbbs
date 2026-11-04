@@ -50,13 +50,23 @@ class ThreadController extends BaseController
 
         $page = max(1, Request::int('page', 1));
         $perPage = max(5, (int)Settings::get('posts_per_page', 15));
+        $isThreadOwner = $user && (int)$user['id'] === (int)$thread['user_id'];
+        $isStaff = \App\Core\Auth::isAdmin() || ($forum && Forum::isModerator($forum, $user));
+        $repliesHidden = !empty($forum['private_replies']) && !$isThreadOwner && !$isStaff;
+        if ($repliesHidden) {
+            $page = 1;
+        }
         $result = Post::listByThread($id, $page, $perPage);
+        if ($repliesHidden) {
+            $result['items'] = array_values(array_filter($result['items'], static fn($p) => (int)($p['is_first'] ?? 0) === 1));
+            $result['total'] = count($result['items']);
+        }
 
         // 楼中楼：取出本页各楼层的子回复（超出预览条数的部分由前端折叠）
         $replyPreview = max(1, (int)Settings::get('reply_preview_count', 5));
         $subposts = [];
         $pageIds = array_values(array_filter(array_map('intval', array_column($result['items'], 'id'))));
-        if ($pageIds) {
+        if ($pageIds && !$repliesHidden) {
             $in = implode(',', array_fill(0, count($pageIds), '?'));
             $childRows = Database::fetchAll(
                 'SELECT p.*, u.nickname, u.avatar
@@ -105,6 +115,7 @@ class ThreadController extends BaseController
             'thread' => $thread,
             'posts' => $result['items'],
             'subposts' => $subposts,
+            'replies_hidden' => $repliesHidden,
             'reply_preview' => $replyPreview,
             // 帖子页侧边栏只保留「发布主题 + 目录」
             'show_toc' => true,
@@ -113,7 +124,7 @@ class ThreadController extends BaseController
             'liked_posts' => $likedPosts,
             'recommend' => $recommend,
             'total' => $result['total'],
-            'pager' => View::paginate($result['total'], $perPage, $page, url('thread/' . $id)),
+            'pager' => $repliesHidden ? '' : View::paginate($result['total'], $perPage, $page, url('thread/' . $id)),
             'can_reply' => $user && (int)$thread['is_closed'] === 0 && Forum::canPost($forum, $user),
             'is_moderator' => \App\Core\Auth::isAdmin() || ($forum && Forum::isModerator($forum, $user)),
             'stats' => Stats::forum(),
@@ -317,7 +328,7 @@ class ThreadController extends BaseController
             'content' => Content::renderMentions(Content::highlight(Content::lazyImages($html))),
             'content_text' => $text,
             'status' => $status,
-            'anonymous' => Request::bool('anonymous') ? 1 : 0,
+            'anonymous' => ((int)($forum['force_anonymous'] ?? 0) === 1 || Request::bool('anonymous')) ? 1 : 0,
             'attachment_fee' => (float)Request::post('attachment_fee', 0),
             'last_reply_user' => (string)$user['username'],
             'last_reply_user_id' => (int)$user['id'],
@@ -396,11 +407,15 @@ class ThreadController extends BaseController
 
         // 违禁词：命中即禁止发布
         self::guardForbidden($title . ' ' . $text);
+        $forumId = Request::int('forum_id', (int)$thread['forum_id']);
+        $forum = Forum::find($forumId);
+        $forceAnon = $forum && (int)($forum['force_anonymous'] ?? 0) === 1;
         $base = [
             'title' => $title,
+            'anonymous' => ($forceAnon || Request::bool('anonymous')) ? 1 : 0,
             'content' => Content::renderMentions(Content::highlight(Content::lazyImages($html))),
             'content_text' => $text,
-            'forum_id' => Request::int('forum_id', (int)$thread['forum_id']),
+            'forum_id' => $forumId,
         ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads') + self::titleFields('threads');
         try {
             // 记录编辑痕迹（前台帖子正文上方显示"XX 编辑于 …"）
@@ -536,7 +551,7 @@ class ThreadController extends BaseController
             'content' => Content::renderMentions(Content::highlight(Content::lazyImages($html))),
             'content_text' => $text,
             'status' => $status,
-            'anonymous' => Request::bool('anonymous') ? 1 : 0,
+            'anonymous' => ((int)($forum['force_anonymous'] ?? 0) === 1 || Request::bool('anonymous')) ? 1 : 0,
             'reply_to' => Request::int('reply_to'),
         ] + self::mdFields('posts', $md, $format));
 

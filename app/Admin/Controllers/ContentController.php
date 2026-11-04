@@ -243,6 +243,10 @@ class ContentController extends BaseAdmin
                     ['name' => 'allow_anonymous', 'label' => '允许匿名'],
                     ['name' => 'allow_attachment', 'label' => '允许附件'],
                 ], 'tip' => '这些开关会合并在一行显示；复制权限时也会同步复制'],
+                ['name' => 'privacy', 'label' => '隐私设置', 'type' => 'switch_group', 'items' => [
+                    ['name' => 'private_replies', 'label' => '回复仅楼主可见'],
+                    ['name' => 'force_anonymous', 'label' => '全板块匿名'],
+                ], 'tip' => '回复仅楼主可见：普通用户看不到回复，仅楼主、版主与管理员可见。全板块匿名：主题与回复都不显示作者身份，仅管理员可见真实信息。'],
                 ['name' => 'need_level', 'label' => '发帖等级要求', 'type' => 'number', 'tip' => '0 表示不限制'],
                 ['name' => 'need_money', 'label' => '发帖货币要求', 'type' => 'number', 'step' => '0.01'],
                 ['name' => 'view_groups', 'label' => '可访问用户组', 'type' => 'checkboxes', 'options' => $groupOpts, 'tip' => '全部不勾选表示不限制'],
@@ -282,6 +286,8 @@ class ContentController extends BaseAdmin
             'allow_post' => Request::bool('allow_post') ? 1 : 0,
             'allow_reply' => Request::bool('allow_reply') ? 1 : 0,
             'allow_anonymous' => Request::bool('allow_anonymous') ? 1 : 0,
+            'private_replies' => Request::bool('private_replies') ? 1 : 0,
+            'force_anonymous' => Request::bool('force_anonymous') ? 1 : 0,
             'allow_attachment' => Request::bool('allow_attachment') ? 1 : 0,
             'need_level' => Request::int('need_level'),
             'need_money' => (float)Request::input('need_money', 0),
@@ -295,7 +301,7 @@ class ContentController extends BaseAdmin
         if ($copyFrom > 0 && $copyFrom !== $id) {
             $src = Forum::find($copyFrom);
             if ($src) {
-                foreach (['need_login', 'allow_post', 'allow_reply', 'allow_anonymous', 'allow_attachment', 'need_level', 'need_money', 'view_groups', 'post_groups', 'moderators'] as $key) {
+                foreach (['need_login', 'allow_post', 'allow_reply', 'allow_anonymous', 'private_replies', 'force_anonymous', 'allow_attachment', 'need_level', 'need_money', 'view_groups', 'post_groups', 'moderators'] as $key) {
                     $data[$key] = $src[$key] ?? $data[$key];
                 }
             }

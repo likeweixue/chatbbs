@@ -315,7 +315,7 @@
     this.mdArea.setAttribute('placeholder', this.mode === 'bbcode'
       ? '在此编写 BBCode…\n[b]加粗[/b] [i]斜体[/i] [u]下划线[/u]\n[quote]引用[/quote] [code]代码[/code]\n[url=https://…]链接[/url] [img]图片地址[/img]'
       : (this.mode === 'easytext'
-        ? '在此编写易文本…\nyi 一级标题\ner 二级标题\njc 加粗\nxt 斜体\nyy 引用\nwxlb 列表\ntplj 图片说明|图片地址'
+        ? '在此编写易文本…\nyi 一级标题\ner 二级标题\njc 加粗\nxt 斜体\nyy 引用\nwxlb 列表\nrw 任务\ntplj 图片说明|图片地址\n| 表格 | 列 ||\n| --- | --- |'
         : '在此编写 Markdown…\n# 标题\n**加粗** *斜体* `代码`\n- 列表\n> 引用\n```\n代码块\n```\n[链接](https://…) 或 ![图片](图片地址)'));
     if (this.hint) {
       this.hint.textContent = rich

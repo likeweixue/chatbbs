@@ -305,6 +305,9 @@ class Schema
             // 附件空间：shared 共享 / private 私人（编辑器附件库与共享空间依赖，缺列会导致「加载失败」）
             ['attachments', 'space', 'varchar(20) NOT NULL DEFAULT \'shared\' COMMENT \'shared 共享 / private 私人\''],
             ['attachments', 'is_image', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'是否图片\''],
+            // 板块隐私：回复仅楼主可见 / 全板块匿名
+            ['forums', 'private_replies', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'回复仅楼主可见\''],
+            ['forums', 'force_anonymous', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'全板块匿名\''],
             // 帖子回复楼中楼
             ['posts', 'reply_to', 'int NOT NULL DEFAULT 0 COMMENT \'楼中楼：回复的目标楼层 ID\''],
             // 帖子版权许可证（license_options() 预设 key；custom 时内容存 license_custom）

@@ -6,6 +6,8 @@ $boxed = $boxed ?? true;
 // $compact = true 时为简洁模式：不显示正文摘要，紧凑单行
 $compact = $compact ?? ((int)config('list_compact', 0) === 1);
 $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--compact' : '');
+$showIdentity = is_admin();
+$anonAvatar = avatar_url(['avatar' => '']);
 ?>
 <div class="cb-thread-list<?= $cls ?>">
   <?php if (!$threads): ?>
@@ -16,9 +18,14 @@ $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--
   <?php elseif ($compact): ?>
     <?php foreach ($threads as $t): ?>
       <article class="cb-trow">
-        <a class="cb-trow__avatar" href="<?= h(url('user/' . $t['user_id'])) ?>">
-          <img class="cb-avatar" src="<?= h(avatar_url(['avatar' => $t['avatar'] ?? ''])) ?>" alt="">
-        </a>
+        <?php $hideAuthor = !empty($t['is_anonymous']) && !$showIdentity; $hideLast = !empty($t['last_reply_hidden']) && !$showIdentity; ?>
+        <?php if ($hideAuthor): ?>
+          <span class="cb-trow__avatar"><img class="cb-avatar" src="<?= h($anonAvatar) ?>" alt=""></span>
+        <?php else: ?>
+          <a class="cb-trow__avatar" href="<?= h(url('user/' . $t['user_id'])) ?>">
+            <img class="cb-avatar" src="<?= h(avatar_url(['avatar' => $t['avatar'] ?? ''])) ?>" alt="">
+          </a>
+        <?php endif; ?>
         <div class="cb-trow__main">
           <div class="cb-trow__title">
             <?php if ((int)($t['is_top'] ?? 0)): ?><span class="cb-badge-pill top"><?= L('置顶') ?></span><?php endif; ?>
@@ -29,11 +36,12 @@ $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--
                title="<?= h($t['title']) ?>"><?= h($t['title']) ?></a>
           </div>
           <div class="cb-trow__meta">
-            <a href="<?= h(url('user/' . $t['user_id'])) ?>"><?= h($t['nickname'] ?? $t['username'] ?? '') ?></a>
+            <?php if ($hideAuthor): ?><span>匿名用户</span><?php else: ?><a href="<?= h(url('user/' . $t['user_id'])) ?>"><?= h($t['nickname'] ?? $t['username'] ?? '') ?></a><?php endif; ?>
+            <?php if (!empty($t['is_anonymous']) && $showIdentity): ?><span class="cb-badge-pill">匿名</span><?php endif; ?>
             <span><?= h(time_ago($t['created_at'])) ?></span>
             <?php if (!empty($t['last_reply_user'])): ?>
               <span class="arrow">←</span>
-              <a href="<?= h(url('user/' . (int)$t['last_reply_user_id'])) ?>"><?= h($t['last_reply_user']) ?></a>
+              <?php if ($hideLast): ?><span>匿名用户</span><?php else: ?><a href="<?= h(url('user/' . (int)$t['last_reply_user_id'])) ?>"><?= h($t['last_reply_user']) ?></a><?php endif; ?>
               <span><?= h(time_ago($t['last_reply_at'])) ?></span>
             <?php endif; ?>
           </div>
@@ -49,11 +57,16 @@ $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--
     <?php endforeach; ?>
   <?php else: ?>
     <?php foreach ($threads as $t): ?>
+      <?php $hideAuthor = !empty($t['is_anonymous']) && !$showIdentity; $hideLast = !empty($t['last_reply_hidden']) && !$showIdentity; ?>
       <div class="cb-thread">
         <div class="cb-thread__avatar">
-          <a href="<?= h(url('user/' . $t['user_id'])) ?>">
-            <img class="cb-avatar cb-avatar-md" src="<?= h(avatar_url(['avatar' => $t['avatar'] ?? ''])) ?>" alt="">
-          </a>
+          <?php if ($hideAuthor): ?>
+            <span><img class="cb-avatar cb-avatar-md" src="<?= h($anonAvatar) ?>" alt=""></span>
+          <?php else: ?>
+            <a href="<?= h(url('user/' . $t['user_id'])) ?>">
+              <img class="cb-avatar cb-avatar-md" src="<?= h(avatar_url(['avatar' => $t['avatar'] ?? ''])) ?>" alt="">
+            </a>
+          <?php endif; ?>
         </div>
         <div class="cb-thread__main">
           <h3 class="cb-thread__title">
@@ -93,13 +106,14 @@ $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--
           <?php endif; ?>
 
           <div class="cb-thread__meta">
-            <a href="<?= h(url('user/' . $t['user_id'])) ?>"><?= h($t['nickname'] ?? $t['username'] ?? '') ?></a>
+            <?php if ($hideAuthor): ?><span>匿名用户</span><?php else: ?><a href="<?= h(url('user/' . $t['user_id'])) ?>"><?= h($t['nickname'] ?? $t['username'] ?? '') ?></a><?php endif; ?>
+            <?php if (!empty($t['is_anonymous']) && $showIdentity): ?><span class="cb-badge-pill">匿名</span><?php endif; ?>
             <?php if (!empty($t['forum_name'])): ?>
               <a href="<?= h(url('forum/' . $t['forum_id'])) ?>"><?= h($t['forum_name']) ?></a>
             <?php endif; ?>
             <span><?= h(time_ago($t['created_at'])) ?></span>
             <?php if (!empty($t['last_reply_user'])): ?>
-              <span class="cb-thread__last">最后回复 <?= h($t['last_reply_user']) ?> · <?= h(time_ago($t['last_reply_at'])) ?></span>
+              <span class="cb-thread__last">最后回复 <?= $hideLast ? '匿名用户' : h($t['last_reply_user']) ?> · <?= h(time_ago($t['last_reply_at'])) ?></span>
             <?php endif; ?>
           </div>
         </div>

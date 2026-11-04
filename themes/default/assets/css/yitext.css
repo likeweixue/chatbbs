@@ -22,11 +22,16 @@
 .yi-doc .yi-media{margin:.8em 0;}.yi-doc .yi-media video,.yi-doc .yi-media audio{max-width:100%;}
 .yi-doc .yi-file{display:inline-block;background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:.4em .8em;color:#1f2328;text-decoration:none;}
 .yi-doc .yi-list{padding-left:1.6em;margin:.6em 0;}
-.yi-doc .yi-table{border-collapse:collapse;width:100%;margin:.8em 0;font-size:.95em;}
+.yi-doc .yi-task-list{list-style:none;padding-left:.2em;}
+.yi-doc .yi-task input{margin-right:.4em;vertical-align:middle;}
+.yi-doc .yi-table{border-collapse:collapse;width:100%;margin:.8em 0;font-size:.95em;overflow:hidden;border-radius:4px;}
 .yi-doc .yi-table th,.yi-doc .yi-table td{border:1px solid #d0d7de;padding:.5em .7em;text-align:left;}
 .yi-doc .yi-table thead th{background:#f6f8fa;font-weight:700;}
 .yi-doc .yi-table tbody tr:nth-child(even){background:#f6f8fa;}
 .yi-doc .yi-hr{border:none;border-top:1px solid #d0d7de;margin:1.2em 0;}
+.yi-doc .yi-hr-double{border-top:3px double #d0d7de;}
+.yi-doc .yi-hr-dashed{border-top:1px dashed #d0d7de;}
+.yi-doc .yi-hr-wavy{border:none;height:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8' viewBox='0 0 40 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q5 0 10 4 T20 4 T30 4 T40 4' fill='none' stroke='%238b949e' stroke-width='1.5'/%3E%3C/svg%3E") repeat-x center/auto 10px;}
 .yi-doc .yi-page-break{border-top:1px dashed #d0d7de;text-align:center;color:#8b949e;margin:1.2em 0;}
 .yi-doc .yi-page-break span{background:#fff;padding:0 .5em;position:relative;top:-.8em;}
 .yi-doc .yi-time{color:#57606a;font-size:.85em;}

@@ -123,7 +123,7 @@ class Thread
             0
         );
         $offset = ($page - 1) * $perPage;
-        $sql = 'SELECT t.*, u.nickname, u.avatar, f.name AS forum_name
+        $sql = 'SELECT t.*, u.nickname, u.avatar, f.name AS forum_name, f.force_anonymous
                 FROM ' . Database::table('threads') . ' t
                 LEFT JOIN ' . Database::table('users') . ' u ON u.id = t.user_id
                 LEFT JOIN ' . Database::table('forums') . ' f ON f.id = t.forum_id
@@ -131,6 +131,8 @@ class Thread
         $items = Database::fetchAll($sql, $params);
         foreach ($items as &$it) {
             $it['tags'] = self::tags((int)$it['id']);
+            $it['is_anonymous'] = ((int)($it['force_anonymous'] ?? 0) === 1 || (int)($it['anonymous'] ?? 0) === 1) ? 1 : 0;
+            $it['last_reply_hidden'] = (int)($it['force_anonymous'] ?? 0) === 1 && (string)($it['last_reply_user'] ?? '') !== '' ? 1 : 0;
         }
         return ['total' => $total, 'items' => $items, 'page' => $page, 'per_page' => $perPage];
     }

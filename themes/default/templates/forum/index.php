@@ -34,7 +34,11 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
           <cite>
             <?= h(format_date($b['last_post_at'] ?: ($b['last_thread_at'] ?? date('Y-m-d H:i:s')))) ?>
             <?php if (!empty($b['last_post_user'])): ?>
-              <a href="<?= h(url('user/' . (int)($b['last_post_uid'] ?? 0))) ?>"><?= h($b['last_post_user']) ?></a>
+              <?php if (!empty($b['force_anonymous']) && !is_admin()): ?>
+                <span>匿名用户</span>
+              <?php else: ?>
+                <a href="<?= h(url('user/' . (int)($b['last_post_uid'] ?? 0))) ?>"><?= h($b['last_post_user']) ?></a>
+              <?php endif; ?>
             <?php endif; ?>
           </cite>
         <?php else: ?>

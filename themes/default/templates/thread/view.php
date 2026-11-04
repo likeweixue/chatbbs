@@ -3,6 +3,11 @@ $marks = \App\Models\Thread::marks();
 $threadUser = $thread['user'] ?? [];
 $canManage = $is_moderator ?? false;
 $isOwner = ($current_user['id'] ?? 0) === (int)$thread['user_id'];
+$forumAnon = !empty($thread['forum']['force_anonymous']);
+$threadAnon = $forumAnon || !empty($thread['anonymous']);
+$showIdentity = is_admin();
+$showThreadIdentity = !$threadAnon || $showIdentity;
+$anonAvatar = avatar_url(['avatar' => '']);
 $subpostsAll = $subposts ?? [];
 $replyPreview = max(1, (int)($reply_preview ?? 5));
 // 帖子详情页在侧边栏展示「发布主题 + 目录」两个面板
@@ -22,18 +27,23 @@ $show_toc = true;
       <span <?php if (!empty($thread['title_color'])): ?>style="color:<?= h($thread['title_color']) ?>"<?php endif; ?>><?= h($thread['title']) ?></span>
     </h1>
     <div class="cb-thread-detail__meta">
-      <a href="<?= h(url('user/' . $thread['user_id'])) ?>">
-        <img class="cb-avatar cb-avatar-sm" src="<?= h(avatar_url($threadUser)) ?>" alt="">
-        <?= h($threadUser['nickname'] ?? $thread['username']) ?>
-      </a>
-      <?php if (!empty($threadUser['level']['name'])): ?>
-        <span class="cb-badge-pill" style="background:var(--color-primary-light);color:var(--color-primary)"><?= h($threadUser['level']['name']) ?></span>
-      <?php endif; ?>
-      <?php if (!empty($threadUser['cert'])): ?>
-        <span class="cb-badge-pill" style="background:<?= h($threadUser['cert']['color'] . '1a') ?>;color:<?= h($threadUser['cert']['color']) ?>">
-          <?php if (!empty($threadUser['cert']['image'])): ?><img class="cb-cert-img" src="<?= h((string)$threadUser['cert']['image']) ?>" alt=""><?php endif; ?>
-          <?= h($threadUser['cert']['name']) ?>
-        </span>
+      <?php if ($showThreadIdentity): ?>
+        <a href="<?= h(url('user/' . $thread['user_id'])) ?>">
+          <img class="cb-avatar cb-avatar-sm" src="<?= h(avatar_url($threadUser)) ?>" alt="">
+          <?= h($threadUser['nickname'] ?? $thread['username']) ?>
+        </a>
+        <?php if ($threadAnon && $showIdentity): ?><span class="cb-badge-pill"><?= L('匿名') ?></span><?php endif; ?>
+        <?php if (!empty($threadUser['level']['name'])): ?>
+          <span class="cb-badge-pill" style="background:var(--color-primary-light);color:var(--color-primary)"><?= h($threadUser['level']['name']) ?></span>
+        <?php endif; ?>
+        <?php if (!empty($threadUser['cert'])): ?>
+          <span class="cb-badge-pill" style="background:<?= h($threadUser['cert']['color'] . '1a') ?>;color:<?= h($threadUser['cert']['color']) ?>">
+            <?php if (!empty($threadUser['cert']['image'])): ?><img class="cb-cert-img" src="<?= h((string)$threadUser['cert']['image']) ?>" alt=""><?php endif; ?>
+            <?= h($threadUser['cert']['name']) ?>
+          </span>
+        <?php endif; ?>
+      <?php else: ?>
+        <span class="cb-post__author"><img class="cb-avatar cb-avatar-sm" src="<?= h($anonAvatar) ?>" alt=""> <?= L('匿名用户') ?></span>
       <?php endif; ?>
       <span>发布于 <?= h(format_date($thread['created_at'])) ?></span>
       <span><?= (int)$thread['views'] ?> 浏览</span>
@@ -66,18 +76,29 @@ $show_toc = true;
   </div>
 
 
+  <?php if (!empty($replies_hidden)): ?>
+    <div class="cb-alert" style="margin:12px 0"><?= L('该板块的回复仅楼主可见，你暂时只能看到主题正文。') ?></div>
+  <?php endif; ?>
+
   <?php foreach ($posts as $i => $p): ?>
     <?php
     $pu = [
       'avatar' => $p['avatar'] ?? '',
       'nickname' => $p['nickname'] ?? $p['username'],
     ];
+    $postAnon = $forumAnon || !empty($p['anonymous']);
+    $postShowIdentity = !$postAnon || $showIdentity;
     ?>
     <div class="cb-post" id="post-<?= (int)$p['id'] ?>">
       <div class="cb-post__main">
         <?php if (!(int)($p['is_first'] ?? 0)): ?>
           <div class="cb-post__head">
-            <a class="cb-post__author" href="<?= h(url('user/' . $p['user_id'])) ?>"><?= h($pu['nickname']) ?></a>
+            <?php if ($postShowIdentity): ?>
+              <a class="cb-post__author" href="<?= h(url('user/' . $p['user_id'])) ?>"><?= h($pu['nickname']) ?></a>
+              <?php if ($postAnon && $showIdentity): ?><span class="cb-badge-pill"><?= L('匿名') ?></span><?php endif; ?>
+            <?php else: ?>
+              <span class="cb-post__author"><?= L('匿名用户') ?></span>
+            <?php endif; ?>
             <span class="cb-post__floor"><?= (int)$p['floor'] ?> 楼</span>
             <button type="button" class="cb-btn sm" data-quote="<?= h(str_cut($p['content_text'], 60)) ?>"><?= L('引用') ?></button>
             <button type="button" class="cb-btn sm" data-reply-to="<?= (int)$p['id'] ?>"><?= L('回复') ?></button>
@@ -93,7 +114,7 @@ $show_toc = true;
 
         <?php if ((int)($p['is_first'] ?? 0) && !empty($thread['edited_at'])): ?>
           <div class="cb-post__edited">
-            <?= h((string)($thread['edited_username'] ?? L('用户'))) ?> 编辑于 <?= h(format_date($thread['edited_at'])) ?>
+            <?= $threadAnon && !$showIdentity ? L('匿名用户') : h((string)($thread['edited_username'] ?? L('用户'))) ?> 编辑于 <?= h(format_date($thread['edited_at'])) ?>
           </div>
         <?php endif; ?>
 
@@ -115,12 +136,19 @@ $show_toc = true;
             <?php foreach ($subs as $k => $sp): ?>
               <?php
               $su = ['avatar' => $sp['avatar'] ?? '', 'nickname' => $sp['nickname'] ?? $sp['username']];
+              $subAnon = $forumAnon || !empty($sp['anonymous']);
+              $subShowIdentity = !$subAnon || $showIdentity;
               ?>
               <div class="cb-subpost <?= $k >= $replyPreview ? 'is-extra hide' : '' ?>">
-                <a class="cb-subpost__user" href="<?= h(url('user/' . (int)$sp['user_id'])) ?>">
-                  <img class="cb-avatar cb-avatar-sm" src="<?= h(avatar_url($su)) ?>" alt="">
-                  <?= h($su['nickname']) ?>
-                </a>
+                <?php if ($subShowIdentity): ?>
+                  <a class="cb-subpost__user" href="<?= h(url('user/' . (int)$sp['user_id'])) ?>">
+                    <img class="cb-avatar cb-avatar-sm" src="<?= h(avatar_url($su)) ?>" alt="">
+                    <?= h($su['nickname']) ?>
+                  </a>
+                  <?php if ($subAnon && $showIdentity): ?><span class="cb-badge-pill"><?= L('匿名') ?></span><?php endif; ?>
+                <?php else: ?>
+                  <span class="cb-subpost__user"><img class="cb-avatar cb-avatar-sm" src="<?= h($anonAvatar) ?>" alt=""><?= L('匿名用户') ?></span>
+                <?php endif; ?>
                 <span class="cb-subpost__meta"><?= h(time_ago($sp['created_at'])) ?></span>
                 <div class="cb-content-html cb-subpost__body"><?= $sp['content'] ?></div>
               </div>
@@ -141,7 +169,7 @@ $show_toc = true;
       <div class="cb-post__main">
         <?php if (!empty($thread['edited_at'])): ?>
           <div class="cb-post__edited">
-            <?= h((string)($thread['edited_username'] ?? L('用户'))) ?> 编辑于 <?= h(format_date($thread['edited_at'])) ?>
+            <?= $threadAnon && !$showIdentity ? L('匿名用户') : h((string)($thread['edited_username'] ?? L('用户'))) ?> 编辑于 <?= h(format_date($thread['edited_at'])) ?>
           </div>
         <?php endif; ?>
         <div class="cb-content-html"><?= $thread['content'] ?></div>
