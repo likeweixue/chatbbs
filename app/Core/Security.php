@@ -41,8 +41,8 @@ class Security
         'thead' => [],
         'tbody' => [],
         'tr' => [],
-        'th' => ['colspan', 'rowspan'],
-        'td' => ['colspan', 'rowspan'],
+        'th' => ['colspan', 'rowspan', 'style'],
+        'td' => ['colspan', 'rowspan', 'style'],
         'span' => ['style', 'class'],
         'div' => ['style', 'class', 'data-upload-id', 'data-attachment'],
         'details' => ['class', 'open'],
@@ -71,8 +71,8 @@ class Security
         }
         // 去掉注释与危险块
         $html = preg_replace('/<!--.*?-->/is', '', $html);
-        $html = preg_replace('#<\s*(script|style|iframe|object|embed|link|meta|base|form|input|button|textarea|select|svg|math)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html);
-        $html = preg_replace('#<\s*(script|style|iframe|object|embed|link|meta|base|form|input|button|textarea|select|svg|math)\b[^>]*/?\s*>#is', '', $html);
+        $html = preg_replace('#<\s*(script|style|iframe|object|embed|link|meta|base|form|button|textarea|select|svg|math)\b[^>]*>.*?<\s*/\s*\1\s*>#is', '', $html);
+        $html = preg_replace('#<\s*(script|style|iframe|object|embed|link|meta|base|form|button|textarea|select|svg|math)\b[^>]*/?\s*>#is', '', $html);
         // 去除事件属性、javascript: 协议
         $html = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#s', function ($m) {
             return self::cleanTag($m[1], $m[2]);
@@ -122,6 +122,15 @@ class Security
         }
         if (in_array($tag, ['video', 'audio'], true) && !in_array('controls', array_column(array_map(fn($a) => ['n' => explode('=', $a)[0]], $out), 'n'), true)) {
             $out[] = 'controls';
+        }
+        if ($tag === 'input') {
+            // 只允许易文本任务列表的只读复选框
+            if (!preg_match('/type="checkbox"/i', implode(' ', $out))) {
+                return '';
+            }
+            if (!in_array('disabled', array_column(array_map(fn($a) => ['n' => explode('=', $a)[0]], $out), 'n'), true)) {
+                $out[] = 'disabled';
+            }
         }
         $void = in_array($tag, ['br', 'hr', 'img', 'source', 'input'], true);
         return '<' . $tag . ($out ? ' ' . implode(' ', $out) : '') . ($void ? ' />' : '>');
