@@ -43,6 +43,8 @@ class HomeController extends BaseController
 
         return $this->render('home/index', [
             'title' => Settings::get('site_name', 'ChatBBS'),
+            // 通知横幅只在首次打开 / 刷新首页时展示，切换 tab 或进入帖子页不再反复出现
+            'is_home_page' => \App\Core\Request::get('tab', '') === '' && \App\Core\Request::int('page', 1) === 1,
             'threads' => $result['items'],
             'total' => $result['total'],
             'page' => $page,

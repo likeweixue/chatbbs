@@ -1,4 +1,4 @@
-# ChatBBS 论坛系统 v1.0.0-RC12
+# ChatBBS 论坛系统 v1.0.0-RC13
 
 > 修改记录见本目录下的 `CHANGELOG.md`。
 

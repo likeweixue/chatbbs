@@ -50,13 +50,6 @@ $show_toc = true;
       <span><?= (int)$thread['replies'] ?> 回复</span>
       <span><?= (int)$thread['likes'] ?> 赞</span>
       <a href="<?= h(url('forum/' . $thread['forum_id'])) ?>"><?= h($thread['forum']['name'] ?? '') ?></a>
-      <?php if ($isOwner || $canManage): ?>
-        <form method="post" action="<?= h(url('thread/' . (int)$thread['id'] . '/delete')) ?>"
-              style="margin-left:auto" onsubmit="return confirm('确定删除该主题？删除后不可恢复。')">
-          <?= csrf_field() ?>
-          <button type="submit" class="cb-btn sm"><?= L('删除') ?></button>
-        </form>
-      <?php endif; ?>
     </div>
 
     <?php if (!empty($thread['tags'])): ?>
@@ -178,7 +171,7 @@ $show_toc = true;
   <?php endif; ?>
 </div>
 
-<div class="cb-card mt-16">
+<div class="cb-card cb-thread-actions-card mt-16">
   <div class="cb-card__body">
     <div class="flex gap-12 cb-thread-actions" style="flex-wrap:wrap;align-items:center">
       <div class="cb-thread-actions__sheet-head">
@@ -212,6 +205,11 @@ $show_toc = true;
 
       <?php if ($isOwner || $canManage): ?>
         <a class="cb-btn" href="<?= h(url('thread/' . $thread['id'] . '/edit')) ?>"><?= cb_icon('edit') ?> <?= L('编辑') ?></a>
+        <form method="post" action="<?= h(url('thread/' . (int)$thread['id'] . '/delete')) ?>" style="display:inline"
+              onsubmit="return confirm('确定删除该主题？删除后不可恢复。')">
+          <?= csrf_field() ?>
+          <button type="submit" class="cb-btn" title="<?= L('删除主题') ?>"><?= cb_icon('trash') ?> <?= L('删除') ?></button>
+        </form>
       <?php endif; ?>
 
       <?php if ($canManage): ?>
@@ -247,7 +245,7 @@ $show_toc = true;
 </div>
 
 <?php if ($can_reply ?? false): ?>
-  <div class="cb-card cb-card--editor" id="reply-card">
+  <div class="cb-card cb-card--editor cb-reply-card" id="reply-card">
     <div class="cb-card__header">
       <?= L('快速回复') ?>
       <a class="cb-btn sm" id="btn-reply-mode" href="javascript:void(0)"><?= L('高级模式') ?></a>

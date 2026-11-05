@@ -100,7 +100,8 @@ class Thread
         }
         // 排行榜 / 最新回复只展示真正有对应数据的主题，0 回复 / 0 赞 / 0 浏览不占位
         if ($positive === 'replies') {
-            $where .= ' AND t.replies > 0';
+            // 置顶帖即使暂时没有回复，也继续出现在最新回复页
+            $where .= ' AND (t.replies > 0 OR t.is_top = 1)';
         } elseif ($positive === 'likes') {
             $where .= ' AND t.likes > 0';
         } elseif ($positive === 'views') {
@@ -108,13 +109,13 @@ class Thread
         }
 
         $orderBy = match ($order) {
-            'new' => 't.created_at DESC',
-            'hot' => 't.views DESC, t.replies DESC',
-            'replies' => 't.replies DESC',
+            'new' => 't.is_top DESC, t.topped_at DESC, t.created_at DESC',
+            'hot' => 't.is_top DESC, t.topped_at DESC, t.views DESC, t.replies DESC',
+            'replies' => 't.is_top DESC, t.topped_at DESC, t.replies DESC, t.last_reply_at DESC',
             'essence' => 't.is_top DESC, t.topped_at DESC, (t.replies > 0) DESC, t.last_reply_at DESC, t.id DESC',
             default => 't.is_top DESC, t.topped_at DESC, (t.replies > 0) DESC, t.last_reply_at DESC, t.id DESC',
-            'likes' => 't.likes DESC, t.replies DESC, t.id DESC',
-            'views' => 't.views DESC, t.replies DESC, t.id DESC',
+            'likes' => 't.is_top DESC, t.topped_at DESC, t.likes DESC, t.replies DESC, t.id DESC',
+            'views' => 't.is_top DESC, t.topped_at DESC, t.views DESC, t.replies DESC, t.id DESC',
         };
 
         $total = (int)Database::value(
