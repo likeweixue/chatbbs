@@ -86,6 +86,7 @@ $show_toc = true;
       <div class="cb-post__main">
         <?php if (!(int)($p['is_first'] ?? 0)): ?>
           <div class="cb-post__head">
+            <img class="cb-avatar cb-avatar-sm cb-post__avatar" src="<?= h($postShowIdentity ? avatar_url($pu) : $anonAvatar) ?>" alt="">
             <?php if ($postShowIdentity): ?>
               <a class="cb-post__author" href="<?= h(url('user/' . $p['user_id'])) ?>"><?= h($pu['nickname']) ?></a>
               <?php if ($postAnon && $showIdentity): ?><span class="cb-badge-pill"><?= L('匿名') ?></span><?php endif; ?>
@@ -93,7 +94,8 @@ $show_toc = true;
               <span class="cb-post__author"><?= L('匿名用户') ?></span>
             <?php endif; ?>
             <span class="cb-post__floor"><?= (int)$p['floor'] ?> 楼</span>
-            <button type="button" class="cb-btn sm" data-quote="<?= h(str_cut($p['content_text'], 60)) ?>"><?= L('引用') ?></button>
+            <button type="button" class="cb-btn sm" data-quote="<?= h(str_cut($p['content_text'], 60)) ?>"
+                    data-quote-url="<?= h(url('thread/' . (int)$thread['id'] . '#post-' . (int)$p['id'])) ?>"><?= L('引用') ?></button>
             <button type="button" class="cb-btn sm" data-reply-to="<?= (int)$p['id'] ?>"><?= L('回复') ?></button>
             <?php if ($canManage || ($current_user['id'] ?? 0) === (int)$p['user_id']): ?>
               <form method="post" action="<?= h(url('post/' . $p['id'] . '/delete')) ?>" style="display:inline"
@@ -308,18 +310,6 @@ $show_toc = true;
           text.disabled = false;
           html.disabled = true;
         }
-      });
-      // 引用回复时切回简洁模式并填入内容
-      document.addEventListener('click', function (e) {
-        var q = e.target.closest('[data-quote]');
-        if (!q) return;
-        if (advanced) { btn.click(); }
-        var box = document.getElementById('reply_text');
-        if (box) {
-          box.value = '> ' + q.dataset.quote + '\n' + box.value;
-          box.focus();
-        }
-        document.getElementById('reply-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     })();
   </script>

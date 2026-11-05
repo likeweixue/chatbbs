@@ -308,19 +308,38 @@
     });
   }
 
-  /* ---------- 回复框快捷插入 ---------- */
+  /* ---------- 回复框快捷插入：引用内容带原文楼层链接 ---------- */
   document.addEventListener('click', function (e) {
     var q = e.target.closest('[data-quote]');
     if (!q) return;
     e.preventDefault();
     var target = document.getElementById('reply-content');
+    var card = document.getElementById('reply-card');
     if (!target) return;
-    if (window.CBEditor) {
-      window.CBEditor.insertHTML('<blockquote>' + escapeHtml(q.dataset.quote) + '</blockquote><p><br></p>');
-    } else {
-      target.value += '\n> ' + q.dataset.quote + '\n';
+    // 引用使用富文本编辑区，便于插入可点击的原文楼层链接
+    var adv = document.getElementById('reply-advanced');
+    var modeBtn = document.getElementById('btn-reply-mode');
+    var wasSimple = !!(adv && adv.classList.contains('hide'));
+    if (wasSimple && modeBtn) { modeBtn.click(); }
+    var ed = target.__cbEditor || window.CBEditor;
+    var simpleBox = document.getElementById('reply_text');
+    if (wasSimple && simpleBox && simpleBox.value.trim() && ed) {
+      ed.area.innerHTML = escapeHtml(simpleBox.value).replace(/\n/g, '<br>');
+      ed.sync();
     }
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var url = q.getAttribute('data-quote-url') || '';
+    var text = q.getAttribute('data-quote') || '';
+    var inner = url
+      ? '<a href="' + escapeHtml(url) + '">' + escapeHtml(text) + '</a>'
+      : escapeHtml(text);
+    if (ed) {
+      if (ed.mode !== 'rich') { ed.setMode('rich'); }
+      ed.insertHTML('<blockquote class="cb-quote">' + inner + '</blockquote><p><br></p>');
+    } else {
+      var box = document.getElementById('reply_text');
+      if (box) { box.value = '> ' + text + '\n' + box.value; box.focus(); }
+    }
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   /* ---------- 移动端抽屉菜单（Flarum 风格：左侧滑出 + 遮罩） ---------- */

@@ -414,11 +414,14 @@ html[data-theme="dark"] [data-theme-toggle] .ico-dark { display: inline-flex; }
 .cb-post__edited {
   margin: 0 0 10px; padding: 5px 10px; text-align: center;
   font-size: 12px; color: var(--color-text-muted);
-  background: var(--color-surface-alt); border-radius: var(--radius-sm);
+  background: transparent; border-radius: 0;
 }
 
+.cb-post__avatar { flex: none; margin-right: 2px; }
 .cb-post__author { font-size: 13px; font-weight: 600; color: var(--color-text); }
 .cb-post__author:hover { color: var(--color-primary); }
+.cb-post__head .cb-btn { border: 0; background: transparent; box-shadow: none; }
+.cb-content-html blockquote a { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 2px; }
 .cb-post__floor {
   padding: 1px 6px; font-size: 11px; border-radius: var(--radius-sm);
   background: var(--color-surface-alt); color: var(--color-text-muted);
@@ -2330,4 +2333,23 @@ body.cb-editor-fullscreen { overflow: hidden; }
   .cb-reply-card:hover,
   .cb-reply-card:focus-within,
   .cb-reply-card:target { opacity: 1; transform: none; }
+}
+
+/* 评论操作：默认隐藏，悬停楼层后显示；同时去掉按钮边框 */
+@media (hover: hover) {
+  .cb-post__head .cb-btn {
+    opacity: 0; transform: translateX(-4px);
+    transition: opacity .18s ease, transform .18s ease, background .18s ease;
+  }
+  .cb-post:hover .cb-post__head .cb-btn,
+  .cb-post__head:focus-within .cb-btn { opacity: 1; transform: none; }
+}
+.cb-post__head .cb-btn:hover { background: var(--color-surface-alt); }
+.cb-thread-actions .cb-btn {
+  border-color: transparent; background: transparent; box-shadow: none;
+}
+.cb-thread-actions .cb-btn:hover { background: var(--color-surface-alt); }
+.cb-thread-actions .cb-btn.primary { background: transparent; color: var(--color-primary); }
+@media (max-width: 640px) {
+  .cb-post__head .cb-btn { opacity: 1; transform: none; }
 }
