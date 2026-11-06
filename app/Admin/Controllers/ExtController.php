@@ -109,6 +109,9 @@ class ExtController extends BaseAdmin
     /* ================== 主题 ================== */
     public function themes(): string
     {
+        if ((string)Request::get('edit', '') !== '') {
+            return $this->themeEdit();
+        }
         $current = (string)Settings::get('theme', 'default');
         $rows = Database::fetchAll('SELECT * FROM ' . Database::table('themes') . ' ORDER BY id ASC');
         $known = [];
@@ -147,6 +150,7 @@ class ExtController extends BaseAdmin
             'actions' => [
                 ['label' => '启用', 'url' => admin_url('themes/enable/{id}'), 'type' => 'post', 'confirm' => '确定启用该主题？',
                     'hidden' => ['slug' => 'slug']],
+                ['label' => '编辑', 'url' => admin_url('themes?edit={slug}')],
             ],
         ]);
 
@@ -188,10 +192,10 @@ class ExtController extends BaseAdmin
                     ['name' => 'about_team', 'label' => '开发 / 运营团队', 'tip' => '显示在介绍卡片底部'],
                 ],
             ])
-            . '<div class="adm-form-tip">这些设置只在“默认布局”下显示；切换到岛屿布局后本面板会自动禁用，但配置会保留。</div>'
+            . '<div class="adm-form-tip">这些设置只在“默认布局”下显示；切换到工作台布局后本面板会自动禁用，但配置会保留。</div>'
             . '</div></div>';
 
-        // 站点布局：默认 / 岛屿（参考 OpenIsle 的交互方向）
+        // 站点布局：默认 / 工作台（参考 OpenIsle 的交互方向）
         $islandWidth = max(200, min(360, (int)Settings::get('island_sidebar_width', 240)));
         $curLayout = (string)Settings::get('site_layout', 'classic');
         $layoutData = [
@@ -208,7 +212,7 @@ class ExtController extends BaseAdmin
                 'fields' => [
                     ['name' => 'site_layout', 'label' => '布局样式', 'type' => 'select', 'options' => [
                         'classic' => '默认布局（经典两栏）',
-                        'island' => '岛屿布局（侧栏工作台）',
+                        'island' => '工作台',
                         'single' => '单栏布局（无侧边栏，整站一块面板）',
                     ], 'tip' => '单栏布局使用默认主题的配色和组件，不再显示侧边栏'],
                     ['name' => 'island_sidebar_side', 'label' => '侧栏默认位置', 'type' => 'select', 'options' => [
@@ -217,10 +221,10 @@ class ExtController extends BaseAdmin
                     ['name' => 'island_sidebar_width', 'label' => '侧栏默认宽度', 'type' => 'number',
                         'tip' => '200 - 360 px；访客拖拽分隔线后使用自己的宽度'],
                     ['name' => 'island_sidebar_default_hidden', 'label' => '默认隐藏侧栏', 'type' => 'switch',
-                        'tip' => '开启后访客首次进入岛屿布局时先看到全宽内容区，可点顶栏按钮展开'],
+                        'tip' => '开启后访客首次进入工作台布局时先看到全宽内容区，可点顶栏按钮展开'],
                 ],
             ])
-            . '<div class="adm-form-tip">岛屿布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
+            . '<div class="adm-form-tip">工作台布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
             . '</div></div>';
 
         $html .= '<div class="adm-panel"><div class="adm-panel-head">DIY 装饰图</div><div class="adm-panel-body">'
@@ -252,10 +256,11 @@ class ExtController extends BaseAdmin
                     ['name' => 'theme_header_bg', 'label' => '顶栏背景', 'type' => 'color'],
                     ['name' => 'theme_header_text', 'label' => '顶栏文字', 'type' => 'color'],
                     ['name' => 'theme_header_opacity', 'label' => '顶栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
-                    ['name' => 'theme_island_bg', 'label' => '侧栏背景', 'type' => 'color', 'tip' => '岛屿布局侧栏'],
+                    ['name' => 'theme_island_bg', 'label' => '侧栏背景', 'type' => 'color', 'tip' => '工作台侧栏'],
                     ['name' => 'theme_island_text', 'label' => '侧栏文字', 'type' => 'color'],
                     ['name' => 'theme_island_opacity', 'label' => '侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
                     ['name' => 'theme_footer_bg', 'label' => '页脚背景', 'type' => 'color'],
+                    ['name' => 'theme_forum_header_bg', 'label' => '分区标题背景', 'type' => 'color', 'tip' => '板块页每个分区标题栏的背景色'],
                     ['name' => 'theme_footer_text', 'label' => '页脚文字', 'type' => 'color'],
                     ['name' => 'theme_footer_opacity', 'label' => '页脚透明度', 'type' => 'number', 'tip' => '0 - 100'],
                 ],
@@ -284,6 +289,56 @@ class ExtController extends BaseAdmin
     }
 
     /**
+     * 默认主题编辑页：外观 / 顶栏 / 工作台侧栏 / 页脚 / 分区标题颜色
+     */
+    public function themeEdit(): string
+    {
+        $slug = trim((string)Request::get('edit', 'default'));
+        $row = Database::fetch('SELECT * FROM ' . Database::table('themes') . ' WHERE slug = ?', [$slug]);
+        if (!$row && is_dir(CB_THEME_DIR . '/' . $slug)) {
+            $row = ['name' => $slug, 'slug' => $slug, 'version' => '1.0.0'];
+        }
+        if (!$row) {
+            $this->back('主题不存在', 'error');
+        }
+        $data = Settings::all();
+        $html = '<div class="adm-alert info">正在编辑主题：<b>' . h((string)$row['name']) . '</b>'
+            . ' <a class="adm-link" href="' . h(admin_url('themes')) . '">返回主题列表</a></div>';
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">外观</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/appearance'),
+                'data' => $data,
+                'submit' => '保存外观',
+                'fields' => [
+                    ['name' => 'theme_radius', 'label' => '圆角大小', 'type' => 'select', 'options' => [
+                        '0' => '0 px（完全直角）', '2' => '2 px', '4' => '4 px（偏方正）', '6' => '6 px',
+                        '8' => '8 px', '10' => '10 px', '12' => '12 px', '16' => '16 px', '20' => '20 px',
+                    ], 'tip' => '控制卡片、按钮、输入框等圆角'],
+                    ['name' => 'theme_primary', 'label' => '主题主色', 'type' => 'color', 'tip' => '影响链接、按钮、标签等主色调，同时同步后台主色'],
+                ],
+            ]) . '</div></div>';
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">顶栏 / 侧栏 / 页脚 / 分区颜色</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/colors'),
+                'data' => $data,
+                'submit' => '保存颜色',
+                'fields' => [
+                    ['name' => 'theme_header_bg', 'label' => '顶栏背景', 'type' => 'color'],
+                    ['name' => 'theme_header_text', 'label' => '顶栏文字', 'type' => 'color'],
+                    ['name' => 'theme_header_opacity', 'label' => '顶栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                    ['name' => 'theme_island_bg', 'label' => '工作台侧栏背景', 'type' => 'color'],
+                    ['name' => 'theme_island_text', 'label' => '工作台侧栏文字', 'type' => 'color'],
+                    ['name' => 'theme_island_opacity', 'label' => '工作台侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                    ['name' => 'theme_footer_bg', 'label' => '页脚背景', 'type' => 'color'],
+                    ['name' => 'theme_footer_text', 'label' => '页脚文字', 'type' => 'color'],
+                    ['name' => 'theme_footer_opacity', 'label' => '页脚透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                    ['name' => 'theme_forum_header_bg', 'label' => '分区标题背景', 'type' => 'color', 'tip' => '板块页每个分区标题栏背景'],
+                ],
+            ]) . '</div></div>';
+        return $this->pageView('编辑主题：' . (string)$row['name'], 'themes', $html);
+    }
+
+    /**
      * 保存外观微调（圆角 / 主色）
      */
     public function themeAppearance(): void
@@ -304,7 +359,7 @@ class ExtController extends BaseAdmin
     }
 
     /**
-     * 保存站点布局（默认 / 岛屿）与岛屿侧栏默认值
+     * 保存站点布局（默认 / 工作台）与工作台侧栏默认值
      */
     public function themeLayoutSave(): void
     {
@@ -371,11 +426,11 @@ class ExtController extends BaseAdmin
     }
 
     /**
-     * 保存顶栏 / 岛屿侧栏 / 页脚颜色
+     * 保存顶栏 / 工作台侧栏 / 页脚颜色
      */
     public function themeColorsSave(): void
     {
-        $colors = ['theme_header_bg', 'theme_header_text', 'theme_island_bg', 'theme_island_text', 'theme_footer_bg', 'theme_footer_text'];
+        $colors = ['theme_header_bg', 'theme_header_text', 'theme_island_bg', 'theme_island_text', 'theme_footer_bg', 'theme_footer_text', 'theme_forum_header_bg'];
         $data = [];
         foreach ($colors as $key) {
             $c = trim((string)Request::post($key, '#ffffff'));

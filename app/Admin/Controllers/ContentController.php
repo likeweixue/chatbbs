@@ -30,28 +30,38 @@ class ContentController extends BaseAdmin
         $list = Database::fetchAll(
             'SELECT * FROM ' . Database::table('forums') . ' ORDER BY sort_order ASC, id ASC'
         );
-        $sorted = [];
+        // 按父子层级展开为深度优先列表，后台表格用缩进 / 树线显示
+        $childrenOf = [];
         foreach ($list as $f) {
-            if ((int)$f['parent_id'] === 0) {
+            $childrenOf[(int)$f['parent_id']][] = $f;
+        }
+        $sorted = [];
+        $walk = function (int $parent, int $depth) use (&$walk, &$sorted, $childrenOf): void {
+            foreach ($childrenOf[$parent] ?? [] as $f) {
+                $f['_depth'] = $depth;
+                $f['_has_children'] = !empty($childrenOf[(int)$f['id']]);
                 $sorted[] = $f;
-                foreach ($list as $c) {
-                    if ((int)$c['parent_id'] === (int)$f['id']) {
-                        $sorted[] = $c;
-                    }
-                }
+                $walk((int)$f['id'], $depth + 1);
+            }
+        };
+        $walk(0, 0);
+        if (!$sorted) {
+            foreach ($list as $f) {
+                $f['_depth'] = 0;
+                $f['_has_children'] = false;
+                $sorted[] = $f;
             }
         }
-        if (!$sorted) {
-            $sorted = $list;
-        }
 
-        // 批量移动目标下拉
+        // 批量移动：隐藏原始 select，由弹窗选择目标；默认必须明确选择
         $moveOpts = Forum::options(false);
-        $moveHtml = '<select class="adm-input" style="width:auto" name="target_id">';
+        $moveHtml = '<select class="hide" data-forum-move-target name="target_id"><option value="">请选择目标</option>';
         foreach ($moveOpts as $k => $v) {
             $moveHtml .= '<option value="' . (int)$k . '">' . h($v) . '</option>';
         }
-        $moveHtml .= '</select>';
+        $moveHtml .= '</select>'
+            . '<a class="adm-link" href="javascript:void(0)" data-forum-collapse-all>全部折叠</a>'
+            . '<button class="adm-btn primary" type="button" data-forum-move>移动到…</button>';
 
         $html = '<div class="adm-alert info">提示：分区（type=1）用于归类，板块（type=2）才能发帖；支持无限层级（板块下也能再建分区或板块）。删除前请先移动或删除其下级。</div>';
         // 板块页顶部聚合设置（四个格子）
@@ -76,20 +86,33 @@ class ContentController extends BaseAdmin
         for ($i = 1; $i <= 4; $i++) {
             $spotFields[] = ['name' => 'spotlight_' . $i, 'label' => '格子 ' . $i, 'type' => 'select', 'options' => $spotOpts];
         }
+        $spotForm = '<form method="post" action="' . h(admin_url('forums/spotlight')) . '" class="adm-form adm-spotlight-form">'
+            . csrf_field()
+            . '<div class="adm-spotlight-row">'
+            . '<label class="adm-inline-switch"><input type="checkbox" name="forum_spotlight_enable" value="1"'
+            . ((int)$spotData['forum_spotlight_enable'] === 1 ? ' checked' : '') . '> 显示聚合</label>'
+            . '<label class="adm-inline-field"><span>每格帖子数</span><input class="adm-input" type="number" step="1" min="1" max="10" name="forum_spotlight_limit" value="' . (int)$spotData['forum_spotlight_limit'] . '"></label>'
+            . '<label class="adm-inline-field"><span>缓存刷新（秒）</span><input class="adm-input" type="number" step="1" min="0" max="3600" name="forum_spotlight_ttl" value="' . (int)$spotData['forum_spotlight_ttl'] . '"></label>'
+            . '<span class="adm-form-tip">每格 1-10 条；缓存 0 表示每次查询</span>'
+            . '</div><div class="adm-spotlight-grid">';
+        for ($i = 1; $i <= 4; $i++) {
+            $spotForm .= '<label class="adm-inline-field"><span>格子 ' . $i . '</span><select class="adm-input" name="spotlight_' . $i . '">';
+            foreach ($spotOpts as $k => $label) {
+                $spotForm .= '<option value="' . h((string)$k) . '"'
+                    . ((string)$spotData['spotlight_' . $i] === (string)$k ? ' selected' : '') . '>' . h((string)$label) . '</option>';
+            }
+            $spotForm .= '</select></label>';
+        }
+        $spotForm .= '</div><div class="adm-form-actions"><button class="adm-btn primary" type="submit">保存聚合设置</button></div></form>';
         $html .= '<div class="adm-panel"><div class="adm-panel-head">板块页顶部聚合</div><div class="adm-panel-body">'
-            . AdminUI::form([
-                'action' => admin_url('forums/spotlight'),
-                'data' => $spotData,
-                'submit' => '保存聚合设置',
-                'fields' => $spotFields,
-            ]) . '</div></div>';
+            . $spotForm . '</div></div>';
         $html .= AdminUI::table([
             'primary' => 'id',
             'rows' => $sorted,
             'bulk_action' => admin_url('forums/bulk'),
             'bulk_extra' => $moveHtml,
+            'row_attrs' => fn($r) => ' class="adm-forum-row adm-forum-depth-' . (int)($r['_depth'] ?? 0) . (($r['_depth'] ?? 0) > 0 ? ' is-child' : '') . '" data-forum-id="' . (int)$r['id'] . '" data-parent-id="' . (int)$r['parent_id'] . '"',
             'bulk' => [
-                ['label' => '移动到 →', 'value' => 'move', 'class' => 'primary'],
                 ['label' => '显示', 'value' => 'show', 'class' => 'success'],
                 ['label' => '隐藏', 'value' => 'hide', 'class' => 'warn'],
                 ['label' => '批量删除', 'value' => 'delete', 'class' => 'danger', 'confirm' => '确定删除选中板块？该操作不可恢复！'],
@@ -97,13 +120,17 @@ class ContentController extends BaseAdmin
             'columns' => [
                 ['key' => 'id', 'label' => 'ID', 'width' => '60px'],
                 ['key' => 'name', 'label' => '名称', 'render' => function ($r) {
-                    $isChild = (int)$r['parent_id'] > 0;
-                    $prefix = $isChild ? '　└ ' : '';
-                    $indent = $isChild ? '<span class="adm-tree-indent"></span>' : '';
-                    $color = (string)$r['color'];
-                    return $indent . $prefix . '<span class="adm-color-dot" style="background:' . h($color) . '"></span>'
+                    $depth = (int)($r['_depth'] ?? 0);
+                    $hasChildren = !empty($r['_has_children']);
+                    $toggle = $hasChildren
+                        ? '<button type="button" class="adm-forum-caret" data-forum-caret="' . (int)$r['id'] . '" aria-label="展开/收起">▾</button>'
+                        : '<span class="adm-forum-caret adm-forum-caret--empty"></span>';
+                    $indent = $depth > 0 ? ' style="padding-left:' . (18 + $depth * 18) . 'px"' : '';
+                    return '<span class="adm-forum-name"' . $indent . '>' . $toggle
+                        . '<span class="adm-color-dot" style="background:' . h((string)$r['color']) . '"></span>'
                         . '<a href="' . h(admin_url('forums/edit/' . (int)$r['id'])) . '">' . h((string)$r['name']) . '</a>'
-                        . ((int)$r['visible'] === 0 ? ' <span class="adm-tag gray">隐藏</span>' : '');
+                        . ((int)$r['visible'] === 0 ? ' <span class="adm-tag gray">隐藏</span>' : '')
+                        . '</span>';
                 }],
                 ['key' => 'slug', 'label' => '标识', 'width' => '130px'],
                 ['key' => 'type', 'label' => '类型', 'width' => '80px', 'render' => fn($r) => (int)$r['type'] === 1
@@ -232,7 +259,8 @@ class ContentController extends BaseAdmin
                 ['name' => 'copy_from', 'label' => '复制权限', 'type' => 'select', 'options' => $copyOpts,
                     'tip' => '保存时把源板块的访问/发帖/回复/匿名/附件/等级/货币/用户组/版主权限复制到当前板块；不会复制名称、简介和排序'],
                 ['name' => 'description', 'label' => '板块简介', 'type' => 'textarea'],
-                ['name' => 'icon', 'label' => '图标', 'tip' => '可填 emoji 或图标 class，如 💬'],
+                ['name' => 'icon', 'label' => '板块头像', 'type' => 'image', 'tip' => '支持图床链接、本地上传，也可继续填 emoji，如 💬'],
+                ['name' => 'forum_columns', 'label' => '子板块排列', 'type' => 'select', 'options' => [0 => '列表（默认）', 2 => '每行 2 个', 3 => '每行 3 个', 4 => '每行 4 个', 5 => '每行 5 个', 6 => '每行 6 个'], 'tip' => '仅分区生效：0 保持列表；2-6 将子板块横向分列显示'],
                 ['name' => 'color', 'label' => '主题色', 'type' => 'color'],
                 ['name' => 'cover', 'label' => '封面图地址', 'tip' => '留空则使用主题色背景'],
                 ['name' => 'permissions', 'label' => '权限开关', 'type' => 'switch_group', 'items' => [
@@ -272,13 +300,23 @@ class ContentController extends BaseAdmin
                 ? strtolower(str_replace([' ', '_'], '-', $name))
                 : 'f' . date('md') . substr(md5($name . microtime(true)), 0, 4);
         }
+        $icon = $this->pure('icon', 255);
+        $iconFile = Request::file('icon_file');
+        if ($iconFile) {
+            [$ok, $res] = \App\Core\Upload::save($iconFile, 'site', (int)(\App\Core\Auth::id() ?? 0));
+            if (!$ok) {
+                $this->back((string)$res, 'error');
+            }
+            $icon = (string)$res['url'];
+        }
+        $forumColumns = max(0, min(6, (int)Request::post('forum_columns', 0)));
         $data = [
             'name' => $name,
             'slug' => $slug,
             'type' => Request::int('type', 2) === 1 ? 1 : 2,
             'parent_id' => Request::int('parent_id'),
             'description' => $this->pure('description', 500),
-            'icon' => $this->pure('icon', 255),
+            'icon' => $icon,
             'color' => $this->pure('color', 20),
             'cover' => $this->pure('cover', 255),
             'visible' => Request::bool('visible') ? 1 : 0,
@@ -288,6 +326,7 @@ class ContentController extends BaseAdmin
             'allow_anonymous' => Request::bool('allow_anonymous') ? 1 : 0,
             'private_replies' => Request::bool('private_replies') ? 1 : 0,
             'force_anonymous' => Request::bool('force_anonymous') ? 1 : 0,
+            'forum_columns' => $forumColumns,
             'allow_attachment' => Request::bool('allow_attachment') ? 1 : 0,
             'need_level' => Request::int('need_level'),
             'need_money' => (float)Request::input('need_money', 0),
@@ -306,6 +345,8 @@ class ContentController extends BaseAdmin
                 }
             }
         }
+        // 当前表单的排列设置优先，避免复制权限时被源板块的 0 覆盖
+        $data['forum_columns'] = $forumColumns;
 
         if ($id > 0) {
             Forum::update($id, $data);
@@ -355,6 +396,9 @@ class ContentController extends BaseAdmin
         $in = implode(',', array_map('intval', $ids));
         $target = Request::int('target_id');
         if ($act === 'move') {
+            if ((string)Request::post('target_id', '') === '') {
+                $this->back('请选择移动目标', 'error');
+            }
             $moved = 0;
             foreach ($ids as $fid) {
                 if ($fid === $target || Forum::isDescendant($target, $fid)) {

@@ -37,7 +37,7 @@ class AdminUI
                     . (($b['confirm'] ?? false) ? ' onclick="return confirm(\'' . h((string)$b['confirm']) . '\')"' : '')
                     . '>' . h($b['label']) . '</button>';
             }
-            $html .= '</div></div>';
+            $html .= '</div></div></form>';
         }
 
         $html .= '<div class="adm-table-wrap"><table class="adm-table"><thead><tr>';
@@ -57,9 +57,13 @@ class AdminUI
             $html .= '<tr><td colspan="' . $colCount . '" class="adm-empty">暂无数据</td></tr>';
         }
         foreach ($rows as $row) {
-            $html .= '<tr>';
+            $rowAttrs = '';
+            if (isset($config['row_attrs']) && is_callable($config['row_attrs'])) {
+                $rowAttrs = (string)$config['row_attrs']($row);
+            }
+            $html .= '<tr' . $rowAttrs . '>';
             if ($bulk) {
-                $html .= '<td><input type="checkbox" name="ids[]" value="' . (int)$row[$primary] . '"></td>';
+                $html .= '<td><input type="checkbox" form="bulk-form" name="ids[]" value="' . (int)$row[$primary] . '"></td>';
             }
             foreach ($columns as $c) {
                 $key = $c['key'];
@@ -73,7 +77,7 @@ class AdminUI
             if ($rowActions) {
                 $html .= '<td><div class="adm-row-actions">';
                 foreach ($rowActions as $a) {
-                    $url = str_replace('{id}', (string)$row[$primary], (string)($a['url'] ?? '#'));
+                    $url = str_replace(['{id}', '{slug}'], [(string)$row[$primary], (string)($row['slug'] ?? '')], (string)($a['url'] ?? '#'));
                     if (($a['type'] ?? 'link') === 'post') {
                         $html .= '<form method="post" action="' . h($url) . '" style="display:inline">'
                             . csrf_field();
@@ -96,9 +100,6 @@ class AdminUI
         }
         $html .= '</tbody></table></div>';
 
-        if ($bulk) {
-            $html .= '</form>';
-        }
         return $html;
     }
 
@@ -191,7 +192,16 @@ class AdminUI
                 return '<input class="adm-input" type="password" id="' . $id . '" name="' . h($name) . '"' . $ph . ' autocomplete="new-password">';
             case 'checkboxes':
                 $out = '<div class="adm-checkboxes">';
-                $selected = is_array($value) ? $value : array_filter(array_map('trim', explode(',', (string)$value)));
+                if (is_array($value)) {
+                    $selected = $value;
+                } else {
+                    $raw = trim((string)$value);
+                    $decoded = $raw !== '' && ($raw[0] === '[' || $raw[0] === '{') ? json_decode($raw, true) : null;
+                    if (!is_array($decoded) && str_starts_with($raw, 'a:')) {
+                        $decoded = @unserialize($raw, ['allowed_classes' => false]);
+                    }
+                    $selected = is_array($decoded) ? $decoded : array_filter(array_map('trim', explode(',', $raw)));
+                }
                 foreach (($f['options'] ?? []) as $k => $v) {
                     $chk = in_array((string)$k, array_map('strval', $selected), true) ? ' checked' : '';
                     $out .= '<label class="adm-checkbox"><input type="checkbox" name="' . h($name) . '[]" value="' . h((string)$k) . '"' . $chk . '> ' . h((string)$v) . '</label>';
@@ -201,13 +211,16 @@ class AdminUI
                 return '<div id="adm-editor-' . h($name) . '" data-editor data-input="' . h($name) . '" data-placeholder="请输入内容…"></div>'
                     . '<input type="hidden" name="' . h($name) . '" id="' . h($name) . '" value="' . h((string)$value) . '">';
             case 'image':
+                $isImageUrl = (bool)preg_match('#^(https?://|/|data:image/)#i', (string)$value);
                 return '<div class="adm-input-group">'
                     . '<input class="adm-input" type="text" id="' . $id . '" name="' . h($name) . '" value="' . h((string)$value) . '"' . $ph . '>'
                     . '<input class="adm-input adm-input-file" type="file" name="' . h($name) . '_file"'
                     . ' accept="' . h((string)($f['accept'] ?? 'image/*')) . '">'
                     . '</div>'
-                    . (!empty($value)
-                        ? '<div class="adm-form-tip"><img src="' . h((string)$value) . '" alt="" style="max-height:32px;max-width:120px;vertical-align:middle;margin-right:6px">当前预览</div>'
+                    . ((string)$value !== ''
+                        ? ($isImageUrl
+                            ? '<div class="adm-form-tip"><img src="' . h((string)$value) . '" alt="" style="max-height:32px;max-width:120px;vertical-align:middle;margin-right:6px">当前预览</div>'
+                            : '<div class="adm-form-tip"><span class="adm-form-preview-emoji">' . h((string)$value) . '</span> 当前内容（emoji / 文本）</div>')
                         : '');
             case 'static':
                 return '<div class="adm-static">' . h((string)$value) . '</div>';

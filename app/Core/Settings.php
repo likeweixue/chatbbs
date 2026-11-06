@@ -134,6 +134,7 @@ class Settings
         'theme_island_text' => '#1f2329',
         'theme_island_opacity' => '100',
         'theme_footer_bg' => '#ffffff',
+        'theme_forum_header_bg' => '#f7f8fa',
         'theme_footer_text' => '#4e5969',
         'theme_footer_opacity' => '100',
         // 网站导航页

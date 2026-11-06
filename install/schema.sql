@@ -149,6 +149,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__forums` (
   `allow_anonymous` tinyint(1) NOT NULL DEFAULT 0,
   `private_replies` tinyint(1) NOT NULL DEFAULT 0 COMMENT '回复仅楼主可见',
   `force_anonymous` tinyint(1) NOT NULL DEFAULT 0 COMMENT '全板块匿名',
+  `forum_columns` tinyint(1) NOT NULL DEFAULT 0 COMMENT '子板块每行列数，0 为列表',
   `allow_attachment` tinyint(1) NOT NULL DEFAULT 1,
   `need_level` int NOT NULL DEFAULT 0,
   `need_money` decimal(12,2) NOT NULL DEFAULT 0.00,

@@ -397,6 +397,40 @@ if (!function_exists('cb_sprite')) {
     }
 }
 
+if (!function_exists('highlight_keyword')) {
+    /**
+     * 搜索结果关键词高亮：先转义，再插入 <mark>
+     */
+    function highlight_keyword(string $text, string $keyword): string
+    {
+        $safe = h($text);
+        $keyword = trim($keyword);
+        if ($keyword === '') {
+            return $safe;
+        }
+        $needle = h($keyword);
+        return preg_replace('/' . preg_quote($needle, '/') . '/iu', '<mark>$0</mark>', $safe) ?? $safe;
+    }
+}
+
+if (!function_exists('forum_icon_html')) {
+    /**
+     * 板块头像：支持图片 URL / 本地上传地址 / emoji / 文本
+     */
+    function forum_icon_html(array $forum, string $class = ''): string
+    {
+        $icon = trim((string)($forum['icon'] ?? ''));
+        $cls = trim('cb-forum-icon ' . $class);
+        if ($icon === '') {
+            return '<span class="' . h($cls) . ' cb-forum-icon--empty">' . cb_icon('folder') . '</span>';
+        }
+        if (preg_match('#^(https?://|/|data:image/)#i', $icon)) {
+            return '<img class="' . h($cls) . '" src="' . h($icon) . '" alt="" loading="lazy" decoding="async">';
+        }
+        return '<span class="' . h($cls) . ' cb-forum-icon--text">' . h($icon) . '</span>';
+    }
+}
+
 if (!function_exists('cb_editor_icons')) {
     /**
      * 编辑器 JS 运行时可能用到的图标清单（加载 editor.js 时预登记）

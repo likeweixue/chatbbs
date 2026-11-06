@@ -47,7 +47,7 @@
           </div>
         <?php endforeach; ?>
       <?php else: ?>
-        <?= \App\Core\View::partial('partials/thread_list', ['threads' => $result['items'], 'marks' => $marks]) ?>
+        <?= \App\Core\View::partial('partials/thread_list', ['threads' => $result['items'], 'marks' => $marks, 'highlight' => $keyword, 'empty_text' => $keyword !== '' ? L('没有找到相关帖子') : L('还没有内容，来发第一个帖子吧。')]) ?>
       <?php endif; ?>
     </div>
   </div>

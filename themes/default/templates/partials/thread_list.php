@@ -8,12 +8,14 @@ $compact = $compact ?? ((int)config('list_compact', 0) === 1);
 $cls = ($boxed ? '' : ' cb-thread-list--plain') . ($compact ? ' cb-thread-list--compact' : '');
 $showIdentity = is_admin();
 $anonAvatar = avatar_url(['avatar' => '']);
+$highlight = trim((string)($highlight ?? ''));
+$emptyText = (string)($empty_text ?? L('还没有内容，来发第一个帖子吧。'));
 ?>
 <div class="cb-thread-list<?= $cls ?>">
   <?php if (!$threads): ?>
     <div class="cb-empty">
       <div class="icon"><?= cb_icon('inbox') ?></div>
-      <p><?= L('还没有内容，来发第一个帖子吧。') ?></p>
+      <p><?= h($emptyText) ?></p>
     </div>
   <?php elseif ($compact): ?>
     <?php foreach ($threads as $t): ?>
@@ -33,7 +35,7 @@ $anonAvatar = avatar_url(['avatar' => '']);
             <?php if ((int)($t['is_closed'] ?? 0)): ?><span class="cb-badge-pill closed"><?= L('已关闭') ?></span><?php endif; ?>
             <a href="<?= h(url('thread/' . $t['id'])) ?>"
                <?php if (!empty($t['title_color'])): ?>style="color:<?= h($t['title_color']) ?>"<?php endif; ?>
-               title="<?= h($t['title']) ?>"><?= h($t['title']) ?></a>
+               title="<?= h($t['title']) ?>"><?= highlight_keyword($t['title'], $highlight) ?></a>
           </div>
           <div class="cb-trow__meta">
             <?php if ($hideAuthor): ?><span>匿名用户</span><?php else: ?><a href="<?= h(url('user/' . $t['user_id'])) ?>"><?= h($t['nickname'] ?? $t['username'] ?? '') ?></a><?php endif; ?>
@@ -88,7 +90,7 @@ $anonAvatar = avatar_url(['avatar' => '']);
             <?php endif; ?>
             <a href="<?= h(url('thread/' . $t['id'])) ?>"
                <?php if (!empty($t['title_color'])): ?>style="color:<?= h($t['title_color']) ?>"<?php endif; ?>>
-              <?= h($t['title']) ?>
+              <?= highlight_keyword($t['title'], $highlight) ?>
             </a>
           </h3>
 
@@ -102,7 +104,7 @@ $anonAvatar = avatar_url(['avatar' => '']);
           <?php endif; ?>
 
           <?php if (!empty($t['content_text'])): ?>
-            <div class="cb-thread__excerpt"><?= h(str_cut($t['content_text'], 90)) ?></div>
+            <div class="cb-thread__excerpt"><?= highlight_keyword(str_cut($t['content_text'], 90), $highlight) ?></div>
           <?php endif; ?>
 
           <div class="cb-thread__meta">

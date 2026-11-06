@@ -921,6 +921,7 @@ body.gateway-body { background: var(--color-bg); min-height: 100vh; }
   position: relative; gap: 10px;
   /* 右侧给绝对定位的折叠按钮留出空间，否则「N 个板块」会和按钮重叠、
      折叠前后左右两侧的留白看起来不一致 */
+  background: var(--cb-forum-head-bg, var(--color-surface-alt));
   padding-right: 48px;
 }
 .cb-forum-block__title {
@@ -2353,3 +2354,75 @@ body.cb-editor-fullscreen { overflow: hidden; }
 @media (max-width: 640px) {
   .cb-post__head .cb-btn { opacity: 1; transform: none; }
 }
+/* 板块头像 */
+.cb-forum-icon { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; vertical-align: middle; flex: none; }
+span.cb-forum-icon { display: inline-flex; align-items: center; justify-content: center; background: var(--color-primary-light); color: var(--color-primary); font-size: 16px; line-height: 1; }
+.cb-forum-icon--empty .cb-ico { width: 14px; height: 14px; }
+.cb-forum-block__icon { margin-right: 2px; }
+.cb-forum-block__head { align-items: center; }
+.cb-forum-block__title { flex: 1; }
+.cb-forum-row-icon { margin-right: 7px; }
+.cb-forum-cell__icon { margin-right: 6px; width: 20px; height: 20px; }
+.cb-forum-head__icon { width: 28px; height: 28px; }
+
+/* 工作台布局：顶栏搜索默认收起为放大镜 */
+.cb-header-search { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.cb-header-search .cb-search {
+  width: 0; opacity: 0; overflow: hidden; transform: scaleX(.82); transform-origin: right center;
+  pointer-events: none; transition: width .28s ease, opacity .2s ease, transform .28s ease;
+}
+.cb-header-search.is-open .cb-search {
+  width: 250px; opacity: 1; transform: none; pointer-events: auto;
+}
+.cb-header-search .cb-search input { width: 100%; }
+.cb-header-search .cb-search input:focus { width: 100%; }
+.cb-header-search.is-open .cb-search { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+@media (max-width: 900px) {
+  .cb-header-search.is-open .cb-search { width: 170px; }
+}
+/* 说说评论发送按钮：固定横排，避免被 flex 压成竖排 */
+.cb-say__comments form .cb-btn { flex: none; white-space: nowrap; }
+.cb-say__comments form .cb-input { min-width: 0; }
+.cb-say__comments form { align-items: center; }
+.cb-say__comments form .cb-btn { min-width: 58px; text-align: center; }
+
+/* 工作台搜索：点击放大镜后整个顶栏变成大输入框 */
+.cb-header__inner { position: relative; }
+.cb-header-search.is-open {
+  position: absolute; inset: 0; z-index: 80;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 16px;
+  background: color-mix(in srgb, var(--cb-header-bg, var(--color-surface)) 88%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+  animation: cb-header-search-in .24s ease both;
+}
+@keyframes cb-header-search-in { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: none; } }
+.cb-header-search.is-open .cb-search { width: 100%; flex: 1; opacity: 1; transform: none; pointer-events: auto; overflow: visible; }
+.cb-header-search.is-open .cb-search input {
+  width: 100%; height: 40px; font-size: 16px; padding: 0 14px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); box-shadow: 0 3px 14px rgba(0,0,0,.06);
+}
+.cb-header-search.is-open .cb-search input:focus { width: 100%; border-color: var(--color-primary); }
+.cb-header-search.is-open .cb-header-search__toggle { width: 38px; height: 38px; color: var(--color-primary); }
+.cb-header-search.is-closing { opacity: 0; transform: scale(.985); transition: opacity .18s ease, transform .18s ease; }
+
+.cb-header__inner.is-searching > .cb-logo,
+.cb-header__inner.is-searching > .cb-burger,
+.cb-header__inner.is-searching > .cb-nav,
+.cb-header__inner.is-searching > .cb-header__publish,
+.cb-header__inner.is-searching .cb-header__right > :not(.cb-header-search) { opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.cb-header__inner.is-searching .cb-header-search { opacity: 1; }
+
+/* 工作台搜索展开：无边框、居中占位、隐藏放大镜 */
+.cb-header-search.is-open .cb-header-search__toggle { display: none; }
+.cb-header-search.is-open .cb-search { padding: 0; }
+.cb-header-search.is-open .cb-search input {
+  border: 0; background: transparent; box-shadow: none; text-align: center;
+  font-size: 18px; padding: 0 24px;
+}
+.cb-header-search.is-open .cb-search input:focus { border: 0; box-shadow: none; }
+/* 搜索结果关键词高亮 */
+.cb-thread-list mark, .cb-trow mark { background: #ffe58f; color: inherit; padding: 0 1px; border-radius: 2px; }
+html[data-theme="dark"] .cb-thread-list mark, html[data-theme="dark"] .cb-trow mark { background: #8a6d1d; color: #fff3cd; }

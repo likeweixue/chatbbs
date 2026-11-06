@@ -131,9 +131,8 @@ class Forum
         if ((int)$forum['need_login'] && !$user) {
             return false;
         }
-        $groups = trim((string)$forum['view_groups']);
-        if ($groups !== '') {
-            $allow = array_filter(array_map('intval', explode(',', $groups)));
+        $allow = self::groupIds((string)($forum['view_groups'] ?? ''));
+        if ($allow) {
             if ($allow && (!$user || !in_array((int)$user['group_id'], $allow, true))) {
                 return false;
             }
@@ -155,9 +154,8 @@ class Forum
         if (in_array((int)$user['group_id'], [6], true)) {
             return false;
         }
-        $groups = trim((string)$forum['post_groups']);
-        if ($groups !== '') {
-            $allow = array_filter(array_map('intval', explode(',', $groups)));
+        $allow = self::groupIds((string)($forum['post_groups'] ?? ''));
+        if ($allow) {
             if ($allow && !in_array((int)$user['group_id'], $allow, true)) {
                 return false;
             }
@@ -166,6 +164,30 @@ class Forum
             return false;
         }
         return true;
+    }
+
+    /**
+     * 兼容旧版 JSON 数组和逗号分隔的用户组字段
+     */
+    private static function groupIds(string $raw): array
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return [];
+        }
+        if ($raw[0] === '[' || $raw[0] === '{') {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                return array_values(array_filter(array_map('intval', $decoded)));
+            }
+        }
+        if (str_starts_with($raw, 'a:')) {
+            $decoded = @unserialize($raw, ['allowed_classes' => false]);
+            if (is_array($decoded)) {
+                return array_values(array_filter(array_map('intval', $decoded)));
+            }
+        }
+        return array_values(array_filter(array_map('intval', explode(',', $raw))));
     }
 
     public static function isModerator(array $forum, ?array $user): bool

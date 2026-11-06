@@ -11,7 +11,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
     <tr class="fl_row<?= $indent ?>">
       <td class="fl_ct">
         <?php if ($level > 0): ?><span class="fl_sub_mark">└</span><?php endif; ?>
-        <h2><a href="<?= h(url('forum/' . $b['id'])) ?>"><?= h($b['name']) ?></a></h2>
+        <h2><?= forum_icon_html($b, 'cb-forum-row-icon') ?><a href="<?= h(url('forum/' . $b['id'])) ?>"><?= h($b['name']) ?></a></h2>
         <?php if (!empty($b['description'])): ?>
           <p class="fl_desc"><?= h($b['description']) ?></p>
         <?php endif; ?>
@@ -82,11 +82,13 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
   $hasTop = ((int)($cat['type'] ?? 1) === 2); // 顶级就是板块（无分区包裹）
   if (!$boards && !$hasTop) { continue; }
   $rows = $hasTop ? [$cat] : $boards;
+  $catCols = max(0, min(6, (int)($cat['forum_columns'] ?? 0)));
+  $useGrid = $layout === 'grid' || (!$hasTop && $catCols >= 2);
   ?>
   <div class="cb-card cb-forum-block">
     <?php if (!$hasTop): ?>
       <div class="cb-card__header cb-forum-block__head">
-        <a class="cb-forum-block__title" href="<?= h(url('forum/' . $cat['id'])) ?>"><?= h($cat['name']) ?></a>
+        <?= forum_icon_html($cat, 'cb-forum-block__icon') ?><a class="cb-forum-block__title" href="<?= h(url('forum/' . $cat['id'])) ?>"><?= h($cat['name']) ?></a>
         <span class="more"><?= count($boards) ?> 个板块</span>
         <button class="cb-forum-toggle" type="button" title="<?= L('收起 / 展开') ?>" data-toggle-cat="<?= (int)$cat['id'] ?>">−</button>
       </div>
@@ -97,12 +99,12 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
     <?php endif; ?>
 
     <div class="cb-card__body cb-forum-block__body" id="cat-<?= (int)$cat['id'] ?>">
-      <?php if ($layout === 'grid'): ?>
-        <div class="cb-forum-grid" style="--cols:<?= $cols ?>">
+      <?php if ($useGrid): ?>
+        <div class="cb-forum-grid" style="--cols:<?= $catCols >= 2 && !$hasTop ? $catCols : $cols ?>">
           <?php foreach ($rows as $b): ?>
             <div class="cb-forum-cell">
               <dl>
-                <dt><a href="<?= h(url('forum/' . $b['id'])) ?>"><?= h($b['name']) ?></a></dt>
+                <dt><?= forum_icon_html($b, 'cb-forum-cell__icon') ?><a href="<?= h(url('forum/' . $b['id'])) ?>"><?= h($b['name']) ?></a></dt>
                 <dd><em>主题 <?= (int)$b['threads'] ?></em> · <em>回复 <?= (int)$b['posts'] ?></em></dd>
                 <dd class="cb-forum-cell__last">
                   <?php if (!empty($b['last_thread_title'])): ?>

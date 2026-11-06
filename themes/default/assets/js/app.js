@@ -1120,3 +1120,64 @@
     }
   });
 })();
+
+/* 工作台顶栏搜索：放大镜点击展开 / 失焦收起 */
+(function () {
+  document.querySelectorAll('[data-header-search]').forEach(function (box) {
+    var toggle = box.querySelector('.cb-header-search__toggle');
+    var input = box.querySelector('input[name="q"]');
+    var header = box.closest('.cb-header__inner');
+    if (!toggle || !input) return;
+    var closeTimer = null;
+    function clearClose() { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } }
+    function close() {
+      clearClose();
+      if (!box.classList.contains('is-open') || box.classList.contains('is-closing')) return;
+      box.classList.add('is-closing');
+      toggle.setAttribute('aria-expanded', 'false');
+      setTimeout(function () { box.classList.remove('is-open', 'is-closing'); if (header) header.classList.remove('is-searching'); }, 180);
+    }
+    function scheduleClose() {
+      clearClose();
+      if (box.classList.contains('is-open')) closeTimer = setTimeout(close, 260);
+    }
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = !box.classList.contains('is-open');
+      box.classList.remove('is-closing');
+      box.classList.toggle('is-open', open);
+      if (header) header.classList.toggle('is-searching', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) setTimeout(function () { input.focus(); }, 40); else close();
+    });
+    var form = box.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = input.value.trim();
+        if (!q) { return; }
+        var action = form.getAttribute('action') || location.href;
+        var sep = action.indexOf('?') >= 0 ? '&' : '?';
+        location.href = action + sep + 'q=' + encodeURIComponent(q);
+      });
+    }
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && form) {
+        e.preventDefault();
+        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      }
+    });
+    box.addEventListener('mouseenter', clearClose);
+    box.addEventListener('mouseleave', scheduleClose);
+    if (header) {
+      header.addEventListener('mouseenter', clearClose);
+      header.addEventListener('mouseleave', scheduleClose);
+    }
+    document.addEventListener('click', function (e) {
+      if (!box.contains(e.target)) close();
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { close(); input.blur(); }
+    });
+  });
+})();

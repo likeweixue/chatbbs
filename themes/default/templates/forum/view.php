@@ -3,7 +3,7 @@
   <div class="cb-card__body">
     <div class="flex items-center justify-between" style="gap:12px;flex-wrap:wrap">
       <div>
-        <h1 style="margin:0;font-size:20px"><?= h($forum['name']) ?></h1>
+        <h1 style="margin:0;font-size:20px;display:flex;align-items:center;gap:10px"><?= forum_icon_html($forum, 'cb-forum-head__icon') ?><span><?= h($forum['name']) ?></span></h1>
         <p class="text-sm text-muted" style="margin:4px 0 0"><?= h($forum['description'] ?? '') ?></p>
       </div>
       <?php if (!($can_post ?? false)): ?>

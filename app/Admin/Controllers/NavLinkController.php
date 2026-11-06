@@ -20,7 +20,7 @@ class NavLinkController extends BaseAdmin
     public function index(): string
     {
         $rows = NavLink::list(false);
-        $html = '<div class="adm-alert info">导航页地址：<code>' . h(url((string)Settings::get('nav_slug', 'nav'))) . '</code>；在「菜单管理」或岛屿布局的侧栏菜单里添加这个地址即可出现在前台。</div>';
+        $html = '<div class="adm-alert info">导航页地址：<code>' . h(url((string)Settings::get('nav_slug', 'nav'))) . '</code>；在「菜单管理」或工作台布局的侧栏菜单里添加这个地址即可出现在前台。</div>';
         $html .= AdminUI::table([
             'primary' => 'id',
             'rows' => $rows,

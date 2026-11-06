@@ -95,12 +95,14 @@ $islandOpacity = max(0, min(100, (int)config('theme_island_opacity', 100)));
 $footerBg = (string)config('theme_footer_bg', '#ffffff');
 $footerText = (string)config('theme_footer_text', '#4e5969');
 $footerOpacity = max(0, min(100, (int)config('theme_footer_opacity', 100)));
+$forumHeaderBg = (string)config('theme_forum_header_bg', '#f7f8fa');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $headerBg)) { $headerBg = '#ffffff'; }
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $headerText)) { $headerText = '#1f2329'; }
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $islandBg)) { $islandBg = '#ffffff'; }
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $islandText)) { $islandText = '#1f2329'; }
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $footerBg)) { $footerBg = '#ffffff'; }
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $footerText)) { $footerText = '#4e5969'; }
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $forumHeaderBg)) { $forumHeaderBg = '#f7f8fa'; }
 $vars = "--radius-sm:{$radiusSm}px;--radius:{$radius}px;--radius-lg:{$radiusLg}px;"
     . "--color-primary:{$primary};--color-link:{$primary};";
 // 只在用户真正改过颜色时输出覆盖变量，避免默认白色把暗色模式顶栏/页脚刷白
@@ -113,6 +115,7 @@ if ($islandBg !== '#ffffff' || $islandText !== '#1f2329' || $islandOpacity !== 1
 if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 100) {
     $vars .= "--cb-footer-bg:" . cb_hex_rgba($footerBg, $footerOpacity) . ";--cb-footer-text:{$footerText};";
 }
+if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg};"; }
 ?>
 <style>:root{<?= $vars ?>}html[data-theme="dark"]{<?= $vars ?>}</style>
 <script>
@@ -192,10 +195,22 @@ if ($footerBg !== '#ffffff' || $footerText !== '#4e5969' || $footerOpacity !== 1
       <?php endif; ?>
 
       <div class="cb-header__right">
+        <?php if ($island): ?>
+        <div class="cb-header-search" data-header-search>
+          <button type="button" class="cb-icon-btn cb-header-search__toggle" aria-label="<?= L('搜索') ?>" title="<?= L('搜索') ?>">
+            <?= cb_icon('search') ?>
+          </button>
+          <form class="cb-search" action="<?= h(url('search')) ?>" method="get">
+            <input type="text" name="q" placeholder="<?= L('搜索…') ?>" autocomplete="off"
+                   value="<?= h(\App\Core\Request::get('q', '')) ?>">
+          </form>
+        </div>
+        <?php else: ?>
         <form class="cb-search" action="<?= h(url('search')) ?>" method="get">
           <input type="text" name="q" placeholder="<?= L('搜索…') ?>" autocomplete="off"
                  value="<?= h(\App\Core\Request::get('q', '')) ?>">
         </form>
+        <?php endif; ?>
 
         <div class="cb-dropdown cb-theme-menu">
           <button class="cb-icon-btn" id="btn-theme" type="button" title="<?= L('外观 / 色调') ?>" aria-haspopup="true">

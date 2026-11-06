@@ -14,9 +14,7 @@
     /* 全选 */
     document.querySelectorAll('[data-check-all]').forEach(function (box) {
         box.addEventListener('change', function () {
-            var form = box.closest('form');
-            if (!form) return;
-            form.querySelectorAll('input[name="ids[]"]').forEach(function (i) {
+            document.querySelectorAll('input[name="ids[]"]').forEach(function (i) {
                 i.checked = box.checked;
             });
         });
@@ -150,4 +148,98 @@
             btn.disabled = false;
         });
     });
+
+    /* 板块树：展开 / 收起 + 全部折叠 / 展开 */
+    (function () {
+        var rows = Array.prototype.slice.call(document.querySelectorAll('.adm-forum-row'));
+        if (!rows.length) return;
+        function childrenOf(id) {
+            return rows.filter(function (r) { return r.getAttribute('data-parent-id') === String(id); });
+        }
+        function hideDescendants(id) {
+            childrenOf(id).forEach(function (child) {
+                child.classList.add('is-tree-hidden');
+                child.classList.add('is-collapsed');
+                hideDescendants(child.getAttribute('data-forum-id'));
+            });
+        }
+        function showDirect(id) {
+            childrenOf(id).forEach(function (child) {
+                child.classList.remove('is-tree-hidden');
+                var cid = child.getAttribute('data-forum-id');
+                if (!child.classList.contains('is-collapsed')) {
+                    showDirect(cid);
+                }
+            });
+        }
+        document.querySelectorAll('[data-forum-caret]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('.adm-forum-row');
+                if (!row) return;
+                var id = row.getAttribute('data-forum-id');
+                var collapsed = !row.classList.contains('is-collapsed');
+                row.classList.toggle('is-collapsed', collapsed);
+                if (collapsed) hideDescendants(id); else showDirect(id);
+            });
+        });
+        var allBtn = document.querySelector('[data-forum-collapse-all]');
+        if (allBtn) {
+            var allCollapsed = false;
+            allBtn.addEventListener('click', function () {
+                allCollapsed = !allCollapsed;
+                rows.forEach(function (row) {
+                    if (row.classList.contains('is-child')) {
+                        row.classList.toggle('is-tree-hidden', allCollapsed);
+                        row.classList.toggle('is-collapsed', allCollapsed);
+                    }
+                });
+                allBtn.textContent = allCollapsed ? '全部展开' : '全部折叠';
+            });
+        }
+
+        /* 批量移动：弹窗选择目标 */
+        var moveBtn = document.querySelector('[data-forum-move]');
+        var bulkForm = document.getElementById('bulk-form');
+        var source = document.querySelector('[data-forum-move-target]');
+        if (moveBtn && bulkForm && source) {
+            var mask = document.createElement('div');
+            mask.className = 'adm-modal-mask hide';
+            mask.innerHTML = '<div class="adm-modal"><h3>移动板块</h3>'
+                + '<p>选择目标上级；选择「（作为顶级）」会把板块从当前分区移出。</p>'
+                + '<select class="adm-input" data-move-select></select>'
+                + '<div class="adm-modal-actions"><button type="button" class="adm-btn" data-move-cancel>取消</button>'
+                + '<button type="button" class="adm-btn primary" data-move-ok>移动</button></div></div>';
+            document.body.appendChild(mask);
+            var sel = mask.querySelector('[data-move-select]');
+            source.querySelectorAll('option').forEach(function (o) {
+                var c = document.createElement('option');
+                c.value = o.value; c.textContent = o.textContent;
+                sel.appendChild(c);
+            });
+            function close() { mask.classList.add('hide'); }
+            moveBtn.addEventListener('click', function () {
+                var checked = document.querySelectorAll('input[name="ids[]"]:checked');
+                if (!checked.length) { alert('请先选择板块'); return; }
+                sel.value = '';
+                mask.classList.remove('hide');
+                sel.focus();
+            });
+            mask.querySelector('[data-move-cancel]').addEventListener('click', close);
+            mask.addEventListener('click', function (e) { if (e.target === mask) close(); });
+            mask.querySelector('[data-move-ok]').addEventListener('click', function () {
+                if (!sel.value) { alert('请选择移动目标'); return; }
+                source.value = sel.value;
+                var act = bulkForm.querySelector('input[data-bulk-act]');
+                if (!act) {
+                    act = document.createElement('input');
+                    act.type = 'hidden'; act.name = 'act'; act.setAttribute('data-bulk-act', '');
+                    bulkForm.appendChild(act);
+                }
+                act.value = 'move';
+                close();
+                bulkForm.submit();
+            });
+        }
+    })();
+
 })();
