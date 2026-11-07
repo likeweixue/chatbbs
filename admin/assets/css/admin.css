@@ -825,3 +825,24 @@ html[data-adm-theme="dark"] .adm-logo span { color: var(--adm-side-title); }
 .adm-search.is-open .adm-search-close { display: inline-flex; align-items: center; justify-content: center; }
 .adm-search-close:hover { background: var(--adm-hover); color: var(--adm-text); }
 .adm-search.is-open .adm-search-list { z-index: 80; }
+.adm-topbar { padding-left: 10px; }
+.adm-topbar .adm-logo { margin-left: 0; }
+.adm-context-nav { padding-top: 12px; }
+
+/* 顶栏横跨全宽，侧边栏位于顶栏下方 */
+.adm-topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 58px; z-index: 50;
+}
+.adm-side { top: 58px; }
+.adm-main { margin-top: 58px; }
+.adm-subbar { top: 58px; }
+.adm-search.is-open { position: fixed; top: 0; left: 0; right: 0; height: 58px; }
+.adm-topbar.is-searching { z-index: 60; }
+@media (max-width: 860px) {
+    .adm-topbar { position: sticky; height: auto; min-height: 54px; }
+    .adm-main { margin-top: 0; }
+    .adm-subbar { position: static; }
+    .adm-side { top: 0; }
+    .adm-search.is-open { position: absolute; }
+}

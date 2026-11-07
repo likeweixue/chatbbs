@@ -43,6 +43,7 @@ $editingPage = (string)($editing_page ?? '');
       </button>
     </div>
   <?php endif; ?>
+  <?php if (in_array('newthread', $mods, true)): ?>
   <div class="cb-card" style="padding:12px">
     <?php if ($editingPage !== ''): ?>
       <button type="submit" form="thread-form" id="cb-side-publish" class="cb-btn cb-btn-newthread block">
@@ -52,6 +53,7 @@ $editingPage = (string)($editing_page ?? '');
       <a class="cb-btn cb-btn-newthread block" href="<?= h(url('thread/create')) ?>"><?= L('发布主题') ?></a>
     <?php endif; ?>
   </div>
+  <?php endif; ?>
 
   <?php if (!empty($show_toc)): ?>
     <!-- 目录面板：由 app.js 从楼主正文中提取标题生成 -->

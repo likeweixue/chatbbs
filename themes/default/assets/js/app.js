@@ -171,15 +171,17 @@
   if (langBtn && langMenu) {
     langBtn.addEventListener('click', function (e) {
       e.stopPropagation();
-      langMenu.classList.toggle('show');
+      var open = langMenu.classList.toggle('show');
+      langBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
     document.addEventListener('click', function (e) {
       if (!langMenu.contains(e.target) && !langBtn.contains(e.target)) {
         langMenu.classList.remove('show');
+        langBtn.setAttribute('aria-expanded', 'false');
       }
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') langMenu.classList.remove('show');
+      if (e.key === 'Escape') { langMenu.classList.remove('show'); langBtn.setAttribute('aria-expanded', 'false'); }
     });
   }
 
@@ -886,6 +888,51 @@
       var d = parseInt(main.getAttribute('data-island-default-width') || '240', 10);
       setWidth(isNaN(d) ? 240 : d);
     }
+  });
+})();
+
+/* 工作台第二个侧栏：拖拽宽度 */
+(function () {
+  var main = document.querySelector('.cb-main--island');
+  var resizer = document.getElementById('island-aside-resizer');
+  if (!main || !resizer) return;
+  var MIN = 200, MAX = 360;
+  function save(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
+  function setWidth(width) {
+    width = Math.max(MIN, Math.min(MAX, Math.round(width)));
+    main.style.setProperty('--island-aside-width', width + 'px');
+    save('cb_island_aside_width', width);
+    resizer.setAttribute('aria-valuenow', String(width));
+  }
+  var saved = null;
+  try { saved = parseInt(localStorage.getItem('cb_island_aside_width'), 10); } catch (e) {}
+  if (saved >= MIN && saved <= MAX) setWidth(saved);
+  var drag = null;
+  resizer.addEventListener('pointerdown', function (e) {
+    if (window.matchMedia('(max-width: 860px)').matches) return;
+    if (main.classList.contains('island-aside-hidden')) return;
+    drag = { x: e.clientX, width: main.querySelector('.cb-island-sidebar').offsetWidth };
+    try { resizer.setPointerCapture(e.pointerId); } catch (err) {}
+    document.body.classList.add('island-resizing');
+    e.preventDefault();
+  });
+  resizer.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x;
+    if (!main.classList.contains('island-side-right')) dx = -dx;
+    setWidth(drag.width + dx);
+  });
+  function end() { if (!drag) return; drag = null; document.body.classList.remove('island-resizing'); }
+  resizer.addEventListener('pointerup', end);
+  resizer.addEventListener('pointercancel', end);
+  resizer.addEventListener('dblclick', function () {
+    var d = parseInt(main.getAttribute('data-island-aside-default-width') || '280', 10);
+    setWidth(isNaN(d) ? 280 : d);
+  });
+  resizer.addEventListener('keydown', function (e) {
+    var w = parseInt(getComputedStyle(main).getPropertyValue('--island-aside-width'), 10) || 280;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); setWidth(w - 10); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); setWidth(w + 10); }
   });
 })();
 

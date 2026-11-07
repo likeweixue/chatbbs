@@ -79,6 +79,21 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC17：侧边栏新增「快速发帖」模块，老站默认补上且仅迁移一次
+        if ((int)Settings::get('migration_rc17_sidebar_newthread', 0) !== 1) {
+            try {
+                $mods = trim((string)Settings::get('sidebar_modules', ''));
+                $list = $mods === '' ? [] : array_values(array_filter(array_map('trim', explode(',', $mods))));
+                if (!in_array('newthread', $list, true)) {
+                    array_unshift($list, 'newthread');
+                }
+                Settings::set('sidebar_modules', implode(',', $list));
+            } catch (\Throwable $e) {
+                Logger::error('RC17 侧栏快速发帖迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc17_sidebar_newthread', 1);
+        }
+
         if ((int)Settings::get('migration_rc7_single_layout', 0) !== 1) {
             try {
                 $activeTheme = (string)Settings::get('theme', 'default');

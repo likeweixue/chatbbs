@@ -310,6 +310,19 @@ class ContentController extends BaseAdmin
             $icon = (string)$res['url'];
         }
         $forumColumns = max(0, min(6, (int)Request::post('forum_columns', 0)));
+        // 兼容尚未执行自动迁移的旧库：确保排列字段存在后再保存
+        try {
+            $hasColumns = Database::fetch(
+                'SHOW COLUMNS FROM ' . Database::table('forums') . ' LIKE ?',
+                ['forum_columns']
+            );
+            if (!$hasColumns) {
+                Database::query('ALTER TABLE ' . Database::table('forums')
+                    . ' ADD COLUMN `forum_columns` tinyint(1) NOT NULL DEFAULT 0 COMMENT \'子板块每行列数，0 为列表\'');
+            }
+        } catch (\Throwable $e) {
+            \App\Core\Logger::error('forum_columns 字段检查失败：' . $e->getMessage());
+        }
         $data = [
             'name' => $name,
             'slug' => $slug,

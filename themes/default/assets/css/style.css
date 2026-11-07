@@ -2512,3 +2512,44 @@ html[data-theme="dark"] .cb-thread-list mark, html[data-theme="dark"] .cb-trow m
   .cb-main--island .cb-island-sidebar { display: none; }
   .cb-main--island.island-primary-hidden { grid-template-areas: "content"; }
 }
+
+/* 工作台侧栏：隐藏滚动条，仅保留上下分隔线；第二个侧栏拖拽线 */
+.cb-island-nav, .cb-island-sidebar { scrollbar-width: none; }
+.cb-island-nav::-webkit-scrollbar, .cb-island-sidebar::-webkit-scrollbar { display: none; }
+.cb-island-sidebar .cb-card {
+  border: 0; border-top: 1px solid var(--color-border);
+  border-radius: 0; box-shadow: none; background: transparent; margin: 0;
+}
+.cb-island-sidebar .cb-card:last-child { border-bottom: 1px solid var(--color-border); }
+.cb-island-sidebar .cb-card > .cb-card__body,
+.cb-island-sidebar .cb-card > .cb-card__footer { background: transparent; }
+.cb-island-sidebar .cb-card__header { background: transparent; }
+.cb-island-resizer--aside { left: auto; right: var(--island-aside-width, 280px); }
+.cb-main--island.island-side-right .cb-island-resizer--aside { left: var(--island-aside-width, 280px); right: auto; }
+.cb-main--island.island-aside-hidden .cb-island-resizer--aside { display: none; }
+
+/* 语言选择：顶栏下拉样式 */
+.cb-lang-select__trigger {
+  height: 32px; display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 9px; border: 1px solid var(--color-border); border-radius: var(--radius);
+  background: var(--color-surface-alt); color: var(--color-text); font-size: 12px; cursor: pointer;
+  white-space: nowrap;
+}
+.cb-lang-select__trigger:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.cb-lang-select__code { font-size: 10px; font-weight: 700; color: var(--color-text-muted); letter-spacing: .3px; }
+.cb-lang-select__name { max-width: 74px; overflow: hidden; text-overflow: ellipsis; }
+.cb-lang-select__caret { font-size: 10px; color: var(--color-text-muted); margin-left: 1px; }
+
+/* 工作台顶栏更宽，右侧操作更靠右；侧栏开关彼此靠近 */
+.cb-island .cb-header__inner { max-width: none; padding-left: 20px; padding-right: 20px; }
+.cb-island #island-nav-toggle { margin-left: -4px; }
+.cb-island #island-nav-side { margin-left: -4px; }
+@media (max-width: 900px) {
+  .cb-lang-select__name { display: none; }
+  .cb-lang-select__trigger { padding: 0 7px; }
+}
+
+/* 语言切换：图标按钮 */
+.cb-lang-icon-btn { color: var(--color-text-sub); }
+.cb-lang-icon { width: 19px; height: 19px; display: block; }
+.cb-lang-icon-btn:hover .cb-lang-icon { color: var(--color-primary); }

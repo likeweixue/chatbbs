@@ -63,10 +63,6 @@ foreach ($menu as $gk => $group) {
 <body>
 <div class="adm-wrap">
     <aside class="adm-side adm-side--context">
-        <div class="adm-context-head">
-            <span>主菜单</span>
-            <b><?= h($activeGroupLabel !== '' ? $activeGroupLabel : '仪表盘') ?></b>
-        </div>
         <nav class="adm-context-nav">
             <?php foreach (($menu[$activeGroup]['items'] ?? []) as $it): ?>
                 <?php

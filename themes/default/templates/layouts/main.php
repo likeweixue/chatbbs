@@ -249,8 +249,13 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
         }
         ?>
         <?php if ($langOn): ?>
-        <div class="cb-dropdown">
-          <button class="cb-icon-btn" id="btn-lang" title="Language / <?= L('语言') ?>" aria-haspopup="true"><?= cb_icon('globe') ?></button>
+        <div class="cb-dropdown cb-lang-select">
+          <button class="cb-icon-btn cb-lang-icon-btn" id="btn-lang" title="Language / <?= L('语言') ?>" aria-haspopup="listbox" aria-expanded="false">
+            <svg class="cb-lang-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M48 112h288M192 64v48m80 336l96-224 96 224m-162.5-64h133M281.3 112S257 206 199 277 80 384 80 384"/>
+              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 336s-35-27-72-75-56-85-56-85"/>
+            </svg>
+          </button>
           <div class="cb-dropdown__menu cb-lang-menu" id="menu-lang">
             <div class="head"><span><?= cb_icon('globe') ?> <?= L('语言') ?> / Language</span></div>
             <div class="list">
@@ -356,7 +361,8 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
 <main class="<?= h($mainClass) ?>"
       data-sidebar-default="<?= $sidebarDefaultHidden ? 'hidden' : 'visible' ?>"
       <?php if ($island): ?>style="--island-nav-width:<?= (int)$islandWidth ?>px"
-      data-island-default-width="<?= (int)$islandWidth ?>"<?php endif; ?>>
+      data-island-default-width="<?= (int)$islandWidth ?>"
+      data-island-aside-default-width="280"<?php endif; ?>>
   <?php if ($island): ?>
   <script>
     // 岛屿布局：优先恢复访客本地偏好，避免服务端默认值造成闪动
@@ -369,6 +375,8 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
         else if (side === 'left') { main.classList.remove('island-side-right'); }
         var w = parseInt(localStorage.getItem('cb_island_width'), 10);
         if (w >= 200 && w <= 360) { main.style.setProperty('--island-nav-width', w + 'px'); }
+        var aw = parseInt(localStorage.getItem('cb_island_aside_width'), 10);
+        if (aw >= 200 && aw <= 360) { main.style.setProperty('--island-aside-width', aw + 'px'); }
         var h = localStorage.getItem('cb_island_hidden');
         if (h === '1') { main.classList.add('island-primary-hidden', 'island-aside-hidden'); }
         else if (h === '0') { main.classList.remove('island-primary-hidden', 'island-aside-hidden'); }
@@ -423,6 +431,9 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
       'sidebar_class' => 'cb-island-sidebar',
       'sidebar_tools' => true,
     ])) ?>
+    <div class="cb-island-resizer cb-island-resizer--aside" id="island-aside-resizer" role="separator"
+         aria-orientation="vertical" aria-label="<?= L('拖拽调整侧栏宽度') ?>" aria-valuemin="200" aria-valuemax="360"
+         aria-valuenow="280" tabindex="0"></div>
   <?php endif; ?>
 </main>
 

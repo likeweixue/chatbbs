@@ -39,7 +39,7 @@ class Settings
         // 侧边栏默认折叠：未手动切换过的访客先看到完整内容区，需要时点顶栏按钮展开
         'sidebar_default_hidden' => '1',
         'sidebar_side' => 'right',
-        'sidebar_modules' => 'stats,calendar,newest_users,newest_threads,checkin,recommend,links',
+        'sidebar_modules' => 'newthread,stats,calendar,newest_users,newest_threads,checkin,recommend,links',
         // 楼层下「楼中楼」回复默认展示条数，超出部分点击「展开更多回复」
         'reply_preview_count' => '5',
         // 聊天（单聊 / 群聊 / 附近的人）

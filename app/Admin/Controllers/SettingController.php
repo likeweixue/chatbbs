@@ -724,6 +724,7 @@ class SettingController extends BaseAdmin
     public static function sidebarModules(): array
     {
         return [
+            'newthread' => '快速发帖',
             'about' => '关于本站',
             'stats' => '论坛统计',
             'checkin' => '每日签到',
@@ -752,7 +753,7 @@ class SettingController extends BaseAdmin
         }
 
         $html = '<div class="adm-alert info">勾选需要显示的模块，并用 ↑ ↓ 调整上下顺序；保存后前台侧边栏按此顺序渲染。</div>';
-        $html .= '<div class="adm-panel"><div class="adm-panel-head">默认布局（双栏）侧边栏模块</div><div class="adm-panel-body">'
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">侧边栏模块（默认布局 / 工作台）</div><div class="adm-panel-body">'
             . '<form method="post" action="' . h(admin_url('sidebar/save')) . '" id="sidebar-form">';
         $html .= csrf_field();
         $html .= '<input type="hidden" name="modules" id="sidebar-modules" value="">';
