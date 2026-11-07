@@ -757,16 +757,22 @@
   } catch (e) {}
 })();
 
-/* 岛屿布局：侧栏显示/隐藏、左右切换、拖拽宽度 */
+/* 工作台布局：导航侧栏 + 内容 + 默认侧栏，两栏联动 */
 (function () {
   var main = document.querySelector('.cb-main--island');
   if (!main) return;
   var MIN = 200, MAX = 360;
   var resizer = document.getElementById('island-resizer');
+  var topToggle = document.getElementById('island-nav-toggle');
 
   function save(key, value) {
     try { localStorage.setItem(key, String(value)); } catch (e) {}
   }
+  function read(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function primaryHidden() { return main.classList.contains('island-primary-hidden'); }
+  function asideHidden() { return main.classList.contains('island-aside-hidden'); }
 
   function setWidth(width) {
     width = Math.max(MIN, Math.min(MAX, Math.round(width)));
@@ -775,34 +781,80 @@
     if (resizer) resizer.setAttribute('aria-valuenow', String(width));
   }
 
-  function setHidden(hidden) {
-    main.classList.toggle('island-nav-hidden', hidden);
-    save('cb_island_hidden', hidden ? '1' : '0');
+  function updateButtons() {
+    var ph = primaryHidden(), ah = asideHidden();
+    var both = ph && ah;
+    if (topToggle) {
+      topToggle.setAttribute('aria-expanded', both ? 'false' : 'true');
+      topToggle.classList.toggle('off', both);
+      topToggle.setAttribute('title', both ? cbT('显示侧栏') : cbT('隐藏侧栏'));
+    }
     document.querySelectorAll('[data-island-hide]').forEach(function (btn) {
+      if (btn === topToggle) return;
+      var side = btn.closest('.cb-island-sidebar') ? 'aside' : (btn.closest('.cb-island-nav') ? 'primary' : '');
+      if (!side) return;
+      var hidden = side === 'aside' ? ah : ph;
       btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
       btn.setAttribute('title', hidden ? cbT('显示侧栏') : cbT('隐藏侧栏'));
     });
   }
 
+  function apply() {
+    main.classList.toggle('island-primary-hidden', primaryHidden());
+    main.classList.toggle('island-aside-hidden', asideHidden());
+    main.classList.remove('island-nav-hidden');
+    updateButtons();
+  }
+
+  function togglePrimary() {
+    main.classList.toggle('island-primary-hidden');
+    save('cb_island_primary_hidden', primaryHidden() ? '1' : '0');
+    apply();
+  }
+  function toggleAside() {
+    main.classList.toggle('island-aside-hidden');
+    save('cb_island_aside_hidden', asideHidden() ? '1' : '0');
+    apply();
+  }
+  function toggleBoth() {
+    var show = primaryHidden() && asideHidden();
+    main.classList.toggle('island-primary-hidden', !show);
+    main.classList.toggle('island-aside-hidden', !show);
+    save('cb_island_primary_hidden', show ? '0' : '1');
+    save('cb_island_aside_hidden', show ? '0' : '1');
+    apply();
+  }
   function toggleSide() {
     var right = main.classList.toggle('island-side-right');
     save('cb_island_side', right ? 'right' : 'left');
   }
 
+  if (topToggle) topToggle.addEventListener('click', toggleBoth);
   document.querySelectorAll('[data-island-hide]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      setHidden(!main.classList.contains('island-nav-hidden'));
-    });
+    if (btn === topToggle) return;
+    var side = btn.closest('.cb-island-sidebar') ? 'aside' : (btn.closest('.cb-island-nav') ? 'primary' : '');
+    if (!side) return;
+    btn.addEventListener('click', side === 'aside' ? toggleAside : togglePrimary);
   });
   document.querySelectorAll('[data-island-side]').forEach(function (btn) {
     btn.addEventListener('click', toggleSide);
   });
 
-  if (!resizer) return;
+  // 迁移旧版的单一隐藏状态；新状态存在时优先
+  var legacy = read('cb_island_hidden');
+  var hp = read('cb_island_primary_hidden');
+  var ha = read('cb_island_aside_hidden');
+  if (hp === null && legacy !== null) hp = legacy;
+  if (ha === null && legacy !== null) ha = legacy;
+  if (hp !== null) main.classList.toggle('island-primary-hidden', hp === '1');
+  if (ha !== null) main.classList.toggle('island-aside-hidden', ha === '1');
+  apply();
 
+  if (!resizer) return;
   var drag = null;
   resizer.addEventListener('pointerdown', function (e) {
     if (window.matchMedia('(max-width: 860px)').matches) return;
+    if (primaryHidden()) return;
     drag = { x: e.clientX, width: main.querySelector('.cb-island-nav').offsetWidth };
     try { resizer.setPointerCapture(e.pointerId); } catch (err) {}
     document.body.classList.add('island-resizing');
@@ -821,7 +873,6 @@
   }
   resizer.addEventListener('pointerup', endDrag);
   resizer.addEventListener('pointercancel', endDrag);
-
   resizer.addEventListener('dblclick', function () {
     var d = parseInt(main.getAttribute('data-island-default-width') || '240', 10);
     setWidth(isNaN(d) ? 240 : d);
@@ -837,7 +888,6 @@
     }
   });
 })();
-
 
 /* 外观 / 色调菜单 */
 (function () {

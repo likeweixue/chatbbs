@@ -24,12 +24,25 @@ $links = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string)confi
 $aboutTitle = trim((string)config('about_title', 'ChatBBS'));
 $aboutText = trim((string)config('about_text', ''));
 $aboutTeam = trim((string)config('about_team', ''));
+$sidebarClass = trim((string)($sidebar_class ?? ''));
+$sidebarTools = !empty($sidebar_tools);
 ?>
 <?php
 // 发帖 / 编辑页：侧栏按钮改为「提交当前表单」，不再跳转到新建页丢内容
 $editingPage = (string)($editing_page ?? '');
 ?>
-<aside class="cb-sidebar">
+<aside class="cb-sidebar<?= $sidebarClass !== '' ? ' ' . h($sidebarClass) : '' ?>">
+  <?php if ($sidebarTools): ?>
+    <div class="cb-island-sidebar__tools">
+      <span class="cb-island-sidebar__title"><?= L('侧栏') ?></span>
+      <button type="button" class="cb-island-tool" data-island-hide title="<?= L('隐藏侧栏') ?>" aria-label="<?= L('隐藏侧栏') ?>">
+        <?= cb_icon('panel-left') ?>
+      </button>
+      <button type="button" class="cb-island-tool" data-island-side title="<?= L('切换侧栏位置') ?>" aria-label="<?= L('切换侧栏位置') ?>">
+        <?= cb_icon('panel-right') ?>
+      </button>
+    </div>
+  <?php endif; ?>
   <div class="cb-card" style="padding:12px">
     <?php if ($editingPage !== ''): ?>
       <button type="submit" form="thread-form" id="cb-side-publish" class="cb-btn cb-btn-newthread block">

@@ -43,7 +43,7 @@ if ($single) {
         $mainClass .= ' island-side-right';
     }
     if ($islandDefaultHidden) {
-        $mainClass .= ' island-nav-hidden';
+        $mainClass .= ' island-primary-hidden island-aside-hidden';
     }
 } else {
     if ($side === 'left') {
@@ -370,10 +370,16 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
         var w = parseInt(localStorage.getItem('cb_island_width'), 10);
         if (w >= 200 && w <= 360) { main.style.setProperty('--island-nav-width', w + 'px'); }
         var h = localStorage.getItem('cb_island_hidden');
-        if (h === '1') { main.classList.add('island-nav-hidden'); }
-        else if (h === '0') { main.classList.remove('island-nav-hidden'); }
+        if (h === '1') { main.classList.add('island-primary-hidden', 'island-aside-hidden'); }
+        else if (h === '0') { main.classList.remove('island-primary-hidden', 'island-aside-hidden'); }
+        var hp = localStorage.getItem('cb_island_primary_hidden');
+        var ha = localStorage.getItem('cb_island_aside_hidden');
+        if (hp === '1') main.classList.add('island-primary-hidden');
+        else if (hp === '0') main.classList.remove('island-primary-hidden');
+        if (ha === '1') main.classList.add('island-aside-hidden');
+        else if (ha === '0') main.classList.remove('island-aside-hidden');
         var btn = document.getElementById('island-nav-toggle');
-        if (btn) { btn.setAttribute('aria-expanded', main.classList.contains('island-nav-hidden') ? 'false' : 'true'); }
+        if (btn) { btn.setAttribute('aria-expanded', (main.classList.contains('island-primary-hidden') && main.classList.contains('island-aside-hidden')) ? 'false' : 'true'); }
       } catch (e) {}
     })();
   </script>
@@ -409,6 +415,14 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
 
   <?php if ($sidebarOn && !$island): ?>
     <?= \App\Core\View::partial('partials/sidebar', get_defined_vars()) ?>
+  <?php endif; ?>
+
+  <?php if ($island): ?>
+    <?= \App\Core\View::partial('partials/sidebar', array_merge(get_defined_vars(), [
+      'show_toc' => false,
+      'sidebar_class' => 'cb-island-sidebar',
+      'sidebar_tools' => true,
+    ])) ?>
   <?php endif; ?>
 </main>
 
