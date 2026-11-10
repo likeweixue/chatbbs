@@ -79,7 +79,14 @@ class Database
     public static function query(string $sql, array $params = []): \PDOStatement
     {
         $stmt = self::prepare($sql);
-        $stmt->execute($params);
+        try {
+            $stmt->execute($params);
+        } catch (\PDOException $e) {
+            // 记录失败 SQL，便于排查「保存后没生效」这类静默失败（不输出密码等敏感值）
+            Logger::error('SQL 执行失败：' . $e->getMessage()
+                . ' | SQL: ' . mb_substr(preg_replace('/\s+/', ' ', $sql) ?? $sql, 0, 300));
+            throw $e;
+        }
         return $stmt;
     }
 

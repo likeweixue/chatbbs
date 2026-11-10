@@ -278,6 +278,8 @@ abstract class BaseAdmin
         $layoutFile = CB_ROOT . '/admin/templates/layout.php';
         return View::renderFile($layoutFile, array_merge($data, [
             'content' => $inner,
+            // 页面标题：用于渲染顶部统一面板标题
+            'title' => $data['title'] ?? '',
             'menu' => self::$menu,
             'current_key' => $data['current_key'] ?? '',
             'admin_user' => Auth::user(),

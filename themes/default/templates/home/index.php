@@ -1,5 +1,5 @@
 <?php $marks = \App\Models\Thread::marks(); ?>
-<?php if (!empty($says) && (int)config('say_on_home', 1)): ?>
+<?php if (!empty($says) && (int)config('say_on_home', 1) && (int)config('say_enable', 1)): ?>
   <div class="cb-card">
     <div class="cb-card__header"><?= L('最新说说') ?> <a class="more" href="<?= h(url('say')) ?>"><?= L('更多') ?></a></div>
     <div class="cb-card__body">

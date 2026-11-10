@@ -11,6 +11,8 @@ Router::get('/', \App\Controllers\HomeController::class . '@index');
 
 // 界面语言切换（只切换界面名词，不影响帖子内容）
 Router::get('/lang/{code}', \App\Controllers\HomeController::class . '@switchLang');
+// 前台布局切换（双栏 / 单栏 / 三栏），需后台允许用户自定义
+Router::get('/layout/{layout}', \App\Controllers\HomeController::class . '@switchLayout');
 // 授权证书（自动识别当前站点域名为被授权方）
 Router::get('/license', \App\Controllers\HomeController::class . '@license');
 

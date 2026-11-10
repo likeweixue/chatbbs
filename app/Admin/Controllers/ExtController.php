@@ -175,6 +175,12 @@ class ExtController extends BaseAdmin
                         '20' => '20 px',
                     ], 'tip' => '控制卡片、按钮、输入框等所有元素的圆角；设为 0 即为方方正正的直角风格'],
                     ['name' => 'theme_primary', 'label' => '主题主色', 'type' => 'color', 'tip' => '影响链接、按钮、标签等主色调'],
+                    ['name' => 'avatar_shape', 'label' => '头像形状', 'type' => 'select', 'options' => ['circle' => '圆形（默认）', 'square' => '圆角方形'], 'tip' => '影响前台所有用户头像'],
+                    ['name' => 'admin_radius', 'label' => '后台圆角', 'type' => 'select', 'options' => [
+                        '0' => '0 px（直角，默认）', '2' => '2 px', '4' => '4 px', '6' => '6 px', '8' => '8 px',
+                    ], 'tip' => '只影响管理后台；前台圆角使用上面的「圆角大小」'],
+                    ['name' => 'links_in_footer', 'label' => '页脚上方友情链接', 'type' => 'switch',
+                        'tip' => '双栏布局在页脚上方显示「论坛统计 / 友情链接」面板；关闭则不显示友链面板'],
                 ],
             ])
             . '<div class="adm-form-tip">提示：外观设置保存后前台立即生效；若浏览器有缓存，请强制刷新（Ctrl+F5）。</div>'
@@ -203,6 +209,8 @@ class ExtController extends BaseAdmin
             'island_sidebar_side' => (string)Settings::get('island_sidebar_side', 'left') === 'right' ? 'right' : 'left',
             'island_sidebar_width' => $islandWidth,
             'island_sidebar_default_hidden' => (int)Settings::get('island_sidebar_default_hidden', 0),
+            'layout_user_switch' => (int)Settings::get('layout_user_switch', 1),
+            'single_width' => (string)Settings::get('single_width', ''),
         ];
         $html .= '<div class="adm-panel"><div class="adm-panel-head">站点布局</div><div class="adm-panel-body">'
             . AdminUI::form([
@@ -222,6 +230,10 @@ class ExtController extends BaseAdmin
                         'tip' => '200 - 360 px；访客拖拽分隔线后使用自己的宽度'],
                     ['name' => 'island_sidebar_default_hidden', 'label' => '默认隐藏侧栏', 'type' => 'switch',
                         'tip' => '开启后访客首次进入工作台布局时先看到全宽内容区，可点顶栏按钮展开'],
+                    ['name' => 'layout_user_switch', 'label' => '允许用户切换布局', 'type' => 'switch',
+                        'tip' => '开启后前台顶栏显示布局切换按钮，访客可在双栏 / 单栏 / 三栏之间选择；关闭后按钮变灰不可点'],
+                    ['name' => 'single_width', 'label' => '单栏模式宽度(px)', 'type' => 'number',
+                        'tip' => '留空或 0 使用默认 1200px；可设置 960 - 1800，例如 1400 让单栏更宽'],
                 ],
             ])
             . '<div class="adm-form-tip">工作台布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
@@ -315,6 +327,10 @@ class ExtController extends BaseAdmin
                         '8' => '8 px', '10' => '10 px', '12' => '12 px', '16' => '16 px', '20' => '20 px',
                     ], 'tip' => '控制卡片、按钮、输入框等圆角'],
                     ['name' => 'theme_primary', 'label' => '主题主色', 'type' => 'color', 'tip' => '影响链接、按钮、标签等主色调，同时同步后台主色'],
+                    ['name' => 'avatar_shape', 'label' => '头像形状', 'type' => 'select', 'options' => ['circle' => '圆形（默认）', 'square' => '圆角方形']],
+                    ['name' => 'admin_radius', 'label' => '后台圆角', 'type' => 'select', 'options' => [
+                        '0' => '0 px（直角，默认）', '2' => '2 px', '4' => '4 px', '6' => '6 px', '8' => '8 px',
+                    ], 'tip' => '只影响管理后台'],
                 ],
             ]) . '</div></div>';
         $html .= '<div class="adm-panel"><div class="adm-panel-head">顶栏 / 侧栏 / 页脚 / 分区颜色</div><div class="adm-panel-body">'
@@ -349,9 +365,14 @@ class ExtController extends BaseAdmin
         if (!preg_match('/^#[0-9a-fA-F]{6}$/i', $primary)) {
             $primary = '#4D698E';
         }
+        $adminRadius = max(0, min(8, Request::int('admin_radius', 0)));
+        $avatarShape = Request::post('avatar_shape', 'circle') === 'square' ? 'square' : 'circle';
         Settings::setMany([
             'theme_radius' => (string)$radius,
             'theme_primary' => $primary,
+            'admin_radius' => (string)$adminRadius,
+            'avatar_shape' => $avatarShape,
+            'links_in_footer' => Request::bool('links_in_footer') ? 1 : 0,
         ]);
         \App\Core\Cache::forget('settings');
         $this->log('修改主题外观', '圆角:' . $radius . ' 主色:' . $primary);
@@ -374,6 +395,8 @@ class ExtController extends BaseAdmin
             'island_sidebar_side' => $side,
             'island_sidebar_width' => (string)$width,
             'island_sidebar_default_hidden' => Request::bool('island_sidebar_default_hidden') ? 1 : 0,
+            'layout_user_switch' => Request::bool('layout_user_switch') ? 1 : 0,
+            'single_width' => (string)max(0, min(1800, Request::int('single_width', 0))),
         ]);
         Cache::forget('settings');
         $this->log('修改站点布局', $layout . ' / ' . $side . ' / ' . $width . 'px');

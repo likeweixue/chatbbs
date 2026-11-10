@@ -846,3 +846,70 @@ html[data-adm-theme="dark"] .adm-logo span { color: var(--adm-side-title); }
     .adm-side { top: 0; }
     .adm-search.is-open { position: absolute; }
 }
+
+/* 统一面板：页面标题 + 首个面板合并成一块，中间不留缝 */
+.adm-page-head { margin-bottom: 0; border-bottom: 0; border-radius: var(--adm-radius) var(--adm-radius) 0 0; }
+.adm-page-head:empty { display: none; }
+.adm-unified > .adm-panel:first-child { margin-top: 0; border-radius: 0 0 var(--adm-radius) var(--adm-radius); }
+.adm-unified > .adm-page-head + .adm-panel:first-child { border-top: 1px solid var(--adm-border); }
+/* 面板标题：用更明显的底色与正文区分 */
+.adm-panel-head {
+    background: var(--adm-panel-head-bg, #f3f5f8);
+    color: var(--adm-text);
+    border-bottom: 1px solid var(--adm-border);
+    border-radius: var(--adm-radius) var(--adm-radius) 0 0;
+}
+html[data-adm-theme="dark"] .adm-panel-head { background: #232a36; }
+/* 面板内嵌套的子面板不再单独圆角 */
+.adm-panel-body .adm-panel { border-radius: 4px; }
+.adm-panel-body .adm-panel .adm-panel-head { border-radius: 4px 4px 0 0; }
+/* 表单提交按钮靠左（面板左下角） */
+.adm-form-actions { padding-left: 0; justify-content: flex-start; }
+@media (max-width: 780px) { .adm-form-actions { padding-left: 0; } }
+/* 后台圆角统一跟随 --adm-radius（默认 0，直角） */
+.adm-panel, .adm-panel-head, .adm-page-head, .adm-stat, .adm-unified > .adm-panel:first-child,
+.adm-toolbar, .adm-table-wrap, .adm-modal, .adm-alert, .adm-btn, .adm-input, .adm-form select,
+.adm-form textarea, .adm-tag, .adm-mainmenu__btn, .adm-submenu, .adm-submenu__item, .adm-search,
+.adm-context-item, .adm-search-list, .adm-input[type="color"] { border-radius: var(--adm-radius, 0); }
+.adm-panel:has(> .adm-panel-head) { overflow: hidden; }
+.adm-side, .adm-side--context { border-radius: 0; }
+
+/* 页面标题合并进首个面板的标题栏 */
+.adm-panel[data-page-panel] > .adm-panel-head:first-child {
+    font-size: 15px; font-weight: 600; padding: 14px 16px;
+}
+/* 统计卡片：去掉间隙，连成一片 */
+.adm-stats {
+    display: grid; gap: 0;
+    background: var(--adm-card);
+    border: 1px solid var(--adm-border);
+    box-shadow: var(--adm-shadow);
+    overflow: hidden;
+}
+.adm-stats .adm-stat {
+    border: 0; border-right: 1px solid var(--adm-border); border-bottom: 1px solid var(--adm-border);
+    box-shadow: none; background: transparent;
+}
+.adm-stats .adm-stat:nth-child(6n) { border-right: 0; }
+@media (max-width: 1100px) { .adm-stats .adm-stat:nth-child(6n) { border-right: 1px solid var(--adm-border); } }
+/* 工具栏圆角统一 */
+.adm-toolbar { border-radius: var(--adm-radius, 0); }
+.adm-toolbar[style*="border-radius"] { border-radius: var(--adm-radius, 0) !important; }
+
+/* 独立页面标题条：与面板标题同色，方便区分 */
+.adm-page-head {
+    background: var(--adm-panel-head-bg, #f3f5f8);
+    border: 1px solid var(--adm-border);
+    margin-bottom: 0;
+}
+html[data-adm-theme="dark"] .adm-page-head { background: #232a36; }
+
+/* 统计卡片按数量铺满，避免 2/4/8 个时留下空格 */
+.adm-stats:has(> .adm-stat:nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.adm-stats:has(> .adm-stat:nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.adm-stats:has(> .adm-stat:nth-child(4):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.adm-stats:has(> .adm-stat:nth-child(6):last-child) { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.adm-stats:has(> .adm-stat:nth-child(8):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 900px) {
+    .adm-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}

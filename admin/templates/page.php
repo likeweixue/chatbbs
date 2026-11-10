@@ -5,6 +5,8 @@
  */
 $actions = $actions ?? [];
 ?>
+<?php $hasPageHead = $actions; ?>
+<?php if ($hasPageHead): ?>
 <div class="adm-page-head">
     <h2><?= h((string)($title ?? '')) ?></h2>
     <div class="spacer"></div>
@@ -25,4 +27,23 @@ $actions = $actions ?? [];
         <?php endif; ?>
     <?php endforeach; ?>
 </div>
-<?= $html ?? '' ?>
+<?php endif; ?>
+<div class="adm-unified">
+<?php
+// 页面主题：无现成面板的表单 / 提示条自动包成带标题的面板
+$body = (string)($html ?? '');
+$pageTitle = (string)($title ?? '');
+$trimmed = ltrim($body);
+if (str_starts_with($trimmed, '<form')) {
+    $body = '<div class="adm-panel" data-page-panel>'
+        . '<div class="adm-panel-head">' . h($pageTitle !== '' ? $pageTitle : '设置') . '</div>'
+        . '<div class="adm-panel-body">' . $body . '</div></div>';
+} elseif (strpos($body, '<div class="adm-panel"') === false) {
+    // 提示条 + 表单等没有现成面板的页面，整体包成带标题的面板
+    $body = '<div class="adm-panel" data-page-panel>'
+        . '<div class="adm-panel-head">' . h($pageTitle !== '' ? $pageTitle : '设置') . '</div>'
+        . '<div class="adm-panel-body">' . $body . '</div></div>';
+}
+?>
+<?= $body ?>
+</div>

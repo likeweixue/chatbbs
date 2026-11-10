@@ -621,7 +621,7 @@ class SettingController extends BaseAdmin
                 . '</tr>';
         }
         $html .= '</tbody></table></div></div>';
-        $html .= '<div class="adm-toolbar" style="border:1px solid var(--adm-border);border-radius:6px">'
+        $html .= '<div class="adm-toolbar" style="border:1px solid var(--adm-border);border-radius:var(--adm-radius,0)">'
             . '<button type="button" class="adm-btn" id="tb-add">+ 新增一行</button>'
             . '<div class="spacer"></div>'
             . '<button class="adm-btn primary" type="submit">保存筛选栏</button>'

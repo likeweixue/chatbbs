@@ -25,11 +25,12 @@ class SystemController extends BaseAdmin
         foreach ($files as $f) {
             $size += (int)filesize($f);
         }
-        $html = '<div class="adm-stats">'
+        $html = '<div class="adm-panel"><div class="adm-panel-head">缓存数据</div><div class="adm-panel-body">'
+            . '<div class="adm-stats">'
             . '<div class="adm-stat"><div class="adm-stat__label">缓存文件</div><div class="adm-stat__value">' . count($files) . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">占用空间</div><div class="adm-stat__value">' . format_size($size) . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">缓存目录</div><div class="adm-stat__value" style="font-size:14px">' . h(CB_CACHE) . '</div></div>'
-            . '</div>';
+            . '</div></div></div>';
 
         $html .= '<div class="adm-panel"><div class="adm-panel-head">清理缓存</div><div class="adm-panel-body">'
             . '<form method="post" action="' . h(admin_url('cache/clear')) . '" class="flex gap-8 items-center" style="flex-wrap:wrap">'
@@ -102,7 +103,7 @@ class SystemController extends BaseAdmin
             $this->baseUrl('logs', ['level' => $level])
         );
 
-        $html = '<div class="adm-toolbar" style="border:1px solid var(--adm-border);border-radius:6px">'
+        $html = '<div class="adm-toolbar" style="border:1px solid var(--adm-border);border-radius:var(--adm-radius,0)">'
             . '<form method="get" action="' . h(admin_url('logs')) . '" class="flex gap-8 items-center">'
             . '<select class="adm-input" style="width:auto" name="level">'
             . '<option value="">全部级别</option>'
@@ -352,14 +353,15 @@ class SystemController extends BaseAdmin
             $totalRows += (int)($r['Rows'] ?? 0);
         }
 
-        $html = '<div class="adm-stats">'
+        $html = '<div class="adm-panel"><div class="adm-panel-head">数据库数据</div><div class="adm-panel-body">'
+            . '<div class="adm-stats">'
             . '<div class="adm-stat"><div class="adm-stat__label">数据表数量</div><div class="adm-stat__value">' . count($rows) . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">总记录数</div><div class="adm-stat__value">' . $totalRows . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">占用空间</div><div class="adm-stat__value">' . format_size($totalSize) . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">表前缀</div><div class="adm-stat__value" style="font-size:16px">' . h(Database::prefix()) . '</div></div>'
-            . '</div>';
+            . '</div></div></div>';
 
-        $html .= '<div class="adm-toolbar" style="border:1px solid var(--adm-border);border-radius:6px">'
+        $html .= '<div class="adm-toolbar" style="border:1px solid var(--adm-border);border-radius:var(--adm-radius,0)">'
             . '<div class="adm-form-tip" style="margin:0">定期优化表可整理碎片、提升查询效率。</div><div class="spacer"></div>'
             . '<form method="post" action="' . h(admin_url('database/fix')) . '" style="display:inline">'
             . csrf_field() . '<button class="adm-btn primary" type="submit">检查并修复表结构</button></form>'

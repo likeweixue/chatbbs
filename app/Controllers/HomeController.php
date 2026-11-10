@@ -37,7 +37,7 @@ class HomeController extends BaseController
         $baseUrl = url($tabQuery);
 
         $says = [];
-        if ((int)Settings::get('say_on_home', 1)) {
+        if ((int)Settings::get('say_on_home', 1) && (int)Settings::get('say_enable', 1)) {
             $says = \App\Models\Say::list(1, 5)['items'];
         }
 
@@ -62,6 +62,18 @@ class HomeController extends BaseController
             'forums' => \App\Models\Forum::tree(),
             'hot_tags' => \App\Models\Tag::hot(15),
         ]);
+    }
+
+    /**
+     * 前台布局切换：写入 cookie 后回到来源页
+     */
+    public function switchLayout(string $layout = ''): void
+    {
+        $ok = \App\Services\LayoutPreference::set((string)$layout);
+        if (!$ok) {
+            \App\Core\Session::flash('error', '当前站点未开放布局自定义');
+        }
+        redirect($this->safeBack());
     }
 
     /**

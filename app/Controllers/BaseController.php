@@ -40,7 +40,7 @@ abstract class BaseController
         if ($user) {
             $user = \App\Models\User::withMeta($user);
         }
-        $layout = (string)Settings::get('site_layout', 'classic');
+        $layout = \App\Services\LayoutPreference::current();
         $island = $layout === 'island';
         $cached = [
             'site_name' => Settings::get('site_name', 'ChatBBS'),
@@ -186,7 +186,15 @@ abstract class BaseController
         // 「推荐」已合并为首页筛选标签，隐藏菜单表里遗留的旧推荐页入口
         $menus = array_values(array_filter($menus, static function ($m): bool {
             $u = (string)($m['url'] ?? '');
-            return !(preg_match('#(^|/)recommend($|[/?])#i', $u) || str_contains($u, 'r=recommend'));
+            if (preg_match('#(^|/)recommend($|[/?])#i', $u) || str_contains($u, 'r=recommend')) {
+                return false;
+            }
+            // 说说功能关闭时隐藏菜单入口
+            if ((int)\App\Core\Settings::get('say_enable', 0) !== 1
+                && (preg_match('#(^|/)say($|[/?])#i', $u) || str_contains($u, 'r=say'))) {
+                return false;
+            }
+            return true;
         }));
         return $menus;
     }

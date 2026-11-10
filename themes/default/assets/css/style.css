@@ -349,6 +349,8 @@ html[data-theme="dark"] [data-theme-toggle] .ico-dark { display: inline-flex; }
 .cb-badge-pill {
   display: inline-flex; align-items: center; padding: 0 6px; border-radius: var(--radius-sm);
   font-size: 11px; line-height: 18px; background: var(--color-border); color: var(--color-text-sub);
+  /* 移动端标题栏是 nowrap，若不约束会被压成逐字竖排 */
+  flex: none; white-space: nowrap; word-break: keep-all;
 }
 .cb-badge-pill.top { background: #fff1f0; color: var(--color-danger); }
 .cb-badge-pill.essence { background: #fff7e6; color: var(--color-warning); }
@@ -2133,7 +2135,7 @@ html[data-theme="dark"][data-palette="orange"] { --color-primary: #ff854f !impor
 body.cb-single .cb-header,
 body.cb-single .cb-footer { width: 100%; }
 body.cb-single .cb-notice-banner,
-body.cb-single .cb-diy-banner { width: 100%; max-width: 1200px; margin-left: auto; margin-right: auto; }
+body.cb-single .cb-diy-banner { width: 100%; max-width: var(--single-width, 1200px); margin-left: auto; margin-right: auto; }
 body.cb-single .cb-card__header--tabs .cb-header-actions { margin-right: 10px; }
 
 /* ---------- 标签选择器 ---------- */
@@ -2553,3 +2555,47 @@ html[data-theme="dark"] .cb-thread-list mark, html[data-theme="dark"] .cb-trow m
 .cb-lang-icon-btn { color: var(--color-text-sub); }
 .cb-lang-icon { width: 19px; height: 19px; display: block; }
 .cb-lang-icon-btn:hover .cb-lang-icon { color: var(--color-primary); }
+
+/* ---------- 头像形状（后台可切换） ---------- */
+body.cb-avatar-square .cb-avatar { border-radius: var(--radius-sm); }
+
+/* ---------- 双栏页脚上方：统计 / 友情链接面板 ---------- */
+.cb-footer-panels {
+  max-width: 1200px; margin: 0 auto 16px; padding: 0 16px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;
+  width: 100%;
+}
+.cb-footer-panels .cb-card { margin-bottom: 0; }
+.cb-footer-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.cb-footer-stats__item b { display: block; font-size: 17px; color: var(--color-text); }
+.cb-footer-stats__item span { font-size: 12px; color: var(--color-text-muted); }
+.cb-footer-stats__newest { margin-top: 10px; font-size: 12px; color: var(--color-text-muted); text-align: center; }
+.cb-footer-stats__newest a { color: var(--color-primary); }
+.cb-footer-links { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; }
+.cb-footer-links a { color: var(--color-text-sub); }
+.cb-footer-links a:hover { color: var(--color-primary); }
+
+/* ---------- 单栏模式宽度可配置 ---------- */
+body.cb-single .cb-header,
+body.cb-single .cb-footer,
+body.cb-single .cb-main--single,
+body.cb-single .cb-notice-banner,
+body.cb-single .cb-diy-banner { max-width: var(--single-width, 1200px); }
+body.cb-single .cb-main--single { width: 100%; }
+@media (max-width: 900px) {
+  body.cb-single .cb-header,
+  body.cb-single .cb-footer,
+  body.cb-single .cb-main--single { max-width: none; }
+}
+@media (max-width: 860px) {
+  .cb-thread__title .cb-badge-pill,
+  .cb-trow__title .cb-badge-pill {
+    flex: 0 0 auto; white-space: nowrap; word-break: keep-all; max-width: none;
+  }
+  .cb-footer-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cb-footer-panels { padding: 0 12px; }
+}
+
+/* 布局切换下拉按钮与外观按钮尺寸一致 */
+.cb-layout-menu .cb-dropdown__menu { width: 160px; }
+.cb-icon-btn.off, .cb-icon-btn:disabled { opacity: .45; cursor: not-allowed; }

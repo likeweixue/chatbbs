@@ -79,6 +79,16 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC18：说说功能默认关闭（老站升级一次；之后可在功能开关中重新开启）
+        if ((int)Settings::get('migration_rc18_say_default_off', 0) !== 1) {
+            try {
+                Settings::set('say_enable', '0');
+            } catch (\Throwable $e) {
+                Logger::error('RC18 说说默认关闭迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc18_say_default_off', 1);
+        }
+
         // RC17：侧边栏新增「快速发帖」模块，老站默认补上且仅迁移一次
         if ((int)Settings::get('migration_rc17_sidebar_newthread', 0) !== 1) {
             try {

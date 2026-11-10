@@ -492,10 +492,11 @@ class ContentMoreController extends BaseAdmin
         $total = (int)Database::value('SELECT COUNT(*) FROM ' . Database::table('attachments'), [], 0);
         $size = (float)Database::value('SELECT SUM(size) FROM ' . Database::table('attachments'), [], 0);
 
-        $html = '<div class="adm-stats">'
+        $html = '<div class="adm-panel"><div class="adm-panel-head">附件数据</div><div class="adm-panel-body">'
+            . '<div class="adm-stats">'
             . '<div class="adm-stat"><div class="adm-stat__label">附件总数</div><div class="adm-stat__value">' . $total . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">占用空间</div><div class="adm-stat__value">' . format_size($size) . '</div></div>'
-            . '</div>';
+            . '</div></div></div>';
         $html .= AdminUI::filter([
             'action' => admin_url('attachments'),
             'fields' => [

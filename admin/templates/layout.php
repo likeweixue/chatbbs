@@ -15,6 +15,7 @@ $admR = hexdec(substr($admPrimary, 1, 2));
 $admG = hexdec(substr($admPrimary, 3, 2));
 $admB = hexdec(substr($admPrimary, 5, 2));
 $admPrimaryDark = sprintf('#%02x%02x%02x', (int)round($admR * .82), (int)round($admG * .82), (int)round($admB * .82));
+$admRadius = max(0, min(8, (int)config('admin_radius', 0)));
 
 // 定位当前菜单分组与名称
 $activeGroup = '';
@@ -58,7 +59,7 @@ foreach ($menu as $gk => $group) {
     <title><?= h($pageTitle) ?> - <?= h((string)config('site_name', 'ChatBBS')) ?> 管理后台</title>
     <script>try { if (localStorage.getItem('adm_theme') === 'dark') { document.documentElement.dataset.admTheme = 'dark'; } } catch (e) {}</script>
     <link rel="stylesheet" href="<?= h(admin_asset('css/admin.css') . '?v=' . CB_VERSION) ?>">
-    <style>:root{--adm-primary:<?= h($admPrimary) ?>;--adm-primary-dark:<?= h($admPrimaryDark) ?>;--adm-side-active:<?= h($admPrimary) ?>;}</style>
+    <style>:root{--adm-primary:<?= h($admPrimary) ?>;--adm-primary-dark:<?= h($admPrimaryDark) ?>;--adm-side-active:<?= h($admPrimary) ?>;--adm-radius:<?= (int)$admRadius ?>px;}</style>
 </head>
 <body>
 <div class="adm-wrap">

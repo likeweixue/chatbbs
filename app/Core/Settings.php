@@ -64,7 +64,7 @@ class Settings
         'allow_user_tag' => '0',
         'max_tags' => '5',
         'thread_audit' => '0',
-        'say_enable' => '1',
+        'say_enable' => '0',
         'say_audit' => '0',
         'say_allow_image' => '1',
         'say_allow_comment' => '1',
@@ -135,6 +135,16 @@ class Settings
         'theme_island_opacity' => '100',
         'theme_footer_bg' => '#ffffff',
         'theme_forum_header_bg' => '#f7f8fa',
+        // 后台圆角（与前台圆角分开控制）
+        'admin_radius' => '0',
+        // 头像形状：circle 圆形 / square 圆角方形
+        'avatar_shape' => 'circle',
+        // 友链在双栏页脚上方展示
+        'links_in_footer' => '1',
+        // 允许访客自行切换前台布局（双栏 / 单栏 / 三栏）
+        'layout_user_switch' => '1',
+        // 单栏布局内容宽度（px）
+        'single_width' => '',
         'theme_footer_text' => '#4e5969',
         'theme_footer_opacity' => '100',
         // 网站导航页

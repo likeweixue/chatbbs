@@ -165,6 +165,29 @@
     });
   }
 
+  /* ---------- 布局切换下拉 ---------- */
+  var layoutBtn = document.getElementById('btn-layout');
+  var layoutMenu = document.getElementById('menu-layout');
+  if (layoutBtn && layoutMenu) {
+    layoutBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = layoutMenu.classList.toggle('show');
+      layoutBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!layoutMenu.contains(e.target) && !layoutBtn.contains(e.target)) {
+        layoutMenu.classList.remove('show');
+        layoutBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        layoutMenu.classList.remove('show');
+        layoutBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
   /* ---------- 语言切换下拉 ---------- */
   var langBtn = document.getElementById('btn-lang');
   var langMenu = document.getElementById('menu-lang');

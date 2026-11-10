@@ -135,7 +135,7 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
   };
 </script>
 </head>
-<body class="cb-body<?= $island ? ' cb-island' : '' ?><?= $single ? ' cb-single' : '' ?><?= $diyImage !== '' ? ' cb-has-diy' : '' ?>">
+<body class="cb-body<?= $island ? ' cb-island' : '' ?><?= $single ? ' cb-single' : '' ?><?= $diyImage !== '' ? ' cb-has-diy' : '' ?><?= (string)config('avatar_shape', 'circle') === 'square' ? ' cb-avatar-square' : '' ?>"<?php if ($single): ?><?php $singleW = max(0, min(1800, (int)config('single_width', 0))); ?> style="--single-width:<?= (int)($singleW > 0 ? $singleW : 1200) ?>px"<?php endif; ?>>
 <?php if ($diyImage !== '' && $diyPos === 'global'): ?>
 <div class="cb-diy-global" style="background-image:url('<?= h($diyImage) ?>');opacity:<?= $diyOpacityCss ?>" aria-hidden="true"></div>
 <?php endif; ?>
@@ -211,6 +211,29 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
                  value="<?= h(\App\Core\Request::get('q', '')) ?>">
         </form>
         <?php endif; ?>
+
+        <?php
+        $layoutOptions = \App\Services\LayoutPreference::options();
+        $layoutSwitchable = \App\Services\LayoutPreference::userSwitchable();
+        ?>
+        <div class="cb-dropdown cb-layout-menu">
+          <button class="cb-icon-btn<?= $layoutSwitchable ? '' : ' off' ?>" id="btn-layout" type="button"
+                  title="<?= $layoutSwitchable ? L('布局') : L('站点未开放布局自定义') ?>"
+                  aria-haspopup="true" aria-expanded="false"<?= $layoutSwitchable ? '' : ' disabled' ?>>
+            <?= cb_icon('layout') ?>
+          </button>
+          <?php if ($layoutSwitchable): ?>
+          <div class="cb-dropdown__menu" id="menu-layout">
+            <div class="head"><span><?= cb_icon('layout') ?> <?= L('布局') ?></span></div>
+            <div class="cb-theme-menu__list">
+              <?php foreach ($layoutOptions as $lk => $ln): ?>
+                <a class="cb-theme-choice <?= $layoutMode === $lk ? 'on' : '' ?>"
+                   href="<?= h(url('layout/' . rawurlencode($lk) . '?back=' . rawurlencode((string)($_SERVER['REQUEST_URI'] ?? '/')))) ?>"><?= h($ln) ?></a>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <?php endif; ?>
+        </div>
 
         <div class="cb-dropdown cb-theme-menu">
           <button class="cb-icon-btn" id="btn-theme" type="button" title="<?= L('外观 / 色调') ?>" aria-haspopup="true">
@@ -436,6 +459,50 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
          aria-valuenow="280" tabindex="0"></div>
   <?php endif; ?>
 </main>
+
+<?php
+// 双栏布局：页脚上方增加统计 / 友情链接面板
+$footerStats = null;
+$footerLinks = [];
+if (!$island && !$single) {
+    $footerStats = \App\Services\FooterStats::stats();
+    $footerLinks = \App\Services\FooterStats::links();
+}
+?>
+<?php if ($footerStats): ?>
+<div class="cb-footer-panels">
+  <div class="cb-card">
+    <div class="cb-card__header"><?= L('论坛统计') ?></div>
+    <div class="cb-card__body">
+      <div class="cb-footer-stats">
+        <div class="cb-footer-stats__item"><b><?= (int)$footerStats['threads'] ?></b><span><?= L('主题') ?></span></div>
+        <div class="cb-footer-stats__item"><b><?= (int)$footerStats['posts'] ?></b><span><?= L('回复') ?></span></div>
+        <div class="cb-footer-stats__item"><b><?= (int)$footerStats['users'] ?></b><span><?= L('会员') ?></span></div>
+        <div class="cb-footer-stats__item"><b><?= (int)$footerStats['today_threads'] ?></b><span><?= L('今日新帖') ?></span></div>
+        <div class="cb-footer-stats__item"><b><?= (int)$footerStats['today_posts'] ?></b><span><?= L('今日回复') ?></span></div>
+        <div class="cb-footer-stats__item"><b><?= (int)$footerStats['today_users'] ?></b><span><?= L('今日注册') ?></span></div>
+      </div>
+      <?php if (!empty($footerStats['newest'])): ?>
+        <div class="cb-footer-stats__newest">
+          <?= L('最新会员：') ?><a href="<?= h(url('user/' . (int)$footerStats['newest']['id'])) ?>"><?= h((string)$footerStats['newest']['name']) ?></a>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+  <?php if ($footerLinks): ?>
+    <div class="cb-card">
+      <div class="cb-card__header"><?= L('友情链接') ?></div>
+      <div class="cb-card__body">
+        <div class="cb-footer-links">
+          <?php foreach ($footerLinks as $link): ?>
+            <a href="<?= h($link['url']) ?>" target="_blank" rel="nofollow noopener"><?= h($link['name']) ?></a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
 
 <footer class="cb-footer<?= ($diyImage !== '' && $diyPos === 'bottom') ? ' cb-footer--diy' : '' ?>"
         <?php if ($diyImage !== '' && $diyPos === 'bottom'): ?>style="--diy-image:url('<?= h($diyImage) ?>');--diy-opacity:<?= $diyOpacityCss ?>;--diy-feather:<?= (int)$diyFeather ?>px"<?php endif; ?>>

@@ -20,7 +20,25 @@
         });
     });
 
-    /* 提交确认 */
+    /* 子板块排列：提交时用隐藏字段兜底，避免个别浏览器 select 未随表单提交 */
+  document.querySelectorAll('form.adm-form').forEach(function (form) {
+    var sel = form.querySelector('#f-forum_columns');
+    if (!sel) return;
+    form.addEventListener('submit', function () {
+      var hidden = form.querySelector('input[type="hidden"][name="forum_columns"]');
+      if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'forum_columns';
+        form.appendChild(hidden);
+      }
+      hidden.value = sel.value;
+      // 隐藏字段已负责提交，移除原生 select 的 name 防止重复键
+      sel.removeAttribute('name');
+    });
+  });
+
+  /* 提交确认 */
     document.querySelectorAll('[data-confirm]').forEach(function (el) {
         el.addEventListener('click', function (e) {
             if (!confirm(el.getAttribute('data-confirm'))) {

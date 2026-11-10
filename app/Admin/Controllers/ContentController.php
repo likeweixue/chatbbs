@@ -309,7 +309,14 @@ class ContentController extends BaseAdmin
             }
             $icon = (string)$res['url'];
         }
-        $forumColumns = max(0, min(6, (int)Request::post('forum_columns', 0)));
+        // 浏览器未提交该字段时保留原值，避免任何异常情况下被重置为「列表（默认）」
+        $forumColumnsRaw = Request::post('forum_columns', null);
+        if ($forumColumnsRaw === null) {
+            $currentForum = $id > 0 ? Forum::find($id) : null;
+            $forumColumns = (int)($currentForum['forum_columns'] ?? 0);
+        } else {
+            $forumColumns = max(0, min(6, (int)$forumColumnsRaw));
+        }
         // 兼容尚未执行自动迁移的旧库：确保排列字段存在后再保存
         try {
             $hasColumns = Database::fetch(
@@ -367,6 +374,16 @@ class ContentController extends BaseAdmin
         } else {
             $id = Forum::create($data);
             $this->log('新增板块', $name);
+        }
+        // 校验子板块排列是否真正落库：旧库 / 自动迁移失败时用直接 SQL 再写一次
+        try {
+            $saved = (int)Database::value('SELECT forum_columns FROM ' . Database::table('forums') . ' WHERE id = ?', [$id], 0);
+            if ($saved !== $forumColumns) {
+                Database::query('UPDATE ' . Database::table('forums') . ' SET forum_columns = ? WHERE id = ?', [$forumColumns, $id]);
+                $this->log('子板块排列补写', 'ID:' . $id . ' ' . $forumColumns);
+            }
+        } catch (\Throwable $e) {
+            \App\Core\Logger::error('forum_columns 写入失败：' . $e->getMessage());
         }
         $this->back('板块已保存');
     }

@@ -671,11 +671,12 @@ class UserAdminController extends BaseAdmin
         $inMoney = (float)Database::value('SELECT SUM(amount) FROM ' . $lt . ' WHERE amount > 0', [], 0);
         $outMoney = (float)Database::value('SELECT SUM(amount) FROM ' . $lt . ' WHERE amount < 0', [], 0);
 
-        $html = '<div class="adm-stats">'
+        $html = '<div class="adm-panel"><div class="adm-panel-head">货币数据</div><div class="adm-panel-body">'
+            . '<div class="adm-stats">'
             . '<div class="adm-stat"><div class="adm-stat__label">全站货币总量</div><div class="adm-stat__value">' . money($totalMoney) . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">累计发放</div><div class="adm-stat__value" style="color:#27ae60">' . money($inMoney) . '</div></div>'
             . '<div class="adm-stat"><div class="adm-stat__label">累计消耗</div><div class="adm-stat__value" style="color:#e34d4d">' . money(abs($outMoney)) . '</div></div>'
-            . '</div>';
+            . '</div></div></div>';
 
         $html .= AdminUI::filter([
             'action' => admin_url('currency'),

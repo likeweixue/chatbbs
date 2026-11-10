@@ -442,7 +442,7 @@ if (!function_exists('cb_editor_icons')) {
             'code', 'fold', 'table', 'link', 'image', 'attach', 'emoji', 'undo', 'redo',
             'clear', 'md', 'preview', 'bgimage',
             'align-left', 'align-center', 'align-right', 'float-left', 'float-none',
-            'attachment-file', 'close', 'panel-right', 'columns', 'expand', 'collapse', 'sup', 'sub', 'task', 'toc', 'sample',
+            'attachment-file', 'close', 'panel-right', 'columns', 'expand', 'collapse', 'sup', 'sub', 'task', 'toc', 'sample', 'layout',
         ];
     }
 }
