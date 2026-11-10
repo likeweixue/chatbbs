@@ -309,6 +309,23 @@ class ContentController extends BaseAdmin
             }
             $icon = (string)$res['url'];
         }
+        // 自愈：确保 forum_columns 存在且能容纳 2-6（旧库可能残留 tinyint(1) 定义）
+        try {
+            $colDef = Database::fetch(
+                'SELECT COLUMN_TYPE AS t FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
+                [Database::table('forums'), 'forum_columns']
+            );
+            if (!$colDef) {
+                Database::query('ALTER TABLE ' . Database::table('forums')
+                    . ' ADD COLUMN `forum_columns` tinyint NOT NULL DEFAULT 0 COMMENT \'子板块每行列数，0 为列表\'');
+            } elseif (stripos((string)($colDef['t'] ?? ''), 'tinyint(1)') === 0) {
+                Database::query('ALTER TABLE ' . Database::table('forums')
+                    . ' MODIFY COLUMN `forum_columns` tinyint NOT NULL DEFAULT 0 COMMENT \'子板块每行列数，0 为列表\'');
+            }
+        } catch (\Throwable $e) {
+            \App\Core\Logger::error('forum_columns 字段检查失败：' . $e->getMessage());
+        }
         // 浏览器未提交该字段时保留原值，避免任何异常情况下被重置为「列表（默认）」
         $forumColumnsRaw = Request::post('forum_columns', null);
         if ($forumColumnsRaw === null) {
@@ -316,19 +333,6 @@ class ContentController extends BaseAdmin
             $forumColumns = (int)($currentForum['forum_columns'] ?? 0);
         } else {
             $forumColumns = max(0, min(6, (int)$forumColumnsRaw));
-        }
-        // 兼容尚未执行自动迁移的旧库：确保排列字段存在后再保存
-        try {
-            $hasColumns = Database::fetch(
-                'SHOW COLUMNS FROM ' . Database::table('forums') . ' LIKE ?',
-                ['forum_columns']
-            );
-            if (!$hasColumns) {
-                Database::query('ALTER TABLE ' . Database::table('forums')
-                    . ' ADD COLUMN `forum_columns` tinyint(1) NOT NULL DEFAULT 0 COMMENT \'子板块每行列数，0 为列表\'');
-            }
-        } catch (\Throwable $e) {
-            \App\Core\Logger::error('forum_columns 字段检查失败：' . $e->getMessage());
         }
         $data = [
             'name' => $name,

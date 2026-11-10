@@ -913,3 +913,6 @@ html[data-adm-theme="dark"] .adm-page-head { background: #232a36; }
 @media (max-width: 900px) {
     .adm-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
+
+/* 板块子板块排列：加宽下拉，避免长选项被截断 */
+#f-forum_columns { width: 300px; max-width: 100%; }

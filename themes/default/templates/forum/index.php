@@ -83,7 +83,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
   if (!$boards && !$hasTop) { continue; }
   $rows = $hasTop ? [$cat] : $boards;
   $catCols = max(0, min(6, (int)($cat['forum_columns'] ?? 0)));
-  $useGrid = $layout === 'grid' || (!$hasTop && $catCols >= 2);
+  $useGrid = $layout === 'grid' || ($catCols >= 2 && count($rows) > 1);
   ?>
   <div class="cb-card cb-forum-block">
     <?php if (!$hasTop): ?>

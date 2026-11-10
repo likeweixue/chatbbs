@@ -333,7 +333,7 @@ class Schema
             // 板块隐私：回复仅楼主可见 / 全板块匿名
             ['forums', 'private_replies', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'回复仅楼主可见\''],
             ['forums', 'force_anonymous', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'全板块匿名\''],
-            ['forums', 'forum_columns', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'子板块每行列数，0 为列表\''],
+            ['forums', 'forum_columns', 'tinyint NOT NULL DEFAULT 0 COMMENT \'子板块每行列数，0 为列表\''],
             // 帖子回复楼中楼
             ['posts', 'reply_to', 'int NOT NULL DEFAULT 0 COMMENT \'楼中楼：回复的目标楼层 ID\''],
             // 帖子版权许可证（license_options() 预设 key；custom 时内容存 license_custom）
