@@ -15,9 +15,6 @@ class FooterStats
     /** 是否显示友链面板（后台开关 + 存在配置） */
     public static function links(): array
     {
-        if ((int)Settings::get('links_in_footer', 1) !== 1) {
-            return [];
-        }
         $raw = (string)Settings::get('friend_links', '');
         $out = [];
         foreach (preg_split('/\r\n|\r|\n/', $raw) ?: [] as $line) {
