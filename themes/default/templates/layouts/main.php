@@ -497,9 +497,18 @@ if ($single) {
     <div class="cb-card">
       <div class="cb-card__header"><?= L('友情链接') ?></div>
       <div class="cb-card__body">
-        <div class="cb-footer-links">
-          <?php foreach ($footerLinks as $link): ?>
-            <a href="<?= h($link['url']) ?>" target="_blank" rel="nofollow noopener"><?= h($link['name']) ?></a>
+        <div class="cb-friend-list">
+          <?php foreach ($footerLinks as $link):
+            $host = (string)(parse_url($link['url'], PHP_URL_HOST) ?: '');
+            $favicon = $host !== '' ? 'https://' . $host . '/favicon.ico' : '';
+          ?>
+            <div class="cb-friend-item">
+              <?php if ($favicon !== ''): ?><img class="cb-friend-ico" src="<?= h($favicon) ?>" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><?php endif; ?>
+              <div class="cb-friend-main">
+                <h5><a href="<?= h($link['url']) ?>" target="_blank" rel="nofollow noopener"><?= h($link['name']) ?></a></h5>
+                <?php if (trim((string)($link['desc'] ?? '')) !== ''): ?><p><?= h((string)$link['desc']) ?></p><?php endif; ?>
+              </div>
+            </div>
           <?php endforeach; ?>
         </div>
       </div>

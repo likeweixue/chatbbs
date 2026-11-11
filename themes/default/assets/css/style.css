@@ -2646,3 +2646,28 @@ body.cb-single .cb-footer-panels { max-width: var(--single-width, 1200px); }
 
 /* ---------- 博客 ---------- */
 .cb-blog-content { font-size: 15px; line-height: 1.85; color: var(--color-text); word-break: break-word; }
+
+/* 单栏底部：统计 + 友情链接面板，宽度与内容区一致 */
+body.cb-single .cb-footer-panels {
+  display: block; width: 100%;
+  max-width: var(--single-width, 1200px);
+  margin: 0 auto 16px; padding: 0;
+}
+body.cb-single .cb-footer-panels .cb-card { margin-bottom: 12px; }
+body.cb-single .cb-footer-panels .cb-card:last-child { margin-bottom: 0; }
+.cb-friend-list { display: flex; flex-direction: column; }
+.cb-friend-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0; border-bottom: 1px dashed var(--color-border);
+}
+.cb-friend-item:last-child { border-bottom: 0; }
+.cb-friend-ico {
+  width: 32px; height: 32px; flex: none; object-fit: contain;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+}
+.cb-friend-main { min-width: 0; }
+.cb-friend-main h5 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.cb-friend-main h5 a { color: var(--color-text); }
+.cb-friend-main h5 a:hover { color: var(--color-primary); }
+.cb-friend-main p { margin: 0; font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }

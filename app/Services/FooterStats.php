@@ -25,16 +25,17 @@ class FooterStats
             if ($line === '') {
                 continue;
             }
-            $parts = preg_split('/\s*\|\s*|\s*,\s*/', $line, 2);
-            $url = trim((string)($parts[0] ?? ''));
-            $name = trim((string)($parts[1] ?? $url));
+            $parts = preg_split('/\s*\|\s*/', $line);
+            $name = trim((string)($parts[0] ?? ''));
+            $url = trim((string)($parts[1] ?? ''));
+            $desc = trim((string)($parts[2] ?? ''));
             if ($url === '') {
                 continue;
             }
             if (!preg_match('#^https?://#i', $url)) {
                 $url = 'https://' . $url;
             }
-            $out[] = ['name' => $name, 'url' => $url];
+            $out[] = ['name' => $name !== '' ? $name : $url, 'url' => $url, 'desc' => $desc];
         }
         return $out;
     }

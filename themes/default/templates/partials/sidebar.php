@@ -202,8 +202,11 @@ $editingPage = (string)($editing_page ?? '');
         <div class="cb-card__header"><?= L('友情链接') ?></div>
         <div class="cb-card__body">
           <?php foreach ($links as $link):
-            $parts = preg_split('/\s*\|\s*|\s*,\s*/', $link, 2);
-            $u = $parts[0] ?? ''; $n = $parts[1] ?? $u;
+            $parts = preg_split('/\s*\|\s*/', $link);
+            $n = trim((string)($parts[0] ?? ''));
+            $u = trim((string)($parts[1] ?? ''));
+            if ($u === '') { $u = $n; }
+            if ($n === '') { $n = $u; }
             if (strpos($u, 'http') !== 0) $u = 'https://' . $u;
           ?>
             <div class="cb-list-item"><a class="t" href="<?= h($u) ?>" target="_blank" rel="nofollow noopener"><?= h($n) ?></a></div>
