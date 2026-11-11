@@ -122,6 +122,10 @@ abstract class BaseController
                 $out[] = ['key' => 'rank', 'title' => '排行榜', 'url' => '', 'link' => false];
             }
         }
+        // 「我的帖子」：登录后显示，只筛选自己发布的主题
+        if (Auth::check()) {
+            $out[] = ['key' => 'mine', 'title' => '我的帖子', 'url' => '', 'link' => false];
+        }
         return $out;
     }
 
@@ -136,7 +140,7 @@ abstract class BaseController
         $tab = (string)Request::get('tab', '');
         $legacy = (string)Request::get('order', '');
 
-        $res = ['tab' => $tab, 'order' => 'default', 'essence' => 0, 'mark_id' => 0, 'digest' => 0, 'recommend_kind' => 0];
+        $res = ['tab' => $tab, 'order' => 'default', 'essence' => 0, 'mark_id' => 0, 'digest' => 0, 'recommend_kind' => 0, 'user_id' => 0];
 
         // 兼容旧的 ?order=xxx
         if ($tab === '' && in_array($legacy, ['default', 'new', 'hot', 'replies', 'essence', 'recommend', 'avoid'], true)) {
@@ -163,6 +167,9 @@ abstract class BaseController
         } elseif ($tab === 'avoid') {
             $res['recommend_kind'] = -1;
             $res['order'] = 'default';
+        } elseif ($tab === 'mine') {
+            $res['user_id'] = (int)Auth::id();
+            $res['order'] = 'new';
         } elseif (in_array($tab, ['new', 'hot', 'replies', 'default'], true)) {
             $res['order'] = $tab;
         }

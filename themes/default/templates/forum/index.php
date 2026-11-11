@@ -90,7 +90,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
       <div class="cb-card__header cb-forum-block__head">
         <?= forum_icon_html($cat, 'cb-forum-block__icon') ?><a class="cb-forum-block__title" href="<?= h(url('forum/' . $cat['id'])) ?>"><?= h($cat['name']) ?></a>
         <span class="more"><?= count($boards) ?> 个板块</span>
-        <button class="cb-forum-toggle" type="button" title="<?= L('收起 / 展开') ?>" data-toggle-cat="<?= (int)$cat['id'] ?>">−</button>
+        <button class="cb-forum-toggle" type="button" title="<?= L('收起 / 展开') ?>" aria-label="<?= L('收起 / 展开') ?>" data-toggle-cat="<?= (int)$cat['id'] ?>"></button>
       </div>
     <?php else: ?>
       <div class="cb-card__header"><?= L('板块总览') ?>
@@ -145,7 +145,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
       try { saved = localStorage.getItem('cb_cat_' + id); } catch (e) {}
       var hidden = saved === '1';
       body.classList.toggle('is-collapsed', hidden);
-      btn.textContent = hidden ? '+' : '\u2212';
+      btn.classList.toggle('is-collapsed', hidden);
       btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
       var card = btn.closest('.cb-forum-block');
       if (card) { card.classList.toggle('is-collapsed', hidden); }
@@ -158,7 +158,7 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
     var body = document.getElementById('cat-' + id);
     if (!body) return;
     var hidden = body.classList.toggle('is-collapsed');
-    btn.textContent = hidden ? '+' : '\u2212';
+    btn.classList.toggle('is-collapsed', hidden);
     btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
     var card = btn.closest('.cb-forum-block');
     if (card) { card.classList.toggle('is-collapsed', hidden); }

@@ -14,6 +14,19 @@ class HomeController extends BaseController
 {
     public function index(): string
     {
+        // 后台指定了某个菜单作为首页时，跳转到该链接（例如首页 = 板块页）
+        $homeMenuId = (int)Settings::get('home_menu_id', 0);
+        if ($homeMenuId > 0) {
+            $home = \App\Core\Database::fetch('SELECT url FROM ' . \App\Core\Database::table('menus') . ' WHERE id = ?', [$homeMenuId]);
+            if ($home && ($home['url'] ?? '') !== '') {
+                $url = (string)$home['url'];
+                if (str_starts_with($url, '/')) {
+                    $url = site_base() . ltrim($url, '/');
+                }
+                redirect($url);
+            }
+        }
+
         $perPage = max(5, (int)Settings::get('threads_per_page', 20));
         $page = max(1, (int)\App\Core\Request::int('page', 1));
         $tabRes = $this->resolveTab();
@@ -31,6 +44,7 @@ class HomeController extends BaseController
             'mark_id' => $tabRes['mark_id'],
             'digest' => $tabRes['digest'],
             'recommend_kind' => $tabRes['recommend_kind'],
+            'user_id' => $tabRes['user_id'],
             'positive' => $positive,
         ]);
         $tabQuery = '?tab=' . rawurlencode($tabRes['tab']);

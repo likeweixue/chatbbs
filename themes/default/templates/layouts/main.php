@@ -453,6 +453,7 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
       'show_toc' => false,
       'sidebar_class' => 'cb-island-sidebar',
       'sidebar_tools' => true,
+      'mods_key' => 'island_sidebar_modules',
     ])) ?>
     <div class="cb-island-resizer cb-island-resizer--aside" id="island-aside-resizer" role="separator"
          aria-orientation="vertical" aria-label="<?= L('拖拽调整侧栏宽度') ?>" aria-valuemin="200" aria-valuemax="360"

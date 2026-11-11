@@ -3,7 +3,8 @@
  * 侧边栏：按后台「侧边栏管理」配置的顺序渲染模块
  */
 $defaultMods = 'about,stats,checkin,calendar,newest_users,newest_threads,tags,links';
-$rawMods = trim((string)config('sidebar_modules', ''));
+$modsKey = (string)($mods_key ?? 'sidebar_modules');
+$rawMods = trim((string)config($modsKey, ''));
 $mods = array_values(array_filter(array_map('trim', explode(',', $rawMods !== '' ? $rawMods : $defaultMods))));
 
 // 侧栏「关于 / 统计」卡片始终展示全站统计：个人主页等页面传入的 $stats 是用户维度，缺少全站字段

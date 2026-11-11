@@ -163,8 +163,12 @@ class Settings
         'reader_sources' => '',
         // 前台布局：classic 经典 / island 岛屿（左侧菜单 + 内容区，预览）
         'site_layout' => 'classic',
+        // 首页指向的菜单 ID：0 表示默认首页（最新帖子），>0 表示跳转到该菜单链接
+        'home_menu_id' => '0',
         // 岛屿布局左侧菜单：每行「类型|标题|链接」，类型 posts/forums/tags/link/divider
         'island_menu' => "posts|帖子\nforums|板块分区\ntags|标签",
+        // 三栏布局右侧栏模块（与双栏侧边栏互相独立）
+        'island_sidebar_modules' => 'newthread,about,calendar,stats,checkin,newest_users,newest_threads,tags,links',
         'island_sidebar_side' => 'left',
         'island_sidebar_width' => '240',
         'island_sidebar_default_hidden' => '0',

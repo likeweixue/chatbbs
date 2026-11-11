@@ -126,9 +126,14 @@ class ContentController extends BaseAdmin
                         ? '<button type="button" class="adm-forum-caret" data-forum-caret="' . (int)$r['id'] . '" aria-label="展开/收起">▾</button>'
                         : '<span class="adm-forum-caret adm-forum-caret--empty"></span>';
                     $indent = $depth > 0 ? ' style="padding-left:' . (18 + $depth * 18) . 'px"' : '';
+                    $isCat = (int)$r['type'] === 1;
+                    $quickAdd = $isCat
+                        ? '<button type="button" class="adm-forum-add" data-forum-add="' . (int)$r['id'] . '" data-add-url="' . h(admin_url('forums/quick-add')) . '" title="在该分区下新增板块" aria-label="在该分区下新增板块">＋</button>'
+                        : '';
                     return '<span class="adm-forum-name"' . $indent . '>' . $toggle
                         . '<span class="adm-color-dot" style="background:' . h((string)$r['color']) . '"></span>'
-                        . '<a href="' . h(admin_url('forums/edit/' . (int)$r['id'])) . '">' . h((string)$r['name']) . '</a>'
+                        . '<input type="text" class="adm-forum-inline" value="' . h((string)$r['name']) . '" data-forum-id="' . (int)$r['id'] . '" data-rename-url="' . h(admin_url('forums/rename')) . '" aria-label="板块名称" autocomplete="off">'
+                        . $quickAdd
                         . ((int)$r['visible'] === 0 ? ' <span class="adm-tag gray">隐藏</span>' : '')
                         . '</span>';
                 }],
@@ -214,6 +219,56 @@ class ContentController extends BaseAdmin
         }
         $this->log('调整板块排序', 'ID:' . $id . ' ' . $dir);
         $this->json(['ok' => true, 'msg' => '排序已更新']);
+    }
+
+    /**
+     * 板块列表内联改名
+     */
+    public function forumRename(): void
+    {
+        $id = Request::int('id');
+        $name = trim((string)Request::post('name', ''));
+        if ($name === '') {
+            $this->json(['ok' => false, 'msg' => '名称不能为空']);
+        }
+        if (mb_strlen($name) > 80) {
+            $name = mb_substr($name, 0, 80);
+        }
+        $row = Database::fetch('SELECT id FROM ' . Database::table('forums') . ' WHERE id = ?', [$id]);
+        if (!$row) {
+            $this->json(['ok' => false, 'msg' => '板块不存在']);
+        }
+        Database::update('forums', ['name' => $name], 'id = ?', ['i' => $id]);
+        $this->log('内联改名板块', 'ID:' . $id . ' → ' . $name);
+        $this->json(['ok' => true, 'name' => $name]);
+    }
+
+    /**
+     * 在分区下快速新增一个板块（默认名称：新增板块）
+     */
+    public function forumQuickAdd(): void
+    {
+        $parentId = Request::int('parent_id');
+        $parent = Database::fetch('SELECT id, name FROM ' . Database::table('forums') . ' WHERE id = ?', [$parentId]);
+        if (!$parent) {
+            $this->json(['ok' => false, 'msg' => '父级板块不存在']);
+        }
+        $max = (int)Database::value('SELECT MAX(sort_order) FROM ' . Database::table('forums') . ' WHERE parent_id = ?', [$parentId], 0);
+        $name = '新增板块';
+        $slug = 'board-' . substr(md5((string)$parentId . microtime(true)), 0, 6);
+        $id = Forum::create([
+            'parent_id' => $parentId,
+            'name' => $name,
+            'slug' => $slug,
+            'type' => 2,
+            'description' => '',
+            'icon' => '',
+            'color' => '#4D698E',
+            'sort_order' => $max + 1,
+            'visible' => 1,
+        ]);
+        $this->log('快速新增板块', '父级 ID:' . $parentId);
+        $this->json(['ok' => true, 'id' => $id, 'name' => $name]);
     }
 
     public function forumForm(int $id = 0): string

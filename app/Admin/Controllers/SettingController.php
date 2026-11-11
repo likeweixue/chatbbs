@@ -461,7 +461,11 @@ class SettingController extends BaseAdmin
     public function menus(): string
     {
         $rows = Database::fetchAll('SELECT * FROM ' . Database::table('menus') . ' ORDER BY sort_order ASC, id ASC');
-        $html = AdminUI::table([
+        $homeMenuId = (int)Settings::get('home_menu_id', 0);
+        $html = '<form id="menu-home-form" method="post" action="' . h(admin_url('menus/home')) . '" style="margin:0">' . csrf_field() . '</form>'
+            . '<div class="adm-toolbar"><span class="adm-form-tip" style="margin:0">在下方「首页」列选中一个菜单，点击「保存首页」后，前台首页将跳转到该菜单链接。</span><div class="spacer"></div>'
+            . '<button class="adm-btn primary" type="submit" form="menu-home-form">保存首页</button></div>';
+        $html .= AdminUI::table([
             'primary' => 'id',
             'rows' => $rows,
             'columns' => [
@@ -472,6 +476,7 @@ class SettingController extends BaseAdmin
                 ['key' => 'target', 'label' => '打开方式', 'width' => '90px'],
                 ['key' => 'visible', 'label' => '显示', 'width' => '70px', 'render' => fn($r) => (int)$r['visible'] === 1
                     ? '<span class="adm-tag green">是</span>' : '<span class="adm-tag gray">否</span>'],
+                ['key' => 'home', 'label' => '首页', 'width' => '70px', 'render' => fn($r) => '<input type="radio" name="home_menu_id" value="' . (int)$r['id'] . '" form="menu-home-form"' . ($homeMenuId === (int)$r['id'] ? ' checked' : '') . '>'],
                 ['key' => 'sort_order', 'label' => '排序', 'width' => '70px'],
             ],
             'actions' => [
@@ -523,6 +528,24 @@ class SettingController extends BaseAdmin
         }
         $this->log('保存菜单', $data['title']);
         $this->back('菜单已保存');
+    }
+
+    public function menuHome(): void
+    {
+        $id = Request::int('home_menu_id', 0);
+        if ($id === 0) {
+            Settings::set('home_menu_id', '0');
+            $this->log('取消首页菜单跳转');
+            $this->back('已恢复默认首页');
+        }
+        $menu = Database::fetch('SELECT id FROM ' . Database::table('menus') . ' WHERE id = ?', [$id]);
+        if (!$menu) {
+            $this->back('菜单不存在', 'error');
+        }
+        Settings::set('home_menu_id', (string)$id);
+        \App\Core\Cache::forget('settings');
+        $this->log('设置首页菜单', 'ID:' . $id);
+        $this->back('首页菜单已保存');
     }
 
     public function menuDelete(int $id): void

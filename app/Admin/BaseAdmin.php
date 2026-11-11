@@ -40,6 +40,9 @@ abstract class BaseAdmin
             'setting' => '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 10.6 3.09V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 16.11 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 20.43 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
             'ext' => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
             'system' => '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+            'interface' => '<path d="M12 3a9 9 0 0 0 0 18c1 0 1.8-.5 2.2-1.2.4-.6.4-1.4 0-2-.3-.5-.9-1.1-.9-1.8 0-1.1 1-2 2.1-2H18a6 6 0 0 0 6-6c0-2.7-5.4-5-12-5z"/><circle cx="7.5" cy="12" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="9" r="1"/>',
+            'circle' => '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+            'shop' => '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.5a2 2 0 0 0 2 1.5h8.7a2 2 0 0 0 2-1.6L22 8H6"/>',
         ];
         $body = $paths[$key] ?? '<circle cx="12" cy="12" r="9"/>';
         return '<svg class="adm-nav-icon adm-nav-icon--svg" viewBox="0 0 24 24" fill="none"'
@@ -52,6 +55,42 @@ abstract class BaseAdmin
             'label' => '仪表盘', 'icon' => '📊', 'icon_key' => 'dashboard', 'url' => '',
             'items' => [
                 ['label' => '全局概览', 'url' => '', 'key' => 'dashboard.index'],
+            ],
+        ],
+        'setting' => [
+            'label' => '论坛设置', 'icon' => '⚙️', 'icon_key' => 'setting',
+            'items' => [
+                ['label' => '站点设置', 'url' => 'settings', 'key' => 'settings'],
+                ['label' => '功能开关', 'url' => 'settings/features', 'key' => 'settings.features'],
+                ['label' => '货币规则', 'url' => 'settings/currency', 'key' => 'settings.currency'],
+                ['label' => '权限设置', 'url' => 'settings/permissions', 'key' => 'settings.permissions'],
+                ['label' => '安全设置', 'url' => 'settings/security', 'key' => 'settings.security'],
+                ['label' => '列表筛选', 'url' => 'list-tabs', 'key' => 'list_tabs'],
+                ['label' => '导航链接', 'url' => 'nav-links', 'key' => 'nav_links'],
+                ['label' => '邮箱配置', 'url' => 'mail', 'key' => 'mail'],
+                ['label' => '通知管理', 'url' => 'notifications', 'key' => 'notifications'],
+            ],
+        ],
+        'interface' => [
+            'label' => '界面设置', 'icon' => '🎨', 'icon_key' => 'interface',
+            'items' => [
+                ['label' => '单栏设置', 'url' => 'interface/single', 'key' => 'interface.single'],
+                ['label' => '双栏设置', 'url' => 'interface/double', 'key' => 'interface.double'],
+                ['label' => '三栏设置', 'url' => 'interface/triple', 'key' => 'interface.triple'],
+                ['label' => '菜单管理', 'url' => 'menus', 'key' => 'menus'],
+            ],
+        ],
+        'user' => [
+            'label' => '用户管理', 'icon' => '👥', 'icon_key' => 'user',
+            'items' => [
+                ['label' => '用户列表', 'url' => 'users', 'key' => 'users'],
+                ['label' => '用户组', 'url' => 'groups', 'key' => 'groups'],
+                ['label' => '认证管理', 'url' => 'certs', 'key' => 'certs'],
+                ['label' => '等级管理', 'url' => 'levels', 'key' => 'levels'],
+                ['label' => '勋章管理', 'url' => 'medals', 'key' => 'medals'],
+                ['label' => '签到记录', 'url' => 'checkins', 'key' => 'checkins'],
+                ['label' => '货币管理', 'url' => 'currency', 'key' => 'currency'],
+                ['label' => '聊天管理', 'url' => 'messages', 'key' => 'messages'],
             ],
         ],
         'content' => [
@@ -70,33 +109,16 @@ abstract class BaseAdmin
                 ['label' => '群聊管理', 'url' => 'chat-groups', 'key' => 'chat_groups'],
             ],
         ],
-        'user' => [
-            'label' => '用户管理', 'icon' => '👥', 'icon_key' => 'user',
+        'circle' => [
+            'label' => '圈子', 'icon' => '⭕', 'icon_key' => 'circle',
             'items' => [
-                ['label' => '用户列表', 'url' => 'users', 'key' => 'users'],
-                ['label' => '用户组', 'url' => 'groups', 'key' => 'groups'],
-                ['label' => '认证管理', 'url' => 'certs', 'key' => 'certs'],
-                ['label' => '等级管理', 'url' => 'levels', 'key' => 'levels'],
-                ['label' => '勋章管理', 'url' => 'medals', 'key' => 'medals'],
-                ['label' => '签到记录', 'url' => 'checkins', 'key' => 'checkins'],
-                ['label' => '货币管理', 'url' => 'currency', 'key' => 'currency'],
-                ['label' => '聊天管理', 'url' => 'messages', 'key' => 'messages'],
+                ['label' => '圈子管理', 'url' => 'circles', 'key' => 'circles'],
             ],
         ],
-        'setting' => [
-            'label' => '论坛设置', 'icon' => '⚙️', 'icon_key' => 'setting',
+        'shop' => [
+            'label' => '商城', 'icon' => '🛒', 'icon_key' => 'shop',
             'items' => [
-                ['label' => '站点设置', 'url' => 'settings', 'key' => 'settings'],
-                ['label' => '功能开关', 'url' => 'settings/features', 'key' => 'settings.features'],
-                ['label' => '货币规则', 'url' => 'settings/currency', 'key' => 'settings.currency'],
-                ['label' => '权限设置', 'url' => 'settings/permissions', 'key' => 'settings.permissions'],
-                ['label' => '安全设置', 'url' => 'settings/security', 'key' => 'settings.security'],
-                ['label' => '菜单管理', 'url' => 'menus', 'key' => 'menus'],
-                ['label' => '侧边栏管理', 'url' => 'sidebar', 'key' => 'sidebar'],
-                ['label' => '列表筛选', 'url' => 'list-tabs', 'key' => 'list_tabs'],
-                ['label' => '导航链接', 'url' => 'nav-links', 'key' => 'nav_links'],
-                ['label' => '邮箱配置', 'url' => 'mail', 'key' => 'mail'],
-                ['label' => '通知管理', 'url' => 'notifications', 'key' => 'notifications'],
+                ['label' => '商品管理', 'url' => 'shops', 'key' => 'shops'],
             ],
         ],
         'ext' => [
@@ -199,6 +221,11 @@ abstract class BaseAdmin
             'settings.security' => '安全 密码 超级密码 二级密码 独立密码 二次验证 验证码 注册 上传 锁定 安全设置 timeout 自动退出',
             'menus' => '菜单 导航 nav',
             'sidebar' => '侧边栏 模块 面板 sidebar',
+            'interface.single' => '单栏 布局 宽度',
+            'interface.double' => '双栏 侧边栏 模块',
+            'interface.triple' => '三栏 工作台 侧边栏 模块',
+            'circles' => '圈子 circle 群组',
+            'shops' => '商城 商品 shop',
             'list_tabs' => '筛选 列表 标签栏 tabs 分类',
             'mail' => '邮箱 smtp 邮件 email 发件 信箱',
             'notifications' => '通知 广播 公告 notice',

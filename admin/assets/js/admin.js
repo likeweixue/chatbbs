@@ -167,6 +167,49 @@
         });
     });
 
+    /* ---- 板块内联改名 + 分区快速新增 ---- */
+    (function () {
+        var csrf = window.CB_ADMIN_CSRF || '';
+        document.addEventListener('keydown', function (e) {
+            var input = e.target.closest('.adm-forum-inline');
+            if (!input) return;
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                input.blur();
+            }
+        });
+        document.addEventListener('change', function (e) {
+            var input = e.target.closest('.adm-forum-inline');
+            if (!input) return;
+            var id = input.getAttribute('data-forum-id');
+            var url = input.getAttribute('data-rename-url');
+            var name = input.value.trim();
+            if (!name) { input.value = input.defaultValue; return; }
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                body: '_csrf=' + encodeURIComponent(csrf) + '&id=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(name)
+            }).then(function (r) { return r.json(); }).then(function (res) {
+                if (res.ok) { input.defaultValue = res.name; input.value = res.name; }
+                else { input.value = input.defaultValue; alert(res.msg || '改名失败'); }
+            }).catch(function () { input.value = input.defaultValue; alert('网络异常'); });
+        });
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-forum-add]');
+            if (!btn || btn.disabled) return;
+            e.preventDefault();
+            btn.disabled = true;
+            fetch(btn.getAttribute('data-add-url'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                body: '_csrf=' + encodeURIComponent(csrf) + '&parent_id=' + encodeURIComponent(btn.getAttribute('data-forum-add') || '')
+            }).then(function (r) { return r.json(); }).then(function (res) {
+                if (res.ok) { location.reload(); }
+                else { alert(res.msg || '新增失败'); btn.disabled = false; }
+            }).catch(function () { alert('网络异常'); btn.disabled = false; });
+        });
+    })();
+
     /* 板块树：展开 / 收起 + 全部折叠 / 展开 */
     (function () {
         var rows = Array.prototype.slice.call(document.querySelectorAll('.adm-forum-row'));

@@ -79,6 +79,21 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC20：导航「首页」改名为「导读」，并初始化首页菜单设置
+        if ((int)Settings::get('migration_rc20_guide_home', 0) !== 1) {
+            try {
+                Database::query(
+                    'UPDATE ' . Database::table('menus') . " SET title = '导读' WHERE url = '/' AND title = '首页'"
+                );
+                if (Settings::get('home_menu_id', '') === '') {
+                    Settings::set('home_menu_id', '0');
+                }
+            } catch (\Throwable $e) {
+                Logger::error('RC20 导读迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc20_guide_home', 1);
+        }
+
         // RC18：说说功能默认关闭（老站升级一次；之后可在功能开关中重新开启）
         if ((int)Settings::get('migration_rc18_say_default_off', 0) !== 1) {
             try {

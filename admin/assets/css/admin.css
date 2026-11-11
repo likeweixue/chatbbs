@@ -490,7 +490,7 @@ html[data-adm-theme="dark"] .adm-theme-toggle .ico-light { display: none; }
 .adm-chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding: 10px 0; }
 .adm-chart-bars .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .adm-chart-bars .bar {
-    width: 100%; max-width: 46px; background: linear-gradient(180deg, #4f9bf5, #2f80ed);
+    width: 100%; max-width: 23px; background: linear-gradient(180deg, #4f9bf5, #2f80ed);
     border-radius: 4px 4px 0 0; min-height: 3px; transition: height .3s;
 }
 .adm-chart-bars .bar-label { font-size: 12px; color: var(--adm-text-2); }
@@ -724,6 +724,20 @@ html[data-adm-theme="dark"] .adm-logo span { color: var(--adm-side-title); }
 .adm-forum-row.is-collapsed > td .adm-forum-caret { transform: rotate(-90deg); }
 [data-forum-collapse-all] { color: var(--adm-primary) !important; text-decoration: none; white-space: nowrap; }
 [data-forum-collapse-all]:hover { text-decoration: underline; }
+.adm-forum-inline {
+    min-width: 0; max-width: 220px; height: 24px; padding: 0 6px;
+    border: 1px solid transparent; border-radius: 4px; background: transparent;
+    color: var(--adm-text); font: inherit; font-size: 13px;
+}
+.adm-forum-depth-0 > td:first-child .adm-forum-inline { font-weight: 600; }
+.adm-forum-inline:hover { border-color: var(--adm-border); background: var(--adm-input-bg, #fff); }
+.adm-forum-inline:focus { border-color: var(--adm-primary); background: var(--adm-input-bg, #fff); outline: none; }
+.adm-forum-add {
+    flex: none; width: 20px; height: 20px; padding: 0; line-height: 18px;
+    border: 1px solid var(--adm-border); border-radius: 4px; background: var(--adm-card);
+    color: var(--adm-text-2); cursor: pointer; font-size: 14px; text-align: center;
+}
+.adm-forum-add:hover { border-color: var(--adm-primary); color: var(--adm-primary); }
 
 /* 通用后台弹窗 */
 .adm-modal-mask { position: fixed; inset: 0; z-index: 900; display: flex; align-items: center; justify-content: center; background: rgba(16,24,40,.42); }

@@ -39,6 +39,8 @@ Router::group('', function () use ($C): void {
     Router::post('/forums/resync', $C . 'ContentController@forumResync', ['csrf']);
     Router::post('/forums/spotlight', $C . 'ContentController@forumSpotlightSave', ['csrf']);
     Router::post('/forums/sort', $C . 'ContentController@forumSort', ['csrf']);
+    Router::post('/forums/rename', $C . 'ContentController@forumRename', ['csrf']);
+    Router::post('/forums/quick-add', $C . 'ContentController@forumQuickAdd', ['csrf']);
 
     Router::get('/threads', $C . 'ContentController@threads');
     Router::get('/threads/edit/{id}', $C . 'ContentController@threadEdit');
@@ -88,6 +90,10 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::get('/chat-groups', $C . 'ChatGroupController@index');
     Router::get('/chat-groups/delete/{id}', $C . 'ChatGroupController@delete');
     Router::post('/chat-groups/settings', $C . 'ChatGroupController@saveSettings', ['csrf']);
+
+    /* ---------- 圈子 / 商城 ---------- */
+    Router::get('/circles', $C . 'CircleController@index');
+    Router::get('/shops', $C . 'ShopController@index');
 
     /* ---------- 用户管理 ---------- */
     Router::get('/users', $C . 'UserAdminController@users');
@@ -147,7 +153,19 @@ Router::post('/sidebar/island-menu', $C . 'SettingController@saveIslandMenu', ['
 
     Router::get('/menus', $C . 'SettingController@menus');
     Router::post('/menus/save', $C . 'SettingController@menuSave', ['csrf']);
+    Router::post('/menus/home', $C . 'SettingController@menuHome', ['csrf']);
     Router::post('/menus/delete/{id}', $C . 'SettingController@menuDelete', ['csrf']);
+
+    /* ---------- 界面设置 ---------- */
+    Router::get('/interface/single', $C . 'UiController@single');
+    Router::post('/interface/single/save', $C . 'UiController@saveSingle', ['csrf']);
+    Router::get('/interface/double', $C . 'UiController@double');
+    Router::post('/interface/double/save', $C . 'UiController@saveDouble', ['csrf']);
+    Router::post('/interface/double/modules', $C . 'UiController@saveDoubleModules', ['csrf']);
+    Router::get('/interface/triple', $C . 'UiController@triple');
+    Router::post('/interface/triple/save', $C . 'UiController@saveTriple', ['csrf']);
+    Router::post('/interface/triple/modules', $C . 'UiController@saveTripleModules', ['csrf']);
+    Router::post('/interface/triple/menu', $C . 'UiController@saveTripleMenu', ['csrf']);
 
     Router::get('/mail', $C . 'SettingController@mail');
     Router::post('/mail/save', $C . 'SettingController@mailSave', ['csrf']);
