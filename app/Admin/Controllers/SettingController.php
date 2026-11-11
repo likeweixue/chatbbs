@@ -71,7 +71,6 @@ class SettingController extends BaseAdmin
                     'tip' => '开启后，首页、板块页与个人中心默认只显示内容区；访客可点顶栏的侧栏按钮展开，选择会记录在浏览器中'],
                 ['name' => 'lang_switch', 'label' => '顶栏语言切换', 'type' => 'switch',
                     'tip' => '开启后前台顶栏显示 🌐 语言切换下拉；关闭则全站固定使用设定的「语言」'],
-                ['name' => 'sidebar_side', 'label' => '侧边栏位置', 'type' => 'select', 'options' => ['right' => '右侧', 'left' => '左侧']],
                 ['name' => 'list_compact', 'label' => '帖子列表简洁模式', 'type' => 'switch',
                     'tip' => '开启后首页/板块页的帖子列表不再显示正文摘要，改为紧凑单行显示，列表更清爽'],
                 ['name' => 'forum_layout', 'label' => '板块页布局', 'type' => 'select', 'options' => [
@@ -79,8 +78,6 @@ class SettingController extends BaseAdmin
                     'grid' => '网格（一行多个，紧凑）',
                 ], 'tip' => '板块总览页（/forums）的展示方式'],
                 ['name' => 'forum_grid_cols', 'label' => '网格每行板块数', 'type' => 'number', 'tip' => '仅"网格"布局生效，建议 3 - 5'],
-                ['name' => 'friend_links', 'label' => '友情链接', 'type' => 'textarea', 'tip' => '每行一条，格式：名称|网址'],
-                ['name' => 'sensitive_words', 'label' => '敏感词过滤', 'type' => 'textarea', 'tip' => '多个用英文逗号分隔，命中内容将被替换'],
             ],
         ]) . '</div></div>';
 
@@ -256,7 +253,7 @@ class SettingController extends BaseAdmin
             }
             foreach (['site_name', 'site_url', 'site_description', 'site_keywords', 'home_seo_title',
                 'logo_type', 'logo_text', 'site_icp', 'theme', 'language', 'site_access',
-                'closed_reason', 'sidebar_side', 'friend_links', 'sensitive_words', 'url_mode',
+                'closed_reason', 'url_mode',
                 'forum_layout', 'forum_grid_cols',
             ] as $k) {
                 $data[$k] = $this->pure($k, 0);

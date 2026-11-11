@@ -109,6 +109,7 @@ abstract class BaseAdmin
                 ['label' => '举报审核', 'url' => 'reports', 'key' => 'reports'],
                 ['label' => '违禁词库', 'url' => 'forbidden-words', 'key' => 'forbidden_words'],
                 ['label' => '群聊管理', 'url' => 'chat-groups', 'key' => 'chat_groups'],
+                ['label' => 'Wiki 维基', 'url' => 'wiki', 'key' => 'wiki'],
             ],
         ],
         'circle' => [
@@ -208,6 +209,7 @@ abstract class BaseAdmin
             'reports' => '举报 审核 投诉',
             'forbidden_words' => '违禁词 敏感词 屏蔽 词库 过滤',
             'chat_groups' => '群聊 聊天室 群组 group chat',
+            'wiki' => 'wiki 维基 词条 百科',
             'users' => '会员 成员 user 会员列表',
             'groups' => '用户组 组 权限组',
             'certs' => '认证 大v 身份',

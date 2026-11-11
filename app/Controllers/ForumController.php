@@ -48,6 +48,21 @@ class ForumController extends BaseController
                 'message' => '你没有权限访问该板块，可能需要登录或提升等级。',
             ]);
         }
+        // 分区（type=1）页面：先展示下属板块，而不是帖子列表
+        if ((int)$forum['type'] === 1) {
+            $boards = Forum::children($id, true);
+            foreach ($boards as &$b) {
+                $b['can_view'] = Forum::canView($b, $user);
+            }
+            unset($b);
+            return $this->render('forum/partition', [
+                'title' => (string)$forum['name'],
+                'forum' => $forum,
+                'boards' => $boards,
+                'stats' => Stats::forum(),
+            ]);
+        }
+
         $page = max(1, Request::int('page', 1));
         $perPage = max(5, (int)Settings::get('threads_per_page', 20));
         $tabRes = $this->resolveTab();

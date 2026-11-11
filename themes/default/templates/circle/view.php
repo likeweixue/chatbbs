@@ -1,3 +1,8 @@
+<?php if ((int)$circle['status'] === 0): ?>
+  <div class="cb-card" style="padding:12px 16px;margin-bottom:12px;color:var(--color-warning)">
+    <?= L('该圈子正在等待管理员审核，审核通过后才会出现在圈子列表中。') ?>
+  </div>
+<?php endif; ?>
 <div class="cb-card cb-circle-head">
   <div class="cb-card__body" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
     <div class="cb-circle-card__icon" style="background:<?= h((string)$circle['color']) ?>">

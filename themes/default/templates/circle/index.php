@@ -1,5 +1,10 @@
 <div class="cb-card">
-  <div class="cb-card__header"><?= L('圈子') ?></div>
+  <div class="cb-card__header">
+    <?= L('圈子') ?>
+    <?php if (!empty($can_create)): ?>
+      <a class="cb-btn sm cb-btn-newthread" href="<?= h(url('circle/create')) ?>" style="margin-left:auto"><?= L('创建圈子') ?></a>
+    <?php endif; ?>
+  </div>
   <div class="cb-card__body">
     <?php if (empty($circles)): ?>
       <div class="cb-empty" style="padding:24px"><?= L('还没有圈子') ?></div>

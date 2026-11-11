@@ -8,6 +8,7 @@ use App\Admin\AdminUI;
 use App\Admin\BaseAdmin;
 use App\Core\Database;
 use App\Core\Request;
+use App\Core\Settings;
 use App\Models\Forbidden;
 
 /**
@@ -73,7 +74,28 @@ class ForbiddenWordController extends BaseAdmin
 
         $html .= '</div></div>';
 
+        // 敏感词过滤（从站点设置迁移过来）
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">敏感词过滤</div><div class="adm-panel-body">'
+            . '<div class="adm-alert info">敏感词只做替换 / 转审核，不会直接阻止发布；多个用英文逗号分隔。</div>'
+            . AdminUI::form([
+                'action' => admin_url('forbidden-words/sensitive'),
+                'data' => Settings::all(),
+                'submit' => '保存敏感词',
+                'fields' => [
+                    ['name' => 'sensitive_words', 'label' => '敏感词列表', 'type' => 'textarea', 'rows' => 6,
+                        'tip' => '多个用英文逗号分隔，命中内容将被替换'],
+                ],
+            ]) . '</div></div>';
+
         return $this->pageView('违禁词库', 'forbidden_words', $html);
+    }
+
+    public function saveSensitive(): void
+    {
+        Settings::set('sensitive_words', $this->pure('sensitive_words', 5000));
+        \App\Core\Cache::forget('settings');
+        $this->log('修改敏感词');
+        $this->back('敏感词已保存');
     }
 
     public function add(): void

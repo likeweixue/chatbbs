@@ -150,6 +150,9 @@ class Settings
         // 商城：是否启用 / 是否允许普通用户发布商品
         'shop_enable' => '1',
         'shop_user_post' => '0',
+        // 圈子：是否允许普通用户创建 / 创建后是否需要审核
+        'circle_user_create' => '0',
+        'circle_need_audit' => '1',
         // 页脚右侧链接显示开关
         'footer_show_github' => '1',
         'footer_show_rss' => '1',

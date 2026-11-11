@@ -107,6 +107,16 @@ class Forum
         return Database::fetchAll('SELECT * FROM ' . Database::table('forums') . ' WHERE type = 2 ORDER BY sort_order, id');
     }
 
+    /** 某个分区 / 板块的直接子级 */
+    public static function children(int $parentId, bool $onlyVisible = true): array
+    {
+        $where = 'parent_id = ?' . ($onlyVisible ? ' AND visible = 1' : '');
+        return Database::fetchAll(
+            'SELECT * FROM ' . Database::table('forums') . ' WHERE ' . $where . ' ORDER BY sort_order, id',
+            [$parentId]
+        );
+    }
+
     public static function create(array $data): int
     {
         return Database::insert('forums', array_merge(['created_at' => date('Y-m-d H:i:s')], $data));
@@ -125,7 +135,11 @@ class Forum
 
     public static function canView(?array $forum, ?array $user): bool
     {
-        if (!$forum || !(int)$forum['visible']) {
+        if (!$forum) {
+            return false;
+        }
+        // 圈子对应的隐藏板块：允许正常浏览圈内帖子
+        if (!(int)$forum['visible'] && !str_starts_with((string)($forum['slug'] ?? ''), 'circle-')) {
             return false;
         }
         if ((int)$forum['need_login'] && !$user) {

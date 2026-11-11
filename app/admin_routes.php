@@ -83,6 +83,7 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     /* 违禁词库 */
     Router::get('/forbidden-words', $C . 'ForbiddenWordController@index');
     Router::post('/forbidden-words/add', $C . 'ForbiddenWordController@add', ['csrf']);
+    Router::post('/forbidden-words/sensitive', $C . 'ForbiddenWordController@saveSensitive', ['csrf']);
     Router::get('/forbidden-words/toggle/{id}', $C . 'ForbiddenWordController@toggle');
     Router::get('/forbidden-words/delete/{id}', $C . 'ForbiddenWordController@delete');
 
@@ -96,9 +97,15 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::post('/global/footer', $C . 'ExtController@globalFooterSave', ['csrf']);
     Router::post('/global/layout', $C . 'ExtController@globalLayoutSave', ['csrf']);
 
+    Router::get('/wiki', $C . 'WikiAdminController@index');
+    Router::post('/wiki/save', $C . 'WikiAdminController@save', ['csrf']);
+    Router::post('/wiki/delete/{id}', $C . 'WikiAdminController@delete', ['csrf']);
+
     Router::get('/circles', $C . 'CircleController@index');
     Router::post('/circles/save', $C . 'CircleController@save', ['csrf']);
     Router::post('/circles/delete/{id}', $C . 'CircleController@delete', ['csrf']);
+    Router::post('/circles/settings', $C . 'CircleController@settings', ['csrf']);
+    Router::post('/circles/approve/{id}', $C . 'CircleController@approve', ['csrf']);
     Router::get('/shops', $C . 'ShopController@index');
     Router::post('/shops/save', $C . 'ShopController@save', ['csrf']);
     Router::post('/shops/delete/{id}', $C . 'ShopController@delete', ['csrf']);

@@ -33,14 +33,32 @@ class CircleController extends BaseAdmin
                 ['key' => 'member_count', 'label' => '成员', 'width' => '80px'],
                 ['key' => 'is_open', 'label' => '加入', 'width' => '80px', 'render' => fn($r) => (int)$r['is_open'] === 1
                     ? '<span class="adm-tag green">开放</span>' : '<span class="adm-tag gray">审核</span>'],
-                ['key' => 'status', 'label' => '状态', 'width' => '80px', 'render' => fn($r) => (int)$r['status'] === 1
-                    ? '<span class="adm-tag green">显示</span>' : '<span class="adm-tag gray">隐藏</span>'],
+                ['key' => 'status', 'label' => '状态', 'width' => '80px', 'render' => fn($r) => match ((int)$r['status']) {
+                    0 => '<span class="adm-tag orange">待审核</span>',
+                    1 => '<span class="adm-tag green">显示</span>',
+                    default => '<span class="adm-tag gray">隐藏</span>',
+                }],
             ],
             'actions' => [
                 ['label' => '编辑', 'url' => admin_url('circles?edit={id}')],
+                ['label' => '通过', 'url' => admin_url('circles/approve/{id}'), 'type' => 'post', 'class' => 'success'],
                 ['label' => '删除', 'url' => admin_url('circles/delete/{id}'), 'type' => 'post', 'class' => 'danger', 'confirm' => '确定删除该圈子？'],
             ],
         ]);
+
+        // 圈子权限设置
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">圈子设置</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('circles/settings'),
+                'data' => \App\Core\Settings::all(),
+                'submit' => '保存圈子设置',
+                'fields' => [
+                    ['name' => 'circle_user_create', 'label' => '允许普通用户创建圈子', 'type' => 'switch',
+                        'tip' => '关闭时只有管理员可以创建圈子'],
+                    ['name' => 'circle_need_audit', 'label' => '用户创建的圈子需审核', 'type' => 'switch',
+                        'tip' => '开启后用户创建的圈子进入待审核，管理员通过后才在前台显示'],
+                ],
+            ]) . '</div></div>';
 
         $html .= '<div class="adm-panel"><div class="adm-panel-head">' . ($edit ? '编辑圈子' : '新增圈子') . '</div><div class="adm-panel-body">'
             . AdminUI::form([
@@ -101,6 +119,24 @@ class CircleController extends BaseAdmin
             $this->log('新增圈子', $name);
         }
         $this->back('圈子已保存');
+    }
+
+    public function approve(int $id): void
+    {
+        Circle::update($id, ['status' => 1]);
+        $this->log('通过圈子审核', 'ID:' . $id);
+        $this->back('圈子已通过审核');
+    }
+
+    public function settings(): void
+    {
+        \App\Core\Settings::setMany([
+            'circle_user_create' => Request::bool('circle_user_create') ? 1 : 0,
+            'circle_need_audit' => Request::bool('circle_need_audit') ? 1 : 0,
+        ]);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改圈子设置');
+        $this->back('圈子设置已保存');
     }
 
     public function delete(int $id): void

@@ -33,6 +33,8 @@ Router::get('/captcha', \App\Controllers\AuthController::class . '@captcha');
 
 // 圈子
 Router::get('/circles', \App\Controllers\CircleController::class . '@index');
+Router::get('/circle/create', \App\Controllers\CircleController::class . '@createForm', ['auth']);
+Router::post('/circle/create', \App\Controllers\CircleController::class . '@store', ['auth', 'csrf']);
 Router::get('/circle/{id}', \App\Controllers\CircleController::class . '@view');
 Router::post('/circle/{id}/join', \App\Controllers\CircleController::class . '@join', ['auth', 'csrf']);
 Router::post('/circle/{id}/leave', \App\Controllers\CircleController::class . '@leave', ['auth', 'csrf']);
