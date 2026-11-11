@@ -39,7 +39,7 @@ Router::get('/circle/{id}', \App\Controllers\CircleController::class . '@view');
 Router::post('/circle/{id}/join', \App\Controllers\CircleController::class . '@join', ['auth', 'csrf']);
 Router::post('/circle/{id}/leave', \App\Controllers\CircleController::class . '@leave', ['auth', 'csrf']);
 Router::get('/circle/{id}/post', \App\Controllers\CircleController::class . '@postForm', ['auth']);
-Router::post('/circle/{id}/post', \App\Controllers\CircleController::class . '@store', ['auth', 'csrf']);
+Router::post('/circle/{id}/post', \App\Controllers\CircleController::class . '@storePost', ['auth', 'csrf']);
 
 // 商城
 Router::get('/shops', \App\Controllers\ShopController::class . '@index');

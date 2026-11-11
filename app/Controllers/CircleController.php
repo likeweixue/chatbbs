@@ -143,7 +143,7 @@ class CircleController extends BaseController
         ]);
     }
 
-    public function store(int $id): void
+    public function storePost(int $id): void
     {
         $this->requireLogin();
         $circle = Circle::find($id);
