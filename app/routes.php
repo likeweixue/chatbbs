@@ -15,6 +15,8 @@ Router::get('/lang/{code}', \App\Controllers\HomeController::class . '@switchLan
 Router::get('/layout/{layout}', \App\Controllers\HomeController::class . '@switchLayout');
 // 授权证书（自动识别当前站点域名为被授权方）
 Router::get('/license', \App\Controllers\HomeController::class . '@license');
+// 小黑屋：展示封禁 / 禁言记录
+Router::get('/jail', \App\Controllers\HomeController::class . '@jail');
 
 // 认证
 Router::get('/login', \App\Controllers\AuthController::class . '@loginForm');
@@ -38,6 +40,9 @@ Router::get('/forum/{id}/{slug}', \App\Controllers\ForumController::class . '@vi
 Router::get('/thread/{id}', \App\Controllers\ThreadController::class . '@view');
 Router::get('/thread/create', \App\Controllers\ThreadController::class . '@createForm', ['auth']);
 Router::post('/thread/create', \App\Controllers\ThreadController::class . '@store', ['auth', 'csrf']);
+// 回收站（前台）
+Router::get('/trash', \App\Controllers\ThreadController::class . '@trash', ['auth']);
+Router::post('/trash/restore/{id}', \App\Controllers\ThreadController::class . '@trashRestore', ['auth', 'csrf']);
 Router::get('/thread/{id}/edit', \App\Controllers\ThreadController::class . '@editForm', ['auth']);
 Router::post('/thread/{id}/edit', \App\Controllers\ThreadController::class . '@update', ['auth', 'csrf']);
 Router::post('/thread/{id}/reply', \App\Controllers\ThreadController::class . '@reply', ['auth', 'csrf']);

@@ -31,6 +31,7 @@ $emptyText = (string)($empty_text ?? L('还没有内容，来发第一个帖子�
         <div class="cb-trow__main">
           <div class="cb-trow__title">
             <?php if ((int)($t['is_top'] ?? 0)): ?><span class="cb-badge-pill top"><?= L('置顶') ?></span><?php endif; ?>
+            <?php if ((int)($t['is_announce'] ?? 0)): ?><span class="cb-badge-pill digest"><?= L('公告') ?></span><?php endif; ?>
             <?php if ((int)($t['is_essence'] ?? 0)): ?><span class="cb-badge-pill essence"><?= L('精华') ?></span><?php endif; ?>
             <?php if ((int)($t['is_closed'] ?? 0)): ?><span class="cb-badge-pill closed"><?= L('已关闭') ?></span><?php endif; ?>
             <a href="<?= h(url('thread/' . $t['id'])) ?>"
@@ -73,6 +74,7 @@ $emptyText = (string)($empty_text ?? L('还没有内容，来发第一个帖子�
         <div class="cb-thread__main">
           <h3 class="cb-thread__title">
             <?php if ((int)($t['is_top'] ?? 0)): ?><span class="cb-badge-pill top"><?= L('置顶') ?></span><?php endif; ?>
+            <?php if ((int)($t['is_announce'] ?? 0)): ?><span class="cb-badge-pill digest"><?= L('公告') ?></span><?php endif; ?>
             <?php if ((int)($t['is_essence'] ?? 0)): ?><span class="cb-badge-pill essence"><?= L('精华') ?></span><?php endif; ?>
             <?php if ((int)($t['is_digest'] ?? 0)): ?><span class="cb-badge-pill digest"><?= L('推荐') ?></span><?php endif; ?>
             <?php if ((int)($t['is_closed'] ?? 0)): ?><span class="cb-badge-pill closed"><?= L('已关闭') ?></span><?php endif; ?>

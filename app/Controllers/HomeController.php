@@ -79,6 +79,18 @@ class HomeController extends BaseController
     }
 
     /**
+     * 小黑屋：封禁 / 禁言记录（公开）
+     */
+    public function jail(): string
+    {
+        $bans = \App\Models\Ban::active();
+        return $this->render('jail/index', [
+            'title' => L('小黑屋'),
+            'bans' => $bans,
+        ]);
+    }
+
+    /**
      * 前台布局切换：写入 cookie 后回到来源页
      */
     public function switchLayout(string $layout = ''): void

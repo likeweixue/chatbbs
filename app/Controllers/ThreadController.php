@@ -272,6 +272,7 @@ class ThreadController extends BaseController
             'editing_page' => 'create',
             'forums' => $forums,
             'forum_id' => $forumId,
+            'announce' => Request::bool('announce') ? 1 : 0,
             'thread' => null,
             'draft' => $draft,
             'tags' => Tag::all(50),
@@ -302,6 +303,10 @@ class ThreadController extends BaseController
         if (!Forum::canPost($forum, $user)) {
             $this->back('你没有在该板块发帖的权限');
         }
+        $isAnnounce = Request::bool('announce') ? 1 : 0;
+        if ($isAnnounce && !\App\Core\Auth::isModerator()) {
+            $this->back('只有管理员或版主可以发布公告');
+        }
 
         [$html, $text, $md, $format] = self::readContent();
         if (mb_strlen($text) < 2) {
@@ -328,6 +333,7 @@ class ThreadController extends BaseController
             'content' => Content::renderMentions(Content::highlight(Content::lazyImages($html))),
             'content_text' => $text,
             'status' => $status,
+            'is_announce' => $isAnnounce,
             'anonymous' => ((int)($forum['force_anonymous'] ?? 0) === 1 || Request::bool('anonymous')) ? 1 : 0,
             'attachment_fee' => (float)Request::post('attachment_fee', 0),
             'last_reply_user' => (string)$user['username'],
@@ -596,14 +602,67 @@ class ThreadController extends BaseController
         if ((int)$thread['user_id'] !== (int)$user['id'] && !\App\Core\Auth::isAdmin()) {
             $this->fail('无权删除');
         }
-        Thread::delete($id);
+        Thread::softDelete($id);
         Stats::clearCache();
-        // 帖子已删除，非 Ajax 提交时跳回首页（否则会停在已失效的详情页）
+        // 帖子已删除（移入回收站），非 Ajax 提交时跳回首页（否则会停在已失效的详情页）
         if (!Request::isAjax()) {
-            Session::flash('success', '已删除');
+            Session::flash('success', '已移入回收站');
             \redirect('');
         }
-        $this->success(null, '已删除');
+        $this->success(null, '已移入回收站');
+    }
+
+    /**
+     * 回收站：列出已删除（status = 2）的帖子，可在前台恢复
+     */
+    public function trash(): string
+    {
+        $this->requireLogin();
+        $user = $this->user();
+        $isMod = \App\Core\Auth::isModerator();
+        $forumId = Request::int('forum', 0);
+        $where = 't.status = 2';
+        $params = [];
+        if (!$isMod) {
+            $where .= ' AND t.user_id = ?';
+            $params[] = (int)$user['id'];
+        }
+        if ($forumId > 0) {
+            $where .= ' AND t.forum_id = ?';
+            $params[] = $forumId;
+        }
+        $rows = Database::fetchAll(
+            'SELECT t.id, t.title, t.forum_id, t.user_id, t.username, t.created_at, f.name AS forum_name'
+            . ' FROM ' . Database::table('threads') . ' t'
+            . ' LEFT JOIN ' . Database::table('forums') . ' f ON f.id = t.forum_id'
+            . ' WHERE ' . $where . ' ORDER BY t.id DESC LIMIT 200',
+            $params
+        );
+        return $this->render('thread/trash', [
+            'title' => L('回收站'),
+            'threads' => $rows,
+            'is_moderator' => $isMod,
+        ]);
+    }
+
+    public function trashRestore(int $id): void
+    {
+        $this->requireLogin();
+        $thread = Thread::find($id);
+        if (!$thread || (int)$thread['status'] !== 2) {
+            $this->fail('帖子不存在');
+        }
+        $user = $this->user();
+        if ((int)$thread['user_id'] !== (int)$user['id'] && !\App\Core\Auth::isModerator()) {
+            $this->fail('无权恢复');
+        }
+        Thread::update($id, ['status' => 1]);
+        Stats::clearCache();
+        if (!Request::isAjax()) {
+            Session::flash('success', '已恢复');
+            \redirect('trash');
+        }
+        $this->success(null, '已恢复');
     }
 
     public function deletePost(int $id): void

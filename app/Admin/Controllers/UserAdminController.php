@@ -297,15 +297,21 @@ class UserAdminController extends BaseAdmin
             $this->back('请先选择用户', 'error');
         }
         $in = implode(',', array_map('intval', $ids));
+        $op = \App\Core\Auth::user();
+        $operator = ['id' => (int)($op['id'] ?? 0), 'name' => (string)($op['nickname'] ?? $op['username'] ?? '')];
+        $banAction = null;
         switch ($act) {
             case 'enable':
                 Database::query('UPDATE ' . Database::table('users') . ' SET status = 1 WHERE id IN (' . $in . ')');
+                foreach ($ids as $uid) { \App\Models\Ban::unban((int)$uid); }
                 break;
             case 'disable':
                 Database::query('UPDATE ' . Database::table('users') . ' SET status = 2 WHERE id IN (' . $in . ')');
+                $banAction = 'ban';
                 break;
             case 'mute':
                 Database::query('UPDATE ' . Database::table('users') . ' SET group_id = 6 WHERE id IN (' . $in . ')');
+                $banAction = 'mute';
                 break;
             case 'delete':
                 $self = (int)(\App\Core\Auth::id() ?? 0);
@@ -315,6 +321,12 @@ class UserAdminController extends BaseAdmin
                     Database::query('DELETE FROM ' . Database::table('users') . ' WHERE id IN (' . $in . ')');
                 }
                 break;
+        }
+        if ($banAction !== null) {
+            $users = Database::fetchAll('SELECT id, username, nickname FROM ' . Database::table('users') . ' WHERE id IN (' . $in . ')');
+            foreach ($users as $u) {
+                \App\Models\Ban::record((int)$u['id'], (string)$u['username'], $banAction, '后台批量操作', null, $operator);
+            }
         }
         $this->log('用户批量操作', $act . ':' . $in);
         $this->back('批量操作完成');

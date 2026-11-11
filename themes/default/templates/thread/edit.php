@@ -119,6 +119,10 @@ $draftText = $draftContent !== '' ? \App\Services\Content::toText($draftContent)
       $canCreateTag = (int)$allow_user_tag === 1 || is_admin();
       ?>
       <div class="cb-form-item cb-form-item--compact">
+        <input type="hidden" name="announce" value="<?= (int)($announce ?? 0) ?>">
+        <?php if (!empty($announce)): ?>
+          <div class="cb-form-tip">当前为「板块公告」发布模式，发布后将置顶显示在本板块。</div>
+        <?php endif; ?>
         <input type="hidden" id="f-tags" name="tags" value="<?= h(implode(',', $tagValues)) ?>">
         <div class="cb-tag-picker" data-tag-picker
              data-options="<?= h(json_encode($tagOptions, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>"

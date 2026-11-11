@@ -521,6 +521,7 @@ if (!$island && !$single) {
           <?= cb_icon('rss') ?><span>RSS</span>
         </a>
       <?php endif; ?>
+      <a class="cb-footer__license" href="<?= h(url('jail')) ?>"><?= L('小黑屋') ?></a>
       <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= L('授权') ?></a>
       <span>页面耗时 <?= number_format((microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1) ?> ms</span>
     </div>

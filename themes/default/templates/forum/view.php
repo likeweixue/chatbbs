@@ -56,6 +56,10 @@
     </div>
     <?php if ($can_post ?? false): ?>
       <div class="cb-header-actions">
+        <?php if (!empty($is_moderator)): ?>
+          <a class="cb-btn cb-newthread-label" href="<?= h(url('thread/create?forum=' . $forum['id'] . '&announce=1')) ?>"><?= L('公告') ?></a>
+          <a class="cb-btn" href="<?= h(url('trash?forum=' . $forum['id'])) ?>"><?= L('回收站') ?></a>
+        <?php endif; ?>
         <a class="cb-btn cb-btn-newthread cb-newthread--action" href="<?= h(url('thread/create?forum=' . $forum['id'])) ?>">
           <span class="cb-newthread-ico"><?= cb_icon('edit') ?></span><span class="cb-newthread-label"><?= L('发布主题') ?></span>
         </a>

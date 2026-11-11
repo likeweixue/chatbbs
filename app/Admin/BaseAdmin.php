@@ -91,6 +91,7 @@ abstract class BaseAdmin
                 ['label' => '签到记录', 'url' => 'checkins', 'key' => 'checkins'],
                 ['label' => '货币管理', 'url' => 'currency', 'key' => 'currency'],
                 ['label' => '聊天管理', 'url' => 'messages', 'key' => 'messages'],
+                ['label' => '小黑屋', 'url' => 'bans', 'key' => 'bans'],
             ],
         ],
         'content' => [
@@ -213,6 +214,7 @@ abstract class BaseAdmin
             'checkins' => '签到 打卡 日历',
             'currency' => '货币 金币 积分 奖励 钱 money',
             'messages' => '私信 聊天 消息 pm chat',
+            'bans' => '小黑屋 封禁 禁言 ban',
             'settings' => '站点 网站 名称 标题 logo favicon 备案 seo 访问模式 语言 description',
             'nav_links' => '导航 链接 友情 推荐 favicon 网址 网站导航',
             'settings.features' => '功能 开关 说说 签到 推荐 编辑器 markdown 审核 标签数 聊天 附近的人',

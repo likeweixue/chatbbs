@@ -95,6 +95,11 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::get('/circles', $C . 'CircleController@index');
     Router::get('/shops', $C . 'ShopController@index');
 
+    /* ---------- 小黑屋 ---------- */
+    Router::get('/bans', $C . 'BanController@index');
+    Router::post('/bans/save', $C . 'BanController@save', ['csrf']);
+    Router::post('/bans/unban/{id}', $C . 'BanController@unban', ['csrf']);
+
     /* ---------- 用户管理 ---------- */
     Router::get('/users', $C . 'UserAdminController@users');
     Router::get('/users/create', $C . 'UserAdminController@userForm');

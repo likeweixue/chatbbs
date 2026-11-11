@@ -253,6 +253,19 @@ class Schema
                   PRIMARY KEY (`id`),
                   UNIQUE KEY `uk_user_medal` (`user_id`,`medal_id`),
                   KEY `idx_medal` (`medal_id`)',
+            // 小黑屋：封禁 / 禁言记录
+            'user_bans' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `username` varchar(80) NOT NULL DEFAULT \'\',
+                  `action` varchar(20) NOT NULL DEFAULT \'ban\' COMMENT \'ban 禁用 / mute 禁言\',
+                  `note` varchar(255) NOT NULL DEFAULT \'\',
+                  `operator_id` int unsigned NOT NULL DEFAULT 0,
+                  `operator_name` varchar(80) NOT NULL DEFAULT \'\',
+                  `expire_at` datetime DEFAULT NULL,
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  KEY `idx_user` (`user_id`),
+                  KEY `idx_expire` (`expire_at`)',
             // 网站导航页的推荐链接
             'nav_links' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
                   `title` varchar(100) NOT NULL DEFAULT \'\',
@@ -352,6 +365,7 @@ class Schema
             // 帖子回复楼中楼
             ['posts', 'reply_to', 'int NOT NULL DEFAULT 0 COMMENT \'楼中楼：回复的目标楼层 ID\''],
             // 帖子版权许可证（license_options() 预设 key；custom 时内容存 license_custom）
+            ['threads', 'is_announce', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'板块公告\''],
             ['threads', 'license', 'varchar(20) NOT NULL DEFAULT \'\' COMMENT \'版权许可证 key，空为未声明\''],
             ['threads', 'license_custom', 'varchar(500) NOT NULL DEFAULT \'\' COMMENT \'自定义版权说明\''],
         ];
