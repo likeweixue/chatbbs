@@ -34,7 +34,7 @@ class FriendLinkController extends BaseAdmin
         return $out;
     }
 
-    private static function save(array $links): void
+    private static function persist(array $links): void
     {
         $lines = [];
         foreach ($links as $l) {
@@ -92,7 +92,7 @@ class FriendLinkController extends BaseAdmin
         }
         $links = self::links();
         $links[] = ['name' => $name, 'url' => $url];
-        self::save($links);
+        self::persist($links);
         $this->log('新增友情链接', $name);
         $this->back('友情链接已添加');
     }
@@ -103,7 +103,7 @@ class FriendLinkController extends BaseAdmin
         if (isset($links[$id])) {
             $name = $links[$id]['name'];
             unset($links[$id]);
-            self::save(array_values($links));
+            self::persist(array_values($links));
             $this->log('删除友情链接', $name);
         }
         $this->back('友情链接已删除');
