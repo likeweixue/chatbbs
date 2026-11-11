@@ -97,6 +97,14 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::post('/global/footer', $C . 'ExtController@globalFooterSave', ['csrf']);
     Router::post('/global/layout', $C . 'ExtController@globalLayoutSave', ['csrf']);
 
+    Router::get('/blog', $C . 'BlogController@index');
+    Router::post('/blog/toggle/{id}', $C . 'BlogController@toggle', ['csrf']);
+    Router::post('/blog/delete/{id}', $C . 'BlogController@delete', ['csrf']);
+
+    Router::get('/friend-links', $C . 'FriendLinkController@index');
+    Router::post('/friend-links/save', $C . 'FriendLinkController@save', ['csrf']);
+    Router::post('/friend-links/delete/{id}', $C . 'FriendLinkController@delete', ['csrf']);
+
     Router::get('/wiki', $C . 'WikiAdminController@index');
     Router::post('/wiki/save', $C . 'WikiAdminController@save', ['csrf']);
     Router::post('/wiki/delete/{id}', $C . 'WikiAdminController@delete', ['csrf']);
@@ -204,6 +212,7 @@ Router::post('/sidebar/island-menu', $C . 'SettingController@saveIslandMenu', ['
     Router::post('/plugins/remove/{id}', $C . 'ExtController@pluginRemove', ['csrf']);
 
     Router::get('/themes', $C . 'ExtController@themes');
+    Router::post('/themes/skin', $C . 'ExtController@themeSkinSave', ['csrf']);
     Router::post('/themes/enable/{id}', $C . 'ExtController@themeEnable', ['csrf']);
     Router::post('/themes/appearance', $C . 'ExtController@themeAppearance', ['csrf']);
 Router::post('/themes/layout', $C . 'ExtController@themeLayoutSave', ['csrf']);

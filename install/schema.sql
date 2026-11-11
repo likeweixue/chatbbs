@@ -834,3 +834,36 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__shop_items` (
   KEY `idx_status` (`status`,`id`),
   KEY `idx_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- 博客
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__blog_posts` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `username` varchar(80) NOT NULL DEFAULT '',
+  `title` varchar(200) NOT NULL DEFAULT '',
+  `slug` varchar(200) NOT NULL DEFAULT '',
+  `content` mediumtext,
+  `content_text` text,
+  `category_id` int unsigned NOT NULL DEFAULT 0,
+  `tags` varchar(255) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `views` int NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_slug` (`slug`),
+  KEY `idx_status` (`status`,`id`),
+  KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__blog_categories` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `name` varchar(80) NOT NULL DEFAULT '',
+  `slug` varchar(80) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

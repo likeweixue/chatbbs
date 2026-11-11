@@ -154,7 +154,29 @@ class ExtController extends BaseAdmin
             ],
         ]);
 
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">风格皮肤</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('themes/skin'),
+                'data' => Settings::all(),
+                'submit' => '保存皮肤',
+                'fields' => [
+                    ['name' => 'theme_skin', 'label' => '界面风格', 'type' => 'select', 'options' => [
+                        'default' => '默认（现代简洁）',
+                        'classic' => '经典论坛（PHPwind 风格）',
+                    ], 'tip' => '经典论坛皮肤：方角、细边框、浅蓝标题栏，加载资源更少'],
+                ],
+            ]) . '</div></div>';
+
         return $this->pageView('主题管理', 'themes', $html);
+    }
+
+    public function themeSkinSave(): void
+    {
+        $skin = Request::post('theme_skin', 'default') === 'classic' ? 'classic' : 'default';
+        Settings::set('theme_skin', $skin);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改风格皮肤', $skin);
+        $this->back('皮肤已保存');
     }
 
     /**
@@ -221,7 +243,7 @@ class ExtController extends BaseAdmin
                 'fields' => [
                     ['name' => 'site_layout', 'label' => '布局样式', 'type' => 'select', 'options' => [
                         'classic' => '默认布局（经典两栏）',
-                        'island' => '工作台',
+                        'island' => '三栏',
                         'single' => '单栏布局（无侧边栏，整站一块面板）',
                     ], 'tip' => '单栏布局使用默认主题的配色和组件，不再显示侧边栏'],
                     ['name' => 'island_sidebar_side', 'label' => '侧栏默认位置', 'type' => 'select', 'options' => [
@@ -230,14 +252,14 @@ class ExtController extends BaseAdmin
                     ['name' => 'island_sidebar_width', 'label' => '侧栏默认宽度', 'type' => 'number',
                         'tip' => '200 - 360 px；访客拖拽分隔线后使用自己的宽度'],
                     ['name' => 'island_sidebar_default_hidden', 'label' => '默认隐藏侧栏', 'type' => 'switch',
-                        'tip' => '开启后访客首次进入工作台布局时先看到全宽内容区，可点顶栏按钮展开'],
+                        'tip' => '开启后访客首次进入三栏布局时先看到全宽内容区，可点顶栏按钮展开'],
                     ['name' => 'layout_user_switch', 'label' => '允许用户切换布局', 'type' => 'switch',
                         'tip' => '开启后前台顶栏显示布局切换按钮，访客可在双栏 / 单栏 / 三栏之间选择；关闭后按钮变灰不可点'],
                     ['name' => 'single_width', 'label' => '单栏模式宽度(px)', 'type' => 'number',
                         'tip' => '留空或 0 使用默认 1200px；可设置 960 - 1800，例如 1400 让单栏更宽'],
                 ],
             ])
-            . '<div class="adm-form-tip">工作台布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
+            . '<div class="adm-form-tip">三栏布局的布局方向参考 <a href="https://github.com/nagisa77/OpenIsle" target="_blank" rel="noopener">OpenIsle</a>（MIT License）；本项目的 PHP / HTML / CSS / JS 为独立实现。详见根目录 THIRD_PARTY_NOTICES.md。</div>'
             . '</div></div>';
 
         $html .= '<div class="adm-panel"><div class="adm-panel-head">DIY 装饰图</div><div class="adm-panel-body">'
@@ -269,7 +291,7 @@ class ExtController extends BaseAdmin
                     ['name' => 'theme_header_bg', 'label' => '顶栏背景', 'type' => 'color'],
                     ['name' => 'theme_header_text', 'label' => '顶栏文字', 'type' => 'color'],
                     ['name' => 'theme_header_opacity', 'label' => '顶栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
-                    ['name' => 'theme_island_bg', 'label' => '侧栏背景', 'type' => 'color', 'tip' => '工作台侧栏'],
+                    ['name' => 'theme_island_bg', 'label' => '侧栏背景', 'type' => 'color', 'tip' => '三栏侧栏'],
                     ['name' => 'theme_island_text', 'label' => '侧栏文字', 'type' => 'color'],
                     ['name' => 'theme_island_opacity', 'label' => '侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
                     ['name' => 'theme_footer_bg', 'label' => '页脚背景', 'type' => 'color'],
@@ -396,9 +418,9 @@ class ExtController extends BaseAdmin
                     ['name' => 'theme_header_bg', 'label' => '顶栏背景', 'type' => 'color'],
                     ['name' => 'theme_header_text', 'label' => '顶栏文字', 'type' => 'color'],
                     ['name' => 'theme_header_opacity', 'label' => '顶栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
-                    ['name' => 'theme_island_bg', 'label' => '工作台侧栏背景', 'type' => 'color'],
-                    ['name' => 'theme_island_text', 'label' => '工作台侧栏文字', 'type' => 'color'],
-                    ['name' => 'theme_island_opacity', 'label' => '工作台侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
+                    ['name' => 'theme_island_bg', 'label' => '三栏侧栏背景', 'type' => 'color'],
+                    ['name' => 'theme_island_text', 'label' => '三栏侧栏文字', 'type' => 'color'],
+                    ['name' => 'theme_island_opacity', 'label' => '三栏侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
                     ['name' => 'theme_footer_bg', 'label' => '页脚背景', 'type' => 'color'],
                     ['name' => 'theme_footer_text', 'label' => '页脚文字', 'type' => 'color'],
                     ['name' => 'theme_footer_opacity', 'label' => '页脚透明度', 'type' => 'number', 'tip' => '0 - 100'],

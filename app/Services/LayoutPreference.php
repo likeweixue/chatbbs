@@ -15,9 +15,9 @@ class LayoutPreference
     public static function options(): array
     {
         return [
-            'classic' => '双栏',
             'single' => '单栏',
-            'island' => '三栏（工作台）',
+            'classic' => '双栏',
+            'island' => '三栏',
         ];
     }
 

@@ -79,6 +79,25 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC26：新增维基导航菜单（仅当不存在时）
+        if ((int)Settings::get('migration_rc26_wiki_menu', 0) !== 1) {
+            try {
+                foreach ([['维基', '/wiki', 'book'], ['博客', '/blog', 'edit']] as [$title, $url, $icon]) {
+                    $exists = Database::value('SELECT id FROM ' . Database::table('menus') . ' WHERE url = ?', [$url]);
+                    if (!$exists) {
+                        $max = (int)Database::value('SELECT MAX(sort_order) FROM ' . Database::table('menus'), [], 0);
+                        Database::insert('menus', [
+                            'title' => $title, 'url' => $url, 'icon' => $icon, 'target' => '_self',
+                            'parent_id' => 0, 'visible' => 1, 'sort_order' => $max + 1,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Logger::error('RC26 维基菜单迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc26_wiki_menu', 1);
+        }
+
         // RC23：新增圈子 / 商城导航菜单（仅当不存在时）
         if ((int)Settings::get('migration_rc23_circle_shop_menus', 0) !== 1) {
             try {
@@ -354,6 +373,31 @@ class Schema
                   `joined_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                   PRIMARY KEY (`id`),
                   UNIQUE KEY `uk_circle_user` (`circle_id`,`user_id`),
+                  KEY `idx_user` (`user_id`)',
+            // 博客：用户文章 + 分类
+            'blog_posts' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `username` varchar(80) NOT NULL DEFAULT '',
+                  `title` varchar(200) NOT NULL DEFAULT '',
+                  `slug` varchar(200) NOT NULL DEFAULT '',
+                  `content` mediumtext,
+                  `content_text` text,
+                  `category_id` int unsigned NOT NULL DEFAULT 0,
+                  `tags` varchar(255) NOT NULL DEFAULT '',
+                  `status` tinyint(1) NOT NULL DEFAULT 1,
+                  `views` int NOT NULL DEFAULT 0,
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `uk_slug` (`slug`),
+                  KEY `idx_status` (`status`,`id`),
+                  KEY `idx_user` (`user_id`)',
+            'blog_categories' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `name` varchar(80) NOT NULL DEFAULT '',
+                  `slug` varchar(80) NOT NULL DEFAULT '',
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
                   KEY `idx_user` (`user_id`)',
             // 商城商品
             'shop_items' => '`id` int unsigned NOT NULL AUTO_INCREMENT,

@@ -5,7 +5,7 @@
       <?= csrf_field() ?>
       <div class="cb-form-item">
         <label for="wiki-title"><?= L('标题') ?></label>
-        <input class="cb-input" id="wiki-title" name="title" maxlength="200" required value="<?= h((string)($page['title'] ?? '')) ?>">
+        <input class="cb-input" id="wiki-title" name="title" maxlength="200" required value="<?= h((string)($page['title'] ?? ($prefillTitle ?? ''))) ?>">
       </div>
       <div class="cb-form-item">
         <label for="wiki-slug"><?= L('路径') ?></label>

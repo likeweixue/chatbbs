@@ -17,6 +17,18 @@ class Wiki
         );
     }
 
+    public static function search(string $q, int $limit = 100): array
+    {
+        $like = '%' . $q . '%';
+        return Database::fetchAll(
+            'SELECT w.*, u.nickname, u.username FROM ' . Database::table('wiki_pages') . ' w
+             LEFT JOIN ' . Database::table('users') . ' u ON u.id = w.user_id
+             WHERE w.status = 1 AND (w.title LIKE ? OR w.content_text LIKE ?)
+             ORDER BY w.updated_at DESC LIMIT ' . max(1, min(300, $limit)),
+            [$like, $like]
+        );
+    }
+
     public static function findBySlug(string $slug): ?array
     {
         return Database::fetch(

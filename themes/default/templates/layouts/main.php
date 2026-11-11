@@ -75,6 +75,9 @@ $favicon = (string)config('site_favicon', '');
 <link rel="alternate" type="application/rss+xml" title="<?= h($siteName) ?> RSS" href="<?= h(url('rss')) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
+<?php if ((string)config('theme_skin', 'default') === 'classic'): ?>
+<link rel="stylesheet" href="<?= h(theme_asset('css/skin-classic.css') . '?v=' . CB_VERSION) ?>">
+<?php endif; ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/yitext.css') . '?v=' . CB_VERSION) ?>">
 <?php
 // 外观微调：圆角大小 / 主题主色（后台「扩展管理 → 主题 → 外观微调」设置）
@@ -465,7 +468,7 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
 // 双栏布局：页脚上方增加统计 / 友情链接面板
 $footerStats = null;
 $footerLinks = [];
-if (!$island && !$single) {
+if ($single) {
     $footerStats = \App\Services\FooterStats::stats();
     $footerLinks = \App\Services\FooterStats::links();
 }

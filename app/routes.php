@@ -41,6 +41,13 @@ Router::post('/circle/{id}/leave', \App\Controllers\CircleController::class . '@
 Router::get('/circle/{id}/post', \App\Controllers\CircleController::class . '@postForm', ['auth']);
 Router::post('/circle/{id}/post', \App\Controllers\CircleController::class . '@storePost', ['auth', 'csrf']);
 
+// 博客
+Router::get('/blog', \App\Controllers\BlogController::class . '@index');
+Router::get('/blog/my', \App\Controllers\BlogController::class . '@my', ['auth']);
+Router::get('/blog/create', \App\Controllers\BlogController::class . '@createForm', ['auth']);
+Router::post('/blog/create', \App\Controllers\BlogController::class . '@store', ['auth', 'csrf']);
+Router::get('/blog/{id}', \App\Controllers\BlogController::class . '@view');
+
 // 商城
 Router::get('/shops', \App\Controllers\ShopController::class . '@index');
 Router::get('/shop/create', \App\Controllers\ShopController::class . '@createForm', ['auth']);

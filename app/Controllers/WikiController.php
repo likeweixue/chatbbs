@@ -14,9 +14,11 @@ class WikiController extends BaseController
 {
     public function index(): string
     {
+        $q = trim((string)Request::get('q', ''));
         return $this->render('wiki/index', [
             'title' => 'Wiki 词条',
-            'pages' => Wiki::list(200),
+            'q' => $q,
+            'pages' => $q !== '' ? Wiki::search($q, 200) : Wiki::list(200),
         ]);
     }
 
@@ -39,6 +41,7 @@ class WikiController extends BaseController
         return $this->render('wiki/form', [
             'title' => '创建词条',
             'page' => null,
+            'prefillTitle' => trim((string)Request::get('title', '')),
         ]);
     }
 

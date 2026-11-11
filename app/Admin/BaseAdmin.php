@@ -110,6 +110,8 @@ abstract class BaseAdmin
                 ['label' => '违禁词库', 'url' => 'forbidden-words', 'key' => 'forbidden_words'],
                 ['label' => '群聊管理', 'url' => 'chat-groups', 'key' => 'chat_groups'],
                 ['label' => 'Wiki 维基', 'url' => 'wiki', 'key' => 'wiki'],
+                ['label' => '友情链接', 'url' => 'friend-links', 'key' => 'friend_links'],
+                ['label' => '博客管理', 'url' => 'blog', 'key' => 'blog'],
             ],
         ],
         'circle' => [
@@ -210,6 +212,8 @@ abstract class BaseAdmin
             'forbidden_words' => '违禁词 敏感词 屏蔽 词库 过滤',
             'chat_groups' => '群聊 聊天室 群组 group chat',
             'wiki' => 'wiki 维基 词条 百科',
+            'friend_links' => '友情链接 友链 friend links',
+            'blog' => '博客 文章 blog',
             'users' => '会员 成员 user 会员列表',
             'groups' => '用户组 组 权限组',
             'certs' => '认证 大v 身份',

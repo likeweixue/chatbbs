@@ -1,0 +1,34 @@
+/* 经典论坛皮肤（PHPwind 风格）：方角、细边框、浅蓝标题栏 */
+:root {
+  --radius: 0px;
+  --radius-sm: 0px;
+  --shadow: none;
+  --shadow-sm: none;
+}
+body.cb-body { background: #eef3f7; }
+.cb-header { background: #ffffff !important; border-bottom: 2px solid #6f94b8 !important; box-shadow: none !important; }
+.cb-logo__text { font-family: Georgia, "Times New Roman", serif; letter-spacing: 0; }
+.cb-nav a { border-radius: 0 !important; color: #33556f; }
+.cb-nav a.active, .cb-nav a:hover { background: #dce8f3 !important; color: #1f4e79 !important; }
+.cb-card { border: 1px solid #b9cbdc; border-radius: 0; box-shadow: none; }
+.cb-card__header {
+  background: linear-gradient(#eaf1f8, #d7e4f0) !important;
+  border-bottom: 1px solid #b9cbdc !important;
+  color: #1f4e79 !important; font-weight: 700;
+}
+.cb-card__header a, .cb-card__header .more { color: #1f4e79 !important; }
+.cb-card__footer { background: #f4f8fb; border-top: 1px solid #d3e0ec; }
+.cb-btn, .cb-input, .cb-select, .cb-tag, .cb-badge-pill { border-radius: 0 !important; }
+.cb-btn { background: #f4f8fb; border-color: #b9cbdc; color: #1f4e79; }
+.cb-btn:hover { background: #e2edf7; border-color: #6f94b8; color: #1f4e79; }
+.cb-btn-newthread { background: #1f6fb2; border-color: #1f6fb2; color: #fff; }
+.cb-tabs { border-bottom: 1px solid #b9cbdc; }
+.cb-tab { border-radius: 0; color: #33556f; }
+.cb-tab.active { background: #1f6fb2; color: #fff; border-radius: 0; }
+.cb-thread-list .cb-trow { border-bottom: 1px solid #d8e3ec; }
+.cb-forum-table .fl_row:nth-child(odd) { background: #f7fafc; }
+.cb-forum-table .fl_row:hover { background: #eaf2f9; }
+.cb-forum-block__head { background: linear-gradient(#eaf1f8, #d7e4f0) !important; }
+.cb-sidebar .cb-card__header, .cb-island-nav, .cb-island-sidebar { border-radius: 0; }
+.cb-footer { background: #ffffff; border-top: 2px solid #b9cbdc; }
+.cb-badge-pill { line-height: 16px; }

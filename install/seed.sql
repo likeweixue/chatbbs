@@ -42,7 +42,9 @@ INSERT INTO `__PREFIX__menus` (`id`,`title`,`url`,`icon`,`target`,`parent_id`,`v
 (8,'签到','/checkin','calendar','_self',0,1,8),
 (9,'聊天','/pm','mail','_self',0,1,9),
 (10,'通知','/notifications','bell','_self',0,1,10),
-(11,'用户中心','/user','user','_self',0,1,11);
+(11,'用户中心','/user','user','_self',0,1,11),
+(12,'维基','/wiki','book','_self',0,1,12),
+(13,'博客','/blog','edit','_self',0,1,13);
 
 -- 默认板块
 INSERT INTO `__PREFIX__forums` (`id`,`parent_id`,`name`,`slug`,`description`,`icon`,`color`,`type`,`sort_order`,`visible`) VALUES

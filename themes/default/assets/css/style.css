@@ -2640,3 +2640,9 @@ body.cb-single .cb-main--single { width: 100%; }
 .cb-shop-card__main { padding: 10px 12px; }
 .cb-shop-card__price, .cb-shop-view__price { color: var(--color-danger); font-weight: 700; font-size: 16px; margin: 4px 0; }
 .cb-shop-view__img { width: 280px; height: 220px; border-radius: var(--radius); flex: none; }
+
+/* 单栏布局：底部统计面板宽度跟随单栏宽度 */
+body.cb-single .cb-footer-panels { max-width: var(--single-width, 1200px); }
+
+/* ---------- 博客 ---------- */
+.cb-blog-content { font-size: 15px; line-height: 1.85; color: var(--color-text); word-break: break-word; }
