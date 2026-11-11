@@ -31,6 +31,20 @@ Router::get('/verify', \App\Controllers\AuthController::class . '@verify');
 Router::any('/logout', \App\Controllers\AuthController::class . '@logout');
 Router::get('/captcha', \App\Controllers\AuthController::class . '@captcha');
 
+// 圈子
+Router::get('/circles', \App\Controllers\CircleController::class . '@index');
+Router::get('/circle/{id}', \App\Controllers\CircleController::class . '@view');
+Router::post('/circle/{id}/join', \App\Controllers\CircleController::class . '@join', ['auth', 'csrf']);
+Router::post('/circle/{id}/leave', \App\Controllers\CircleController::class . '@leave', ['auth', 'csrf']);
+Router::get('/circle/{id}/post', \App\Controllers\CircleController::class . '@postForm', ['auth']);
+Router::post('/circle/{id}/post', \App\Controllers\CircleController::class . '@store', ['auth', 'csrf']);
+
+// 商城
+Router::get('/shops', \App\Controllers\ShopController::class . '@index');
+Router::get('/shop/create', \App\Controllers\ShopController::class . '@createForm', ['auth']);
+Router::post('/shop/create', \App\Controllers\ShopController::class . '@store', ['auth', 'csrf']);
+Router::get('/shop/{id}', \App\Controllers\ShopController::class . '@view');
+
 // 板块
 Router::get('/forums', \App\Controllers\ForumController::class . '@index');
 Router::get('/forum/{id}', \App\Controllers\ForumController::class . '@view');

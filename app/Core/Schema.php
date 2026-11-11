@@ -79,6 +79,26 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC23：新增圈子 / 商城导航菜单（仅当不存在时）
+        if ((int)Settings::get('migration_rc23_circle_shop_menus', 0) !== 1) {
+            try {
+                $max = (int)Database::value('SELECT MAX(sort_order) FROM ' . Database::table('menus'), [], 0);
+                foreach ([['圈子', '/circles', 'group'], ['商城', '/shops', 'cart']] as [$title, $url, $icon]) {
+                    $exists = Database::value('SELECT id FROM ' . Database::table('menus') . ' WHERE url = ?', [$url]);
+                    if (!$exists) {
+                        $max++;
+                        Database::insert('menus', [
+                            'title' => $title, 'url' => $url, 'icon' => $icon, 'target' => '_self',
+                            'parent_id' => 0, 'visible' => 1, 'sort_order' => $max,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Logger::error('RC23 圈子/商城菜单迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc23_circle_shop_menus', 1);
+        }
+
         // RC20：导航「首页」改名为「导读」，并初始化首页菜单设置
         if ((int)Settings::get('migration_rc20_guide_home', 0) !== 1) {
             try {
@@ -311,6 +331,44 @@ class Schema
                   `content` text,
                   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                   PRIMARY KEY (`id`), KEY `idx_group` (`group_id`,`id`)',
+            // 圈子：兴趣小组（每个圈子对应一个隐藏板块存放讨论帖）
+            'circles' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `name` varchar(80) NOT NULL DEFAULT \'\',
+                  `slug` varchar(80) NOT NULL DEFAULT \'\',
+                  `description` varchar(500) NOT NULL DEFAULT \'\',
+                  `icon` varchar(500) NOT NULL DEFAULT \'\',
+                  `color` varchar(20) NOT NULL DEFAULT \'#4D698E\',
+                  `forum_id` int unsigned NOT NULL DEFAULT 0,
+                  `owner_id` int unsigned NOT NULL DEFAULT 0,
+                  `member_count` int unsigned NOT NULL DEFAULT 0,
+                  `is_open` tinyint(1) NOT NULL DEFAULT 1,
+                  `status` tinyint(1) NOT NULL DEFAULT 1,
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `uk_slug` (`slug`),
+                  KEY `idx_status` (`status`)',
+            'circle_members' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `circle_id` int unsigned NOT NULL DEFAULT 0,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `role` tinyint(1) NOT NULL DEFAULT 0,
+                  `joined_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `uk_circle_user` (`circle_id`,`user_id`),
+                  KEY `idx_user` (`user_id`)',
+            // 商城商品
+            'shop_items' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `username` varchar(80) NOT NULL DEFAULT \'\',
+                  `title` varchar(120) NOT NULL DEFAULT \'\',
+                  `description` text,
+                  `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+                  `stock` int NOT NULL DEFAULT 0,
+                  `image` varchar(500) NOT NULL DEFAULT \'\',
+                  `status` tinyint(1) NOT NULL DEFAULT 1,
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  KEY `idx_status` (`status`,`id`),
+                  KEY `idx_user` (`user_id`)',
         ];
     }
 

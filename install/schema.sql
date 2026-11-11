@@ -783,3 +783,54 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__chat_group_messages` (
   PRIMARY KEY (`id`),
   KEY `idx_group` (`group_id`, `id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- 圈子（兴趣小组）
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__circles` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) NOT NULL DEFAULT '',
+  `slug` varchar(80) NOT NULL DEFAULT '',
+  `description` varchar(500) NOT NULL DEFAULT '',
+  `icon` varchar(500) NOT NULL DEFAULT '',
+  `color` varchar(20) NOT NULL DEFAULT '#4D698E',
+  `forum_id` int unsigned NOT NULL DEFAULT 0,
+  `owner_id` int unsigned NOT NULL DEFAULT 0,
+  `member_count` int unsigned NOT NULL DEFAULT 0,
+  `is_open` tinyint(1) NOT NULL DEFAULT 1,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_slug` (`slug`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__circle_members` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `circle_id` int unsigned NOT NULL DEFAULT 0,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `role` tinyint(1) NOT NULL DEFAULT 0,
+  `joined_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_circle_user` (`circle_id`,`user_id`),
+  KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- 商城商品
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__shop_items` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `username` varchar(80) NOT NULL DEFAULT '',
+  `title` varchar(120) NOT NULL DEFAULT '',
+  `description` text,
+  `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `stock` int NOT NULL DEFAULT 0,
+  `image` varchar(500) NOT NULL DEFAULT '',
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_status` (`status`,`id`),
+  KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

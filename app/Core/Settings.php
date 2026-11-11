@@ -147,6 +147,9 @@ class Settings
         'single_width' => '',
         'theme_footer_text' => '#4e5969',
         'theme_footer_opacity' => '100',
+        // 商城：是否启用 / 是否允许普通用户发布商品
+        'shop_enable' => '1',
+        'shop_user_post' => '0',
         // 页脚右侧链接显示开关
         'footer_show_github' => '1',
         'footer_show_rss' => '1',

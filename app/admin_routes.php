@@ -94,9 +94,15 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     /* ---------- 圈子 / 商城 ---------- */
     Router::get('/global', $C . 'ExtController@global');
     Router::post('/global/footer', $C . 'ExtController@globalFooterSave', ['csrf']);
+    Router::post('/global/layout', $C . 'ExtController@globalLayoutSave', ['csrf']);
 
     Router::get('/circles', $C . 'CircleController@index');
+    Router::post('/circles/save', $C . 'CircleController@save', ['csrf']);
+    Router::post('/circles/delete/{id}', $C . 'CircleController@delete', ['csrf']);
     Router::get('/shops', $C . 'ShopController@index');
+    Router::post('/shops/save', $C . 'ShopController@save', ['csrf']);
+    Router::post('/shops/delete/{id}', $C . 'ShopController@delete', ['csrf']);
+    Router::post('/shops/settings', $C . 'ShopController@settings', ['csrf']);
 
     /* ---------- 小黑屋 ---------- */
     Router::get('/bans', $C . 'BanController@index');

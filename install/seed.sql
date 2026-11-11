@@ -37,10 +37,12 @@ INSERT INTO `__PREFIX__menus` (`id`,`title`,`url`,`icon`,`target`,`parent_id`,`v
 (2,'板块','/forums','category','_self',0,1,2),
 (4,'说说','/say','comment','_self',0,1,4),
 (5,'标签','/tags','tag','_self',0,1,5),
-(6,'签到','/checkin','calendar','_self',0,1,6),
-(7,'聊天','/pm','mail','_self',0,1,7),
-(8,'通知','/notifications','bell','_self',0,1,8),
-(9,'用户中心','/user','user','_self',0,1,9);
+(6,'圈子','/circles','group','_self',0,1,6),
+(7,'商城','/shops','cart','_self',0,1,7),
+(8,'签到','/checkin','calendar','_self',0,1,8),
+(9,'聊天','/pm','mail','_self',0,1,9),
+(10,'通知','/notifications','bell','_self',0,1,10),
+(11,'用户中心','/user','user','_self',0,1,11);
 
 -- 默认板块
 INSERT INTO `__PREFIX__forums` (`id`,`parent_id`,`name`,`slug`,`description`,`icon`,`color`,`type`,`sort_order`,`visible`) VALUES

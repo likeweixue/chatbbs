@@ -96,8 +96,6 @@ class UiController extends BaseAdmin
                 ['name' => 'island_sidebar_width', 'label' => '左侧导航栏宽度', 'type' => 'number',
                     'tip' => '200 - 360 px'],
                 ['name' => 'island_sidebar_default_hidden', 'label' => '默认隐藏侧栏', 'type' => 'switch'],
-                ['name' => 'layout_user_switch', 'label' => '允许用户切换布局', 'type' => 'switch',
-                    'tip' => '开启后前台顶栏显示布局切换按钮，访客可在双栏 / 单栏 / 三栏之间选择'],
             ],
         ]);
 
@@ -124,7 +122,6 @@ class UiController extends BaseAdmin
             'island_sidebar_side' => $side,
             'island_sidebar_width' => (string)$width,
             'island_sidebar_default_hidden' => Request::bool('island_sidebar_default_hidden') ? 1 : 0,
-            'layout_user_switch' => Request::bool('layout_user_switch') ? 1 : 0,
         ]);
         \App\Core\Cache::forget('settings');
         $this->log('修改三栏设置');

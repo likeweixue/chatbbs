@@ -281,6 +281,20 @@ class ExtController extends BaseAdmin
             . '<div class="adm-form-tip">透明度为 0 时完全透明；页脚使用 DIY 底部图片时，文字会使用白色以适配图片。</div>'
             . '</div></div>';
 
+        // 全局布局设置
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">全局布局设置</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('global/layout'),
+                'data' => Settings::all(),
+                'submit' => '保存全局布局设置',
+                'fields' => [
+                    ['name' => 'layout_user_switch', 'label' => '允许用户切换布局', 'type' => 'switch',
+                        'tip' => '开启后前台顶栏显示布局切换按钮，访客可在双栏 / 单栏 / 三栏之间选择；关闭后按钮变灰不可点'],
+                ],
+            ])
+            . '<div class="adm-form-tip">这里控制「访客能否自行切换布局」，单栏 / 双栏 / 三栏的具体参数请到各自设置页调整。</div>'
+            . '</div></div>';
+
         // 页脚显示控制
         $html .= '<div class="adm-panel"><div class="adm-panel-head">页脚显示</div><div class="adm-panel-body">'
             . AdminUI::form([
@@ -317,6 +331,14 @@ class ExtController extends BaseAdmin
         </script>';
 
         return $this->pageView('全局控制', 'global', $html);
+    }
+
+    public function globalLayoutSave(): void
+    {
+        Settings::set('layout_user_switch', Request::bool('layout_user_switch') ? 1 : 0);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改全局布局设置');
+        $this->back('全局布局设置已保存');
     }
 
     public function globalFooterSave(): void
