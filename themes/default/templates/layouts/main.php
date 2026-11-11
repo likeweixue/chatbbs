@@ -513,17 +513,25 @@ if (!$island && !$single) {
       <div class="text-xs" style="margin-top:4px"><?= h(config('site_footer', '')) ?></div>
     </div>
     <div class="cb-footer__meta">
-      <?php if (config('site_icp')): ?><span><?= h(config('site_icp')) ?></span><?php endif; ?>
-      <a class="cb-footer__github" href="https://github.com/likeweixue/chatbbs" target="_blank" rel="noopener"
-         title="GitHub 仓库" aria-label="GitHub 仓库"><?= cb_icon('github') ?><span>GitHub</span></a>
-      <?php if ((int)config('rss_enable', 1) === 1): ?>
+      <?php if ((int)config('footer_show_icp', 1) === 1 && config('site_icp')): ?><span><?= h(config('site_icp')) ?></span><?php endif; ?>
+      <?php if ((int)config('footer_show_github', 1) === 1): ?>
+        <a class="cb-footer__github" href="https://github.com/likeweixue/chatbbs" target="_blank" rel="noopener"
+           title="GitHub 仓库" aria-label="GitHub 仓库"><?= cb_icon('github') ?><span>GitHub</span></a>
+      <?php endif; ?>
+      <?php if ((int)config('footer_show_rss', 1) === 1 && (int)config('rss_enable', 1) === 1): ?>
         <a class="cb-footer__github cb-footer__rss" href="<?= h(url('rss')) ?>" title="RSS 订阅" aria-label="RSS 订阅">
           <?= cb_icon('rss') ?><span>RSS</span>
         </a>
       <?php endif; ?>
-      <a class="cb-footer__license" href="<?= h(url('jail')) ?>"><?= L('小黑屋') ?></a>
-      <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= L('授权') ?></a>
-      <span>页面耗时 <?= number_format((microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1) ?> ms</span>
+      <?php if ((int)config('footer_show_jail', 1) === 1): ?>
+        <a class="cb-footer__license" href="<?= h(url('jail')) ?>"><?= L('小黑屋') ?></a>
+      <?php endif; ?>
+      <?php if ((int)config('footer_show_license', 1) === 1): ?>
+        <a class="cb-footer__license" href="<?= h(url('license')) ?>"><?= L('授权') ?></a>
+      <?php endif; ?>
+      <?php if ((int)config('footer_show_time', 1) === 1): ?>
+        <span>页面耗时 <?= number_format((microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true))) * 1000, 1) ?> ms</span>
+      <?php endif; ?>
     </div>
   </div>
 </footer>

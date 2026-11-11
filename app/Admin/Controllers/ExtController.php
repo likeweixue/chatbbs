@@ -154,7 +154,15 @@ class ExtController extends BaseAdmin
             ],
         ]);
 
-        $html .= '<div class="adm-panel"><div class="adm-panel-head">外观微调（圆角 / 主色）</div><div class="adm-panel-body">'
+        return $this->pageView('主题管理', 'themes', $html);
+    }
+
+    /**
+     * 全局控制：外观微调 / 默认布局 / 站点布局 / DIY / 全局颜色 / 页脚显示
+     */
+    public function global(): string
+    {
+        $html = '<div class="adm-panel"><div class="adm-panel-head">外观微调（圆角 / 主色）</div><div class="adm-panel-body">'
             . AdminUI::form([
                 'action' => admin_url('themes/appearance'),
                 'data' => [
@@ -164,15 +172,8 @@ class ExtController extends BaseAdmin
                 'submit' => '保存外观设置',
                 'fields' => [
                     ['name' => 'theme_radius', 'label' => '圆角大小', 'type' => 'select', 'options' => [
-                        '0' => '0 px（完全直角）',
-                        '2' => '2 px',
-                        '4' => '4 px（偏方正）',
-                        '6' => '6 px',
-                        '8' => '8 px（默认）',
-                        '10' => '10 px',
-                        '12' => '12 px',
-                        '16' => '16 px（偏圆润）',
-                        '20' => '20 px',
+                        '0' => '0 px（完全直角）', '2' => '2 px', '4' => '4 px（偏方正）', '6' => '6 px',
+                        '8' => '8 px（默认）', '10' => '10 px', '12' => '12 px', '16' => '16 px（偏圆润）', '20' => '20 px',
                     ], 'tip' => '控制卡片、按钮、输入框等所有元素的圆角；设为 0 即为方方正正的直角风格'],
                     ['name' => 'theme_primary', 'label' => '主题主色', 'type' => 'color', 'tip' => '影响链接、按钮、标签等主色调'],
                     ['name' => 'avatar_shape', 'label' => '头像形状', 'type' => 'select', 'options' => ['circle' => '圆形（默认）', 'square' => '圆角方形'], 'tip' => '影响前台所有用户头像'],
@@ -201,7 +202,7 @@ class ExtController extends BaseAdmin
             . '<div class="adm-form-tip">这些设置只在“默认布局”下显示；切换到工作台布局后本面板会自动禁用，但配置会保留。</div>'
             . '</div></div>';
 
-        // 站点布局：默认 / 工作台（参考 OpenIsle 的交互方向）
+        // 站点布局
         $islandWidth = max(200, min(360, (int)Settings::get('island_sidebar_width', 240)));
         $curLayout = (string)Settings::get('site_layout', 'classic');
         $layoutData = [
@@ -280,6 +281,24 @@ class ExtController extends BaseAdmin
             . '<div class="adm-form-tip">透明度为 0 时完全透明；页脚使用 DIY 底部图片时，文字会使用白色以适配图片。</div>'
             . '</div></div>';
 
+        // 页脚显示控制
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">页脚显示</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('global/footer'),
+                'data' => Settings::all(),
+                'submit' => '保存页脚设置',
+                'fields' => [
+                    ['name' => 'footer_show_github', 'label' => '显示 GitHub 链接', 'type' => 'switch'],
+                    ['name' => 'footer_show_rss', 'label' => '显示 RSS 链接', 'type' => 'switch'],
+                    ['name' => 'footer_show_jail', 'label' => '显示小黑屋链接', 'type' => 'switch'],
+                    ['name' => 'footer_show_license', 'label' => '显示授权链接', 'type' => 'switch'],
+                    ['name' => 'footer_show_icp', 'label' => '显示 ICP 备案号', 'type' => 'switch'],
+                    ['name' => 'footer_show_time', 'label' => '显示页面耗时', 'type' => 'switch'],
+                ],
+            ])
+            . '<div class="adm-form-tip">默认全部显示；关闭后前台页脚对应链接隐藏。</div>'
+            . '</div></div>';
+
         $html .= '<script>
         (function () {
           var sel = document.getElementById("f-site_layout");
@@ -297,7 +316,20 @@ class ExtController extends BaseAdmin
         })();
         </script>';
 
-        return $this->pageView('主题管理', 'themes', $html);
+        return $this->pageView('全局控制', 'global', $html);
+    }
+
+    public function globalFooterSave(): void
+    {
+        $keys = ['footer_show_github', 'footer_show_rss', 'footer_show_jail', 'footer_show_license', 'footer_show_icp', 'footer_show_time'];
+        $data = [];
+        foreach ($keys as $k) {
+            $data[$k] = Request::bool($k) ? 1 : 0;
+        }
+        Settings::setMany($data);
+        \App\Core\Cache::forget('settings');
+        $this->log('修改页脚显示');
+        $this->back('页脚设置已保存');
     }
 
     /**

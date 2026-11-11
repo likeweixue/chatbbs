@@ -92,6 +92,9 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::post('/chat-groups/settings', $C . 'ChatGroupController@saveSettings', ['csrf']);
 
     /* ---------- 圈子 / 商城 ---------- */
+    Router::get('/global', $C . 'ExtController@global');
+    Router::post('/global/footer', $C . 'ExtController@globalFooterSave', ['csrf']);
+
     Router::get('/circles', $C . 'CircleController@index');
     Router::get('/shops', $C . 'ShopController@index');
 

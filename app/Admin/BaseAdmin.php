@@ -78,6 +78,7 @@ abstract class BaseAdmin
                 ['label' => '双栏设置', 'url' => 'interface/double', 'key' => 'interface.double'],
                 ['label' => '三栏设置', 'url' => 'interface/triple', 'key' => 'interface.triple'],
                 ['label' => '菜单管理', 'url' => 'menus', 'key' => 'menus'],
+                ['label' => '全局控制', 'url' => 'global', 'key' => 'global'],
             ],
         ],
         'user' => [
@@ -226,6 +227,7 @@ abstract class BaseAdmin
             'interface.single' => '单栏 布局 宽度',
             'interface.double' => '双栏 侧边栏 模块',
             'interface.triple' => '三栏 工作台 侧边栏 模块',
+            'global' => '全局控制 外观 颜色 页脚 footer global',
             'circles' => '圈子 circle 群组',
             'shops' => '商城 商品 shop',
             'list_tabs' => '筛选 列表 标签栏 tabs 分类',

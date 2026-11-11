@@ -147,6 +147,13 @@ class Settings
         'single_width' => '',
         'theme_footer_text' => '#4e5969',
         'theme_footer_opacity' => '100',
+        // 页脚右侧链接显示开关
+        'footer_show_github' => '1',
+        'footer_show_rss' => '1',
+        'footer_show_jail' => '1',
+        'footer_show_license' => '1',
+        'footer_show_time' => '1',
+        'footer_show_icp' => '1',
         // 网站导航页
         'nav_title' => '网站导航',
         'nav_slug' => 'nav',
