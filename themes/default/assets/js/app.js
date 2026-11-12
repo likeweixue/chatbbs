@@ -1301,3 +1301,18 @@
     });
   });
 })();
+
+/* 通用面板折叠（单栏底部统计 / 友链） */
+(function () {
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-toggle-panel]');
+    if (!btn) return;
+    var id = btn.getAttribute('data-toggle-panel');
+    var body = document.getElementById(id);
+    if (!body) return;
+    var hidden = body.style.display === 'none';
+    body.style.display = hidden ? '' : 'none';
+    btn.classList.toggle('is-collapsed', !hidden);
+    btn.setAttribute('aria-expanded', hidden ? 'true' : 'false');
+  });
+})();

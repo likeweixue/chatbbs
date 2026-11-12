@@ -27,10 +27,11 @@ class FriendLinkController extends BaseAdmin
             $name = trim((string)($parts[0] ?? ''));
             $url = trim((string)($parts[1] ?? ''));
             $desc = trim((string)($parts[2] ?? ''));
+            $icon = trim((string)($parts[3] ?? ''));
             if ($name === '' && $url === '') {
                 continue;
             }
-            $out[] = ['name' => $name !== '' ? $name : $url, 'url' => $url, 'desc' => $desc];
+            $out[] = ['name' => $name !== '' ? $name : $url, 'url' => $url, 'desc' => $desc, 'icon' => $icon];
         }
         return $out;
     }
@@ -42,10 +43,11 @@ class FriendLinkController extends BaseAdmin
             $name = trim((string)($l['name'] ?? ''));
             $url = trim((string)($l['url'] ?? ''));
             $desc = trim((string)($l['desc'] ?? ''));
+            $icon = trim((string)($l['icon'] ?? ''));
             if ($name === '' && $url === '') {
                 continue;
             }
-            $lines[] = $name . '|' . $url . ($desc !== '' ? '|' . $desc : '');
+            $lines[] = $name . '|' . $url . '|' . $desc . ($icon !== '' ? '|' . $icon : '');
         }
         Settings::set('friend_links', implode("\n", $lines));
         \App\Core\Cache::forget('settings');
@@ -57,7 +59,7 @@ class FriendLinkController extends BaseAdmin
         $html = '<div class="adm-alert info">友情链接统一在这里维护，单栏、双栏、三栏布局会自动同步。</div>';
         $rows = [];
         foreach ($links as $i => $l) {
-            $rows[] = ['id' => $i, 'name' => $l['name'], 'url' => $l['url'], 'desc' => $l['desc'] ?? ''];
+            $rows[] = ['id' => $i, 'name' => $l['name'], 'url' => $l['url'], 'desc' => $l['desc'] ?? '', 'icon' => $l['icon'] ?? ''];
         }
         $html .= AdminUI::table([
             'primary' => 'id',
@@ -81,6 +83,7 @@ class FriendLinkController extends BaseAdmin
                     ['name' => 'name', 'label' => '名称'],
                     ['name' => 'url', 'label' => '网址', 'tip' => '完整 http(s):// 地址'],
                     ['name' => 'desc', 'label' => '介绍', 'type' => 'textarea', 'rows' => 2, 'tip' => '显示在单栏友情链接面板里'],
+                    ['name' => 'icon', 'label' => '头像', 'type' => 'image', 'tip' => '可上传或填图床地址；留空自动读取网站 ICO'],
                 ],
             ]) . '</div></div>';
 
@@ -92,11 +95,12 @@ class FriendLinkController extends BaseAdmin
         $name = $this->pure('name', 80);
         $url = $this->pure('url', 500);
         $desc = $this->pure('desc', 255);
+        $icon = $this->pure('icon', 500);
         if ($name === '' || $url === '') {
             $this->back('名称和网址不能为空', 'error');
         }
         $links = self::links();
-        $links[] = ['name' => $name, 'url' => $url, 'desc' => $desc];
+        $links[] = ['name' => $name, 'url' => $url, 'desc' => $desc, 'icon' => $icon];
         self::persist($links);
         $this->log('新增友情链接', $name);
         $this->back('友情链接已添加');

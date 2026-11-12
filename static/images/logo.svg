@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="ChatBBS logo">
+  <defs>
+    <radialGradient id="cbOrange" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#ffd08a"/>
+      <stop offset="45%" stop-color="#ff9e3d"/>
+      <stop offset="100%" stop-color="#e2661a"/>
+    </radialGradient>
+    <radialGradient id="cbCore" cx="40%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#fff3d9"/>
+      <stop offset="60%" stop-color="#ffb15c"/>
+      <stop offset="100%" stop-color="#d95a12"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(120,120)">
+    <g>
+    <path transform="rotate(0.00) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(10.91) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(21.82) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(32.73) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(43.64) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(54.55) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(65.45) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(76.36) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(87.27) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(98.18) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(109.09) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(120.00) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(130.91) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(141.82) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(152.73) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(163.64) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(174.55) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(185.45) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(196.36) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(207.27) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(218.18) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(229.09) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(240.00) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(250.91) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(261.82) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(272.73) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(283.64) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(294.55) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(305.45) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(316.36) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(327.27) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(338.18) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    <path transform="rotate(349.09) translate(0,-86)" d="M0,-21 C7.5,-13 7.5,2.5 0,13 C-7.5,2.5 -7.5,-13 0,-21 Z" fill="url(#cbOrange)" opacity="0.85"/>
+    </g>
+    <g>
+    <path transform="rotate(0.00) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(16.36) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(32.73) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(49.09) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(65.45) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(81.82) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(98.18) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(114.55) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(130.91) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(147.27) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(163.64) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(180.00) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(196.36) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(212.73) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(229.09) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(245.45) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(261.82) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(278.18) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(294.55) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(310.91) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(327.27) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    <path transform="rotate(343.64) translate(0,-54)" d="M0,-15 C5.5,-9 5.5,1.5 0,8.5 C-5.5,1.5 -5.5,-9 0,-15 Z" fill="#ff8a1f" opacity="0.95"/>
+    </g>
+    <circle r="34" fill="#fff7ea" opacity="0.95"/>
+    <circle r="24" fill="url(#cbCore)"/>
+    <circle r="10" fill="#fff7ea" opacity="0.9"/>
+  </g>
+</svg>

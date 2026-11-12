@@ -2671,3 +2671,10 @@ body.cb-single .cb-footer-panels .cb-card:last-child { margin-bottom: 0; }
 .cb-friend-main h5 a { color: var(--color-text); }
 .cb-friend-main h5 a:hover { color: var(--color-primary); }
 .cb-friend-main p { margin: 0; font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }
+
+/* 板块行图标放大，和行高更协调 */
+.cb-forum-row-icon { width: 40px; height: 40px; }
+.cb-forum-row-icon.cb-forum-icon--empty .cb-ico { width: 22px; height: 22px; }
+/* 分区卡片之间不再留白色缝隙 */
+.cb-forum-block { margin-bottom: 10px; }
+.cb-content .cb-forum-block:last-child { margin-bottom: 0; }

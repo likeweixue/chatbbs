@@ -18,10 +18,11 @@ class HomeController extends BaseController
         $homeMenuId = (int)Settings::get('home_menu_id', 0);
         if ($homeMenuId > 0) {
             $home = \App\Core\Database::fetch('SELECT url FROM ' . \App\Core\Database::table('menus') . ' WHERE id = ?', [$homeMenuId]);
-            if ($home && ($home['url'] ?? '') !== '') {
-                $url = (string)$home['url'];
-                if (str_starts_with($url, '/')) {
-                    $url = site_base() . ltrim($url, '/');
+            $url = trim((string)($home['url'] ?? ''));
+            // 首页就是「导读」本身时不能重定向，否则会无限循环
+            if ($url !== '' && $url !== '/' && $url !== './') {
+                if (!preg_match('#^https?://#i', $url)) {
+                    $url = rtrim(site_base(), '/') . '/' . ltrim($url, '/');
                 }
                 redirect($url);
             }

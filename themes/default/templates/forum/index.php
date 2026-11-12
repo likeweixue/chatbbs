@@ -141,9 +141,8 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
       var id = btn.getAttribute('data-toggle-cat');
       var body = document.getElementById('cat-' + id);
       if (!body) return;
-      var saved = null;
-      try { saved = localStorage.getItem('cb_cat_' + id); } catch (e) {}
-      var hidden = saved === '1';
+      // 分区默认全部展开（不读取上次折叠状态，避免新访客看到收起的板块）
+      var hidden = false;
       body.classList.toggle('is-collapsed', hidden);
       btn.classList.toggle('is-collapsed', hidden);
       btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
@@ -162,6 +161,5 @@ $renderRow = function (array $b, int $level) use (&$renderRow): string {
     btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
     var card = btn.closest('.cb-forum-block');
     if (card) { card.classList.toggle('is-collapsed', hidden); }
-    try { localStorage.setItem('cb_cat_' + id, hidden ? '1' : '0'); } catch (e) {}
   });
 </script>

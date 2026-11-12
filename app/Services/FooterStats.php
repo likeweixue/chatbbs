@@ -26,13 +26,14 @@ class FooterStats
             $name = trim((string)($parts[0] ?? ''));
             $url = trim((string)($parts[1] ?? ''));
             $desc = trim((string)($parts[2] ?? ''));
+            $icon = trim((string)($parts[3] ?? ''));
             if ($url === '') {
                 continue;
             }
             if (!preg_match('#^https?://#i', $url)) {
                 $url = 'https://' . $url;
             }
-            $out[] = ['name' => $name !== '' ? $name : $url, 'url' => $url, 'desc' => $desc];
+            $out[] = ['name' => $name !== '' ? $name : $url, 'url' => $url, 'desc' => $desc, 'icon' => $icon];
         }
         return $out;
     }

@@ -476,8 +476,8 @@ if ($single) {
 <?php if ($footerStats): ?>
 <div class="cb-footer-panels">
   <div class="cb-card">
-    <div class="cb-card__header"><?= L('论坛统计') ?></div>
-    <div class="cb-card__body">
+    <div class="cb-card__header"><?= L('论坛统计') ?><button class="cb-forum-toggle" type="button" title="<?= L('收起 / 展开') ?>" aria-label="<?= L('收起 / 展开') ?>" data-toggle-panel="footer-stats-body" aria-expanded="true"></button></div>
+    <div class="cb-card__body" id="footer-stats-body">
       <div class="cb-footer-stats">
         <div class="cb-footer-stats__item"><b><?= (int)$footerStats['threads'] ?></b><span><?= L('主题') ?></span></div>
         <div class="cb-footer-stats__item"><b><?= (int)$footerStats['posts'] ?></b><span><?= L('回复') ?></span></div>
@@ -495,12 +495,13 @@ if ($single) {
   </div>
   <?php if ($footerLinks): ?>
     <div class="cb-card">
-      <div class="cb-card__header"><?= L('友情链接') ?></div>
-      <div class="cb-card__body">
+      <div class="cb-card__header"><?= L('友情链接') ?><button class="cb-forum-toggle" type="button" title="<?= L('收起 / 展开') ?>" aria-label="<?= L('收起 / 展开') ?>" data-toggle-panel="footer-links-body" aria-expanded="true"></button></div>
+      <div class="cb-card__body" id="footer-links-body">
         <div class="cb-friend-list">
           <?php foreach ($footerLinks as $link):
             $host = (string)(parse_url($link['url'], PHP_URL_HOST) ?: '');
-            $favicon = $host !== '' ? 'https://' . $host . '/favicon.ico' : '';
+            $icon = trim((string)($link['icon'] ?? ''));
+            $favicon = $icon !== '' ? $icon : ($host !== '' ? 'https://' . $host . '/favicon.ico' : '');
           ?>
             <div class="cb-friend-item">
               <?php if ($favicon !== ''): ?><img class="cb-friend-ico" src="<?= h($favicon) ?>" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><?php endif; ?>

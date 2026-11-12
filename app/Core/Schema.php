@@ -79,6 +79,25 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC30：默认把「板块」设为首页（若当前首页为空 / 指向导读）
+        if ((int)Settings::get('migration_rc30_home_forums', 0) !== 1) {
+            try {
+                $forumsId = (int)Database::value('SELECT id FROM ' . Database::table('menus') . " WHERE url = '/forums' LIMIT 1", [], 0);
+                if ($forumsId > 0) {
+                    $curId = (int)Settings::get('home_menu_id', 0);
+                    $curUrl = $curId > 0
+                        ? (string)Database::value('SELECT url FROM ' . Database::table('menus') . ' WHERE id = ?', [$curId], '')
+                        : '';
+                    if ($curUrl === '' || $curUrl === '/') {
+                        Settings::set('home_menu_id', (string)$forumsId);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Logger::error('RC30 首页板块迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc30_home_forums', 1);
+        }
+
         // RC26：新增维基导航菜单（仅当不存在时）
         if ((int)Settings::get('migration_rc26_wiki_menu', 0) !== 1) {
             try {
