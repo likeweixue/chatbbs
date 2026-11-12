@@ -2678,3 +2678,8 @@ body.cb-single .cb-footer-panels .cb-card:last-child { margin-bottom: 0; }
 /* 分区卡片之间不再留白色缝隙 */
 .cb-forum-block { margin-bottom: 10px; }
 .cb-content .cb-forum-block:last-child { margin-bottom: 0; }
+
+/* 板块介绍与板块名称对齐（图标 44px + 间距 7px） */
+.cb-forum-table .fl_desc { margin-left: 61px; }
+.cb-forum-row-icon { width: 44px; height: 44px; }
+.cb-forum-table tr.fl_sub .fl_desc { margin-left: 79px; }

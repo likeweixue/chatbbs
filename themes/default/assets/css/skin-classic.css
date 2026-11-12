@@ -62,3 +62,32 @@ html[data-theme="dark"] .cb-footer { background: #222a33; border-top-color: #3b4
 html[data-theme="dark"] .cb-footer__inner { border-top-color: #3b4653; }
 html[data-theme="dark"] .cb-btn { background: #2a333d; border-color: #3b4653; color: #cfe2f2; }
 html[data-theme="dark"] .cb-btn:hover { background: #344251; border-color: #5b7086; color: #e6f0f8; }
+
+/* 三栏：内容区贴合左右侧栏，去掉左右留白 */
+.cb-main--island .cb-content { padding-left: 0; padding-right: 0; }
+.cb-main--island .cb-content > .cb-card,
+.cb-main--island .cb-content > .cb-thread-detail { border-left: 0; border-right: 0; }
+
+/* 黑金调色板：避免经典皮肤出现白底 */
+html[data-palette="blackgold"] body.cb-body { background: #17140d; }
+html[data-palette="blackgold"] .cb-card { background: #211d14; border-color: #4a4028; }
+html[data-palette="blackgold"] .cb-card__header { background: #2b2518 !important; border-color: #4a4028 !important; color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-card__header a,
+html[data-palette="blackgold"] .cb-card__header .more { color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-card__footer { background: #1d1911; border-color: #4a4028; }
+html[data-palette="blackgold"] .cb-header { background: #211d14 !important; border-bottom-color: #4a4028 !important; }
+html[data-palette="blackgold"] .cb-nav a { color: #cbbd9a; }
+html[data-palette="blackgold"] .cb-nav a.active,
+html[data-palette="blackgold"] .cb-nav a:hover { background: #2f291b !important; color: #f5dfa6 !important; }
+html[data-palette="blackgold"] .cb-forum-block { border-color: #4a4028; }
+html[data-palette="blackgold"] .cb-forum-block__head { background: #2b2518 !important; border-color: #4a4028 !important; color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-forum-block__head .cb-forum-block__title { color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-forum-table .fl_row { border-bottom-color: #3f3722; }
+html[data-palette="blackgold"] .cb-forum-table .fl_row:nth-child(odd) { background: #1d1911; }
+html[data-palette="blackgold"] .cb-forum-table .fl_row:hover { background: #2a2416; }
+html[data-palette="blackgold"] .cb-footer { background: #211d14; border-top-color: #4a4028; }
+html[data-palette="blackgold"] .cb-footer__inner { border-top-color: #4a4028; }
+html[data-palette="blackgold"] .cb-btn { background: #2b2518; border-color: #4a4028; color: #f0d48a; }
+html[data-palette="blackgold"] .cb-btn:hover { background: #3a3220; border-color: #7a683e; color: #ffe9b0; }
+html[data-palette="blackgold"] .cb-tab { color: #cbbd9a; }
+html[data-palette="blackgold"] .cb-tab.active { background: #a88418; color: #fff; }
