@@ -22,7 +22,8 @@ class HomeController extends BaseController
             // 首页就是「导读」本身时不能重定向，否则会无限循环
             if ($url !== '' && $url !== '/' && $url !== './') {
                 if (!preg_match('#^https?://#i', $url)) {
-                    $url = rtrim(site_base(), '/') . '/' . ltrim($url, '/');
+                    // 兼容 query 模式：/forums 应转成 ?r=forums，而不是裸路径
+                    $url = url(ltrim($url, '/'));
                 }
                 redirect($url);
             }
