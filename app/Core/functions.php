@@ -158,7 +158,12 @@ if (!function_exists('theme_asset')) {
     function theme_asset(string $path): string
     {
         $theme = (string)config('theme', 'default');
-        return site_base() . '/themes/' . $theme . '/assets/' . ltrim($path, '/');
+        $path = ltrim($path, '/');
+        // 子主题缺失的静态资源回退到 default
+        if (!is_file(CB_THEME_DIR . '/' . $theme . '/assets/' . $path)) {
+            $theme = 'default';
+        }
+        return site_base() . '/themes/' . $theme . '/assets/' . $path;
     }
 }
 

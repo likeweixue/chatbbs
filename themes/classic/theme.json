@@ -1,0 +1,8 @@
+{
+  "name": "经典",
+  "slug": "classic",
+  "version": "1.0.0",
+  "author": "ChatBBS",
+  "description": "经典论坛主题：方角、细边框、纯色标题栏，适合喜欢传统 PHPwind 风格的用户。",
+  "supports": ["dark-mode", "responsive", "sidebar-right", "island", "single-column"]
+}

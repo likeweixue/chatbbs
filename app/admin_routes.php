@@ -212,7 +212,6 @@ Router::post('/sidebar/island-menu', $C . 'SettingController@saveIslandMenu', ['
     Router::post('/plugins/remove/{id}', $C . 'ExtController@pluginRemove', ['csrf']);
 
     Router::get('/themes', $C . 'ExtController@themes');
-    Router::post('/themes/skin', $C . 'ExtController@themeSkinSave', ['csrf']);
     Router::post('/themes/enable/{id}', $C . 'ExtController@themeEnable', ['csrf']);
     Router::post('/themes/appearance', $C . 'ExtController@themeAppearance', ['csrf']);
 Router::post('/themes/layout', $C . 'ExtController@themeLayoutSave', ['csrf']);

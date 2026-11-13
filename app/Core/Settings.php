@@ -151,8 +151,6 @@ class Settings
         'single_footer_panels' => '1',
         'theme_footer_text' => '#4e5969',
         'theme_footer_opacity' => '100',
-        // 风格皮肤：default 默认 / classic 经典论坛（PHPwind 风格）
-        'theme_skin' => 'default',
         // 商城：是否启用 / 是否允许普通用户发布商品
         'shop_enable' => '1',
         'shop_user_post' => '0',

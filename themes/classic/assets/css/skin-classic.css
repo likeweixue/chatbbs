@@ -1,0 +1,93 @@
+/* 经典论坛皮肤（PHPwind 风格）：方角、细边框、纯色标题栏 */
+:root {
+  --radius: 0px;
+  --radius-sm: 0px;
+  --shadow: none;
+  --shadow-sm: none;
+  --cb-classic-line: #9db3c8;
+}
+body.cb-body { background: #eef3f7; }
+.cb-header { background: #ffffff !important; border-bottom: 2px solid var(--cb-classic-line) !important; box-shadow: none !important; }
+.cb-logo__text { font-family: Georgia, "Times New Roman", serif; letter-spacing: 0; }
+.cb-nav a { border-radius: 0 !important; color: #33556f; }
+.cb-nav a.active, .cb-nav a:hover { background: #dce8f3 !important; color: #1f4e79 !important; }
+.cb-card { border: 1px solid var(--cb-classic-line); border-radius: 0; box-shadow: none; background: #fff; }
+.cb-card__header {
+  background: #e6eef6 !important;
+  border-bottom: 1px solid var(--cb-classic-line) !important;
+  color: #1f4e79 !important; font-weight: 700;
+}
+.cb-card__header a, .cb-card__header .more { color: #1f4e79 !important; }
+.cb-card__footer { background: #f2f7fb; border-top: 1px solid var(--cb-classic-line); }
+.cb-btn, .cb-input, .cb-select, .cb-tag, .cb-badge-pill { border-radius: 0 !important; }
+.cb-btn { background: #f4f8fb; border-color: var(--cb-classic-line); color: #1f4e79; }
+.cb-btn:hover { background: #e2edf7; border-color: #6f94b8; color: #1f4e79; }
+.cb-btn-newthread { background: #1f6fb2; border-color: #1f6fb2; color: #fff; }
+.cb-tabs { border-bottom: 1px solid var(--cb-classic-line); }
+.cb-tab { border-radius: 0; color: #33556f; }
+.cb-tab.active { background: #1f6fb2; color: #fff; border-radius: 0; }
+.cb-thread-list .cb-trow { border-bottom: 1px solid #c9d7e4; }
+.cb-forum-table .fl_row { border-bottom: 1px solid #c9d7e4; }
+.cb-forum-table .fl_row:nth-child(odd) { background: #f7fafc; }
+.cb-forum-table .fl_row:hover { background: #eaf2f9; }
+.cb-forum-block { border: 1px solid var(--cb-classic-line); }
+.cb-forum-block__head {
+  background: #dfe9f3 !important;
+  border-bottom: 1px solid var(--cb-classic-line) !important;
+  color: #1f4e79 !important;
+}
+.cb-forum-block__head .cb-forum-block__title { color: #1f4e79 !important; }
+.cb-sidebar .cb-card__header, .cb-island-nav, .cb-island-sidebar { border-radius: 0; }
+.cb-footer { background: #fff; border-top: 2px solid var(--cb-classic-line); }
+.cb-footer__inner { border-top: 1px solid #c9d7e4; padding-top: 14px; }
+.cb-badge-pill { line-height: 16px; }
+.cb-pagination .page { border-radius: 0; border: 1px solid var(--cb-classic-line); }
+
+/* 暗色模式兼容 */
+html[data-theme="dark"] body.cb-body { background: #171c22; }
+html[data-theme="dark"] .cb-card { background: #222a33; border-color: #3b4653; }
+html[data-theme="dark"] .cb-card__header { background: #2a333d !important; border-color: #3b4653 !important; color: #dce6f0 !important; }
+html[data-theme="dark"] .cb-card__header a, html[data-theme="dark"] .cb-card__header .more { color: #dce6f0 !important; }
+html[data-theme="dark"] .cb-card__footer { background: #1f262e; border-color: #3b4653; }
+html[data-theme="dark"] .cb-header { background: #222a33 !important; border-bottom-color: #3b4653 !important; }
+html[data-theme="dark"] .cb-nav a { color: #a9bccd; }
+html[data-theme="dark"] .cb-nav a.active, html[data-theme="dark"] .cb-nav a:hover { background: #2a3742 !important; color: #cfe2f2 !important; }
+html[data-theme="dark"] .cb-forum-block { border-color: #3b4653; }
+html[data-theme="dark"] .cb-forum-block__head { background: #2a333d !important; border-color: #3b4653 !important; color: #dce6f0 !important; }
+html[data-theme="dark"] .cb-forum-block__head .cb-forum-block__title { color: #dce6f0 !important; }
+html[data-theme="dark"] .cb-forum-table .fl_row { border-bottom-color: #3b4653; }
+html[data-theme="dark"] .cb-forum-table .fl_row:nth-child(odd) { background: #1e252d; }
+html[data-theme="dark"] .cb-forum-table .fl_row:hover { background: #26313c; }
+html[data-theme="dark"] .cb-footer { background: #222a33; border-top-color: #3b4653; }
+html[data-theme="dark"] .cb-footer__inner { border-top-color: #3b4653; }
+html[data-theme="dark"] .cb-btn { background: #2a333d; border-color: #3b4653; color: #cfe2f2; }
+html[data-theme="dark"] .cb-btn:hover { background: #344251; border-color: #5b7086; color: #e6f0f8; }
+
+/* 三栏：内容区贴合左右侧栏，去掉左右留白 */
+.cb-main--island .cb-content { padding-left: 0; padding-right: 0; }
+.cb-main--island .cb-content > .cb-card,
+.cb-main--island .cb-content > .cb-thread-detail { border-left: 0; border-right: 0; }
+
+/* 黑金调色板：避免经典皮肤出现白底 */
+html[data-palette="blackgold"] body.cb-body { background: #17140d; }
+html[data-palette="blackgold"] .cb-card { background: #211d14; border-color: #4a4028; }
+html[data-palette="blackgold"] .cb-card__header { background: #2b2518 !important; border-color: #4a4028 !important; color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-card__header a,
+html[data-palette="blackgold"] .cb-card__header .more { color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-card__footer { background: #1d1911; border-color: #4a4028; }
+html[data-palette="blackgold"] .cb-header { background: #211d14 !important; border-bottom-color: #4a4028 !important; }
+html[data-palette="blackgold"] .cb-nav a { color: #cbbd9a; }
+html[data-palette="blackgold"] .cb-nav a.active,
+html[data-palette="blackgold"] .cb-nav a:hover { background: #2f291b !important; color: #f5dfa6 !important; }
+html[data-palette="blackgold"] .cb-forum-block { border-color: #4a4028; }
+html[data-palette="blackgold"] .cb-forum-block__head { background: #2b2518 !important; border-color: #4a4028 !important; color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-forum-block__head .cb-forum-block__title { color: #f0d48a !important; }
+html[data-palette="blackgold"] .cb-forum-table .fl_row { border-bottom-color: #3f3722; }
+html[data-palette="blackgold"] .cb-forum-table .fl_row:nth-child(odd) { background: #1d1911; }
+html[data-palette="blackgold"] .cb-forum-table .fl_row:hover { background: #2a2416; }
+html[data-palette="blackgold"] .cb-footer { background: #211d14; border-top-color: #4a4028; }
+html[data-palette="blackgold"] .cb-footer__inner { border-top-color: #4a4028; }
+html[data-palette="blackgold"] .cb-btn { background: #2b2518; border-color: #4a4028; color: #f0d48a; }
+html[data-palette="blackgold"] .cb-btn:hover { background: #3a3220; border-color: #7a683e; color: #ffe9b0; }
+html[data-palette="blackgold"] .cb-tab { color: #cbbd9a; }
+html[data-palette="blackgold"] .cb-tab.active { background: #a88418; color: #fff; }

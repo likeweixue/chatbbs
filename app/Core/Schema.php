@@ -79,6 +79,18 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC35：经典皮肤升级为独立主题；原 theme_skin=classic 的站点自动切到 classic 主题
+        if ((int)Settings::get('migration_rc35_classic_theme', 0) !== 1) {
+            try {
+                if ((string)Settings::get('theme_skin', 'default') === 'classic' && is_dir(CB_THEME_DIR . '/classic')) {
+                    Settings::set('theme', 'classic');
+                }
+            } catch (\Throwable $e) {
+                Logger::error('RC35 经典主题迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc35_classic_theme', 1);
+        }
+
         // RC33：单栏统计 / 友情链接面板拆成两个开关
         if ((int)Settings::get('migration_rc33_single_panels', 0) !== 1) {
             try {

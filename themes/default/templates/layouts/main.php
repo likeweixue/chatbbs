@@ -75,7 +75,7 @@ $favicon = (string)config('site_favicon', '');
 <link rel="alternate" type="application/rss+xml" title="<?= h($siteName) ?> RSS" href="<?= h(url('rss')) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
-<?php if ((string)config('theme_skin', 'default') === 'classic'): ?>
+<?php if (\App\Core\View::theme() === 'classic'): ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/skin-classic.css') . '?v=' . CB_VERSION) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="<?= h(theme_asset('css/yitext.css') . '?v=' . CB_VERSION) ?>">

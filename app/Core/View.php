@@ -36,7 +36,12 @@ class View
 
     public static function path(string $view): string
     {
-        return CB_THEME_DIR . '/' . self::theme() . '/templates/' . $view . '.php';
+        $file = CB_THEME_DIR . '/' . self::theme() . '/templates/' . $view . '.php';
+        // 子主题可以只覆盖部分模板，其余回退到 default
+        if (!is_file($file)) {
+            $file = CB_THEME_DIR . '/default/templates/' . $view . '.php';
+        }
+        return $file;
     }
 
     public static function exists(string $view): bool

@@ -154,34 +154,10 @@ class ExtController extends BaseAdmin
             ],
         ]);
 
-        $html .= '<div class="adm-panel"><div class="adm-panel-head">内置主题</div><div class="adm-panel-body">'
-            . AdminUI::form([
-                'action' => admin_url('themes/skin'),
-                'data' => Settings::all(),
-                'submit' => '保存皮肤',
-                'fields' => [
-                    ['name' => 'theme_skin', 'label' => '界面风格', 'type' => 'select', 'options' => [
-                        'default' => '简洁（现代）',
-                        'classic' => '经典（PHPwind 风格）',
-                    ], 'tip' => '两套内置主题可随时切换：简洁偏现代，经典偏传统论坛（方角、细边框）'],
-                ],
-            ]) . '</div></div>';
-
         return $this->pageView('主题管理', 'themes', $html);
     }
 
-    public function themeSkinSave(): void
-    {
-        $skin = Request::post('theme_skin', 'default') === 'classic' ? 'classic' : 'default';
-        Settings::set('theme_skin', $skin);
-        \App\Core\Cache::forget('settings');
-        $this->log('修改风格皮肤', $skin);
-        $this->back('皮肤已保存');
-    }
 
-    /**
-     * 全局控制：外观微调 / 默认布局 / 站点布局 / DIY / 全局颜色 / 页脚显示
-     */
     public function global(): string
     {
         $html = '<div class="adm-panel"><div class="adm-panel-head">外观微调（圆角 / 主色）</div><div class="adm-panel-body">'
