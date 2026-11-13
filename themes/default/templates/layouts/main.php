@@ -468,7 +468,7 @@ if ($forumHeaderBg !== '#f7f8fa') { $vars .= "--cb-forum-head-bg:{$forumHeaderBg
 // 双栏布局：页脚上方增加统计 / 友情链接面板
 $footerStats = null;
 $footerLinks = [];
-if ($single) {
+if ($single && (int)config('single_footer_panels', 1) === 1) {
     $footerStats = \App\Services\FooterStats::stats();
     $footerLinks = \App\Services\FooterStats::links();
 }

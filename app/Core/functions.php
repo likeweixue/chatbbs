@@ -422,7 +422,11 @@ if (!function_exists('forum_icon_html')) {
         $icon = trim((string)($forum['icon'] ?? ''));
         $cls = trim('cb-forum-icon ' . $class);
         if ($icon === '') {
-            return '<span class="' . h($cls) . ' cb-forum-icon--empty">' . cb_icon('folder') . '</span>';
+            // 默认板块图标：有新帖用 forum_new，否则 forum_old
+            $isNew = (int)($forum['today_threads'] ?? 0) > 0
+                || (!empty($forum['last_post_at']) && strtotime((string)$forum['last_post_at']) >= time() - 86400);
+            $img = $isNew ? 'images/forum_new.webp' : 'images/forum_old.webp';
+            return '<img class="' . h($cls) . ' cb-forum-icon--' . ($isNew ? 'new' : 'old') . '" src="' . h(asset($img)) . '" alt="" loading="lazy" decoding="async">';
         }
         if (preg_match('#^(https?://|/|data:image/)#i', $icon)) {
             return '<img class="' . h($cls) . '" src="' . h($icon) . '" alt="" loading="lazy" decoding="async">';

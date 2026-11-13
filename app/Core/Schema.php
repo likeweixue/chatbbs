@@ -79,6 +79,18 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC32：导读改为独立地址 /guide，避免首页设为板块后无法访问导读
+        if ((int)Settings::get('migration_rc32_guide_url', 0) !== 1) {
+            try {
+                Database::query(
+                    'UPDATE ' . Database::table('menus') . " SET url = '/guide' WHERE title = '导读' AND (url = '/' OR url = '')"
+                );
+            } catch (\Throwable $e) {
+                Logger::error('RC32 导读地址迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc32_guide_url', 1);
+        }
+
         // RC30：默认把「板块」设为首页（若当前首页为空 / 指向导读）
         if ((int)Settings::get('migration_rc30_home_forums', 0) !== 1) {
             try {

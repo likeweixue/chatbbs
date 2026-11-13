@@ -57,6 +57,7 @@ class Thread
         $markId = (int)($opt['mark_id'] ?? 0);
         $digest = (int)($opt['digest'] ?? 0);
         $announce = (int)($opt['announce'] ?? 0);
+        $excludeAnnounce = (int)($opt['exclude_announce'] ?? 0);
         $positive = (string)($opt['positive'] ?? '');
 
         $where = 't.status = ?';
@@ -84,6 +85,9 @@ class Thread
         }
         if ($announce) {
             $where .= ' AND t.forum_id IN (SELECT af.id FROM ' . Database::table('forums') . " af WHERE af.slug = 'notice' OR af.name LIKE '%公告%')";
+        }
+        if ($excludeAnnounce) {
+            $where .= ' AND t.is_announce = 0';
         }
         if ($recommendKind === 1 || $recommendKind === -1) {
             $where .= ' AND EXISTS (SELECT 1 FROM ' . Database::table('recommendations') . ' rec WHERE rec.thread_id = t.id AND rec.kind = ?)';
@@ -170,6 +174,16 @@ class Thread
     public static function update(int $id, array $data): int
     {
         return Database::update('threads', $data, 'id = ?', ['id' => $id]);
+    }
+
+    /** 某板块的公告 */
+    public static function announcements(int $forumId, int $limit = 10): array
+    {
+        return Database::fetchAll(
+            'SELECT id, title, created_at, username FROM ' . Database::table('threads')
+            . ' WHERE forum_id = ? AND is_announce = 1 AND status = 1 ORDER BY id DESC LIMIT ' . (int)$limit,
+            [$forumId]
+        );
     }
 
     public static function delete(int $id): int

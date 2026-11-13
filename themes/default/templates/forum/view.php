@@ -19,6 +19,20 @@
   </div>
 </div>
 
+<?php if (!empty($announcements)): ?>
+<div class="cb-card cb-announce-panel">
+  <div class="cb-card__header"><?= L('公告') ?></div>
+  <div class="cb-card__body">
+    <?php foreach ($announcements as $a): ?>
+      <div class="cb-announce-item">
+        <a href="<?= h(url('thread/' . (int)$a['id'])) ?>"><?= h((string)$a['title']) ?></a>
+        <span class="text-xs text-muted"><?= h((string)$a['username']) ?> · <?= h(time_ago((string)$a['created_at'])) ?></span>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</div>
+<?php endif; ?>
+
 <div class="cb-card">
   <div class="cb-card__header cb-card__header--tabs">
     <div class="cb-tabs">

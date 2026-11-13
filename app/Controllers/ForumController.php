@@ -82,8 +82,10 @@ class ForumController extends BaseController
             'digest' => $tabRes['digest'],
             'recommend_kind' => $tabRes['recommend_kind'],
             'positive' => $positive,
+            'exclude_announce' => 1,
         ]);
         $baseUrl = url('forum/' . $id . '?tab=' . rawurlencode($tabRes['tab']));
+        $announcements = Thread::announcements($id, 10);
 
         return $this->render('forum/view', [
             'title' => (string)$forum['name'],
@@ -91,6 +93,7 @@ class ForumController extends BaseController
             'can_post' => Forum::canPost($forum, $user),
             'is_moderator' => Forum::isModerator($forum, $user),
             'threads' => $result['items'],
+            'announcements' => $announcements,
             'total' => $result['total'],
             'pager' => View::paginate($result['total'], $perPage, $page, $baseUrl),
             'order' => $tabRes['order'],

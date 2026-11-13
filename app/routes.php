@@ -8,6 +8,8 @@ declare(strict_types=1);
 use App\Core\Router;
 
 Router::get('/', \App\Controllers\HomeController::class . '@index');
+// 导读：独立的帖子流地址，首页设置为板块时仍可访问
+Router::get('/guide', \App\Controllers\HomeController::class . '@guide');
 
 // 界面语言切换（只切换界面名词，不影响帖子内容）
 Router::get('/lang/{code}', \App\Controllers\HomeController::class . '@switchLang');

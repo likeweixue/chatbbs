@@ -29,6 +29,17 @@ class HomeController extends BaseController
             }
         }
 
+        return $this->feed();
+    }
+
+    /** 导读：直接显示帖子流，不经过首页跳转 */
+    public function guide(): string
+    {
+        return $this->feed();
+    }
+
+    private function feed(): string
+    {
         $perPage = max(5, (int)Settings::get('threads_per_page', 20));
         $page = max(1, (int)\App\Core\Request::int('page', 1));
         $tabRes = $this->resolveTab();

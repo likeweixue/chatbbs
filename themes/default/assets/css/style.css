@@ -2683,3 +2683,18 @@ body.cb-single .cb-footer-panels .cb-card:last-child { margin-bottom: 0; }
 .cb-forum-table .fl_desc { margin-left: 61px; }
 .cb-forum-row-icon { width: 44px; height: 44px; }
 .cb-forum-table tr.fl_sub .fl_desc { margin-left: 79px; }
+
+/* 板块公告面板 */
+.cb-announce-panel { margin-bottom: 12px; }
+.cb-announce-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--color-border); }
+.cb-announce-item:last-child { border-bottom: 0; }
+.cb-announce-item a { color: var(--color-primary); font-weight: 600; }
+
+/* 板块行 LOGO：占满标题 + 简介高度 */
+.cb-forum-row-icon { width: 60px; height: 60px; }
+.cb-forum-table .fl_desc { margin-left: 67px; }
+.cb-forum-table tr.fl_sub .fl_desc { margin-left: 85px; }
+
+/* 单栏底部面板折叠按钮定位 */
+body.cb-single .cb-footer-panels .cb-card__header { position: relative; padding-right: 42px; }
+body.cb-single .cb-footer-panels .cb-card__header .cb-forum-toggle { right: 10px; }
