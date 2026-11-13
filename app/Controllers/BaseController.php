@@ -53,6 +53,7 @@ abstract class BaseController
             // 顶栏「聊天」角标 = 单聊未读 + 群聊未读
             'unread_messages' => $user ? (\App\Models\Message::unreadTotal((int)$user['id']) + self::chatUnread((int)$user['id'])) : 0,
             'menus' => self::menus(),
+            'is_home_page' => self::isHomePage(),
             'sidebar_enable' => 1,
             'sidebar_side' => Settings::get('sidebar_side', 'right'),
         ];
@@ -175,6 +176,31 @@ abstract class BaseController
         }
         $res['tab'] = $tab;
         return $res;
+    }
+
+    /**
+     * 当前请求是否是后台设置的「首页」（用于通知横幅）
+     */
+    protected static function isHomePage(): bool
+    {
+        if (Request::get('tab', '') !== '' || Request::int('page', 1) !== 1) {
+            return false;
+        }
+        $route = (string)Request::get('r', '');
+        $id = (int)Settings::get('home_menu_id', 0);
+        if ($id > 0) {
+            $url = trim((string)\App\Core\Database::value(
+                'SELECT url FROM ' . \App\Core\Database::table('menus') . ' WHERE id = ?',
+                [$id],
+                ''
+            ));
+            if (str_starts_with($url, '?r=')) {
+                $url = substr($url, 3);
+            }
+            $url = trim($url, '/');
+            return $url !== '' && $route === $url;
+        }
+        return $route === '';
     }
 
     protected static function menus(): array

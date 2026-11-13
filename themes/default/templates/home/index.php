@@ -25,12 +25,14 @@
         ['key' => 'essence', 'title' => L('精华'), 'link' => false],
       ];
       $curTab = (string)($tab ?? '');
-      $rankBase = url('?tab=rank&sort=');
+      $tabBase = (string)($tab_base ?? '');
+      $tabPrefix = $tabBase !== '' ? $tabBase . '?' : '?';
+      $rankBase = url($tabPrefix . 'tab=rank&sort=');
       $rankSort = (string)\App\Core\Request::get('sort', 'replies');
       foreach ($tabs as $tb):
         $href = $tb['link']
           ? (string)$tb['url']
-          : url(($tb['key'] === 'rank' ? '?tab=rank&sort=replies' : '?tab=' . rawurlencode((string)$tb['key'])));
+          : url($tabPrefix . ($tb['key'] === 'rank' ? 'tab=rank&sort=replies' : 'tab=' . rawurlencode((string)$tb['key'])));
         $active = !$tb['link'] && $curTab === (string)$tb['key'];
         if (($tb['key'] ?? '') === 'rank'):
       ?>

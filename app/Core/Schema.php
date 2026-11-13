@@ -79,6 +79,18 @@ class Schema
             Settings::set('migration_beta24_primary', 1);
         }
 
+        // RC33：单栏统计 / 友情链接面板拆成两个开关
+        if ((int)Settings::get('migration_rc33_single_panels', 0) !== 1) {
+            try {
+                $old = (string)Settings::get('single_footer_panels', '1') === '0' ? '0' : '1';
+                Settings::set('single_stats_panel', $old);
+                Settings::set('single_links_panel', $old);
+            } catch (\Throwable $e) {
+                Logger::error('RC33 单栏面板开关迁移失败：' . $e->getMessage());
+            }
+            Settings::set('migration_rc33_single_panels', 1);
+        }
+
         // RC32：导读改为独立地址 /guide，避免首页设为板块后无法访问导读
         if ((int)Settings::get('migration_rc32_guide_url', 0) !== 1) {
             try {

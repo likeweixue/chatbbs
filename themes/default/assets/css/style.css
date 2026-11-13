@@ -2698,3 +2698,17 @@ body.cb-single .cb-footer-panels .cb-card:last-child { margin-bottom: 0; }
 /* 单栏底部面板折叠按钮定位 */
 body.cb-single .cb-footer-panels .cb-card__header { position: relative; padding-right: 42px; }
 body.cb-single .cb-footer-panels .cb-card__header .cb-forum-toggle { right: 10px; }
+
+/* 暗色 / 黑金：分区标题栏跟随主题，避免固定浅色背景 */
+html[data-theme="dark"] .cb-forum-block__head {
+  background: #2a333d !important;
+  border-bottom-color: #3b4653 !important;
+  color: #dce6f0 !important;
+}
+html[data-theme="dark"] .cb-forum-block__head .cb-forum-block__title { color: #dce6f0 !important; }
+html[data-palette="blackgold"] .cb-forum-block__head {
+  background: #2b2518 !important;
+  border-bottom-color: #4a4028 !important;
+  color: #f0d48a !important;
+}
+html[data-palette="blackgold"] .cb-forum-block__head .cb-forum-block__title { color: #f0d48a !important; }

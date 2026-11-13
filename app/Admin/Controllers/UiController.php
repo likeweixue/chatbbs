@@ -32,8 +32,10 @@ class UiController extends BaseAdmin
             'fields' => [
                 ['name' => 'single_width', 'label' => '单栏内容宽度(px)', 'type' => 'number',
                     'tip' => '留空或 0 使用默认 1200px；可设置 960 - 1800，例如 1400 让单栏更宽'],
-                ['name' => 'single_footer_panels', 'label' => '显示统计 / 友情链接面板', 'type' => 'switch',
-                    'tip' => '单栏底部显示论坛统计与友情链接面板，默认开启'],
+                ['name' => 'single_stats_panel', 'label' => '显示论坛统计面板', 'type' => 'switch',
+                    'tip' => '单栏底部显示论坛统计，默认开启'],
+                ['name' => 'single_links_panel', 'label' => '显示友情链接面板', 'type' => 'switch',
+                    'tip' => '单栏底部显示友情链接，默认开启'],
             ],
         ]);
         return $this->pageView('单栏设置', 'interface.single', $html);
@@ -42,7 +44,8 @@ class UiController extends BaseAdmin
     public function saveSingle(): void
     {
         Settings::set('single_width', (string)max(0, min(1800, Request::int('single_width', 0))));
-        Settings::set('single_footer_panels', Request::bool('single_footer_panels') ? 1 : 0);
+        Settings::set('single_stats_panel', Request::bool('single_stats_panel') ? 1 : 0);
+        Settings::set('single_links_panel', Request::bool('single_links_panel') ? 1 : 0);
         \App\Core\Cache::forget('settings');
         $this->log('修改单栏设置');
         $this->back('单栏设置已保存');

@@ -29,16 +29,16 @@ class HomeController extends BaseController
             }
         }
 
-        return $this->feed();
+        return $this->feed('');
     }
 
     /** 导读：直接显示帖子流，不经过首页跳转 */
     public function guide(): string
     {
-        return $this->feed();
+        return $this->feed('guide');
     }
 
-    private function feed(): string
+    private function feed(string $base = ''): string
     {
         $perPage = max(5, (int)Settings::get('threads_per_page', 20));
         $page = max(1, (int)\App\Core\Request::int('page', 1));
@@ -60,8 +60,8 @@ class HomeController extends BaseController
             'user_id' => $tabRes['user_id'],
             'positive' => $positive,
         ]);
-        $tabQuery = '?tab=' . rawurlencode($tabRes['tab']);
-        $baseUrl = url($tabQuery);
+        $prefix = $base !== '' ? $base . '?' : '?';
+        $baseUrl = url($prefix . 'tab=' . rawurlencode($tabRes['tab']));
 
         $says = [];
         if ((int)Settings::get('say_on_home', 1) && (int)Settings::get('say_enable', 1)) {
@@ -70,8 +70,6 @@ class HomeController extends BaseController
 
         return $this->render('home/index', [
             'title' => Settings::get('site_name', 'ChatBBS'),
-            // 通知横幅只在首次打开 / 刷新首页时展示，切换 tab 或进入帖子页不再反复出现
-            'is_home_page' => \App\Core\Request::get('tab', '') === '' && \App\Core\Request::int('page', 1) === 1,
             'threads' => $result['items'],
             'total' => $result['total'],
             'page' => $page,
@@ -79,6 +77,7 @@ class HomeController extends BaseController
             'pager' => \App\Core\View::paginate($result['total'], $perPage, $page, $baseUrl),
             'order' => $tabRes['order'],
             'tab' => $tabRes['tab'],
+            'tab_base' => $base,
             'list_tabs' => self::listTabs(),
             'stats' => Stats::forum(),
             'new_users' => User::newest(8),

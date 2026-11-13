@@ -145,7 +145,9 @@ class Settings
         'layout_user_switch' => '1',
         // 单栏布局内容宽度（px）
         'single_width' => '',
-        // 单栏底部统计 / 友情链接面板
+        // 单栏底部统计 / 友情链接面板（两个独立开关）
+        'single_stats_panel' => '1',
+        'single_links_panel' => '1',
         'single_footer_panels' => '1',
         'theme_footer_text' => '#4e5969',
         'theme_footer_opacity' => '100',
