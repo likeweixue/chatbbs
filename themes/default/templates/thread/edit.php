@@ -175,10 +175,13 @@ $draftText = $draftContent !== '' ? \App\Services\Content::toText($draftContent)
         </label>
       </div>
 
-      <div class="cb-form-item cb-form-item--compact">
-        <input class="cb-input" id="f-fee" name="attachment_fee" type="number" min="0" step="0.01"
-               value="<?= h((string)($thread['attachment_fee'] ?? 0)) ?>" placeholder="帖子附件售价（<?= h(currency_name()) ?>，0 为免费）">
-        <div class="cb-form-tip">设置后，本贴中上传的附件需付费才能下载</div>
+      <div class="cb-form-item">
+        <label><?= L('付费面板') ?></label>
+        <input class="cb-input" id="f-paid-price" name="paid_price" type="number" min="0" step="0.01"
+               value="<?= h((string)($thread['paid_price'] ?? 0)) ?>" placeholder="价格（<?= h(currency_name()) ?>，0 为免费）" style="max-width:220px">
+        <textarea class="cb-input" id="f-paid-content" name="paid_content" rows="4"
+                  placeholder="付费后可见的内容：下载链接、提取码、附件说明等"><?= h((string)($thread['paid_content'] ?? '')) ?></textarea>
+        <div class="cb-form-tip">发布后会在文章底部显示「下载面板」，读者付费后可见这里的内容。</div>
       </div>
 
       <div class="cb-form-item cb-form-item--compact">

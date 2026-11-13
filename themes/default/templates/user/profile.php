@@ -72,6 +72,7 @@ $medals = $medals ?? [];
     <?php if ($is_self): ?>
       <a class="cb-btn sm" href="<?= h(url('user/settings')) ?>"><?= L('账号设置') ?></a>
       <a class="cb-btn sm" href="<?= h(url('user/attachments')) ?>"><?= L('我的附件库') ?></a>
+      <a class="cb-btn sm" href="<?= h(url('user/purchases')) ?>"><?= L('我的购买') ?></a>
     <?php else: ?>
       <?php if ($current_user): ?>
         <button class="cb-btn sm" data-action="follow" data-user-id="<?= (int)$p['id'] ?>">

@@ -154,16 +154,16 @@ class ExtController extends BaseAdmin
             ],
         ]);
 
-        $html .= '<div class="adm-panel"><div class="adm-panel-head">风格皮肤</div><div class="adm-panel-body">'
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">内置主题</div><div class="adm-panel-body">'
             . AdminUI::form([
                 'action' => admin_url('themes/skin'),
                 'data' => Settings::all(),
                 'submit' => '保存皮肤',
                 'fields' => [
                     ['name' => 'theme_skin', 'label' => '界面风格', 'type' => 'select', 'options' => [
-                        'default' => '默认（现代简洁）',
-                        'classic' => '经典论坛（PHPwind 风格）',
-                    ], 'tip' => '经典论坛皮肤：方角、细边框、浅蓝标题栏，加载资源更少'],
+                        'default' => '简洁（现代）',
+                        'classic' => '经典（PHPwind 风格）',
+                    ], 'tip' => '两套内置主题可随时切换：简洁偏现代，经典偏传统论坛（方角、细边框）'],
                 ],
             ]) . '</div></div>';
 

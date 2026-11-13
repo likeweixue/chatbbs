@@ -312,6 +312,22 @@ class UserController extends BaseController
         ]);
     }
 
+    /** 我的购买：帖子付费面板 */
+    public function purchases(): string
+    {
+        $this->requireLogin();
+        $rows = \App\Core\Database::fetchAll(
+            'SELECT p.*, t.title, t.forum_id FROM ' . \App\Core\Database::table('thread_purchases') . ' p'
+            . ' LEFT JOIN ' . \App\Core\Database::table('threads') . ' t ON t.id = p.thread_id'
+            . ' WHERE p.user_id = ? ORDER BY p.id DESC',
+            [(int)$this->userId()]
+        );
+        return $this->render('user/purchases', [
+            'title' => '我的购买',
+            'rows' => $rows,
+        ]);
+    }
+
     public function attachments(): string
     {
         $this->requireLogin();

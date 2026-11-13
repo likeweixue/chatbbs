@@ -201,6 +201,8 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__threads` (
   `is_closed` tinyint(1) NOT NULL DEFAULT 0,
   `is_digest` tinyint(1) NOT NULL DEFAULT 0,
   `is_announce` tinyint(1) NOT NULL DEFAULT 0 COMMENT '板块公告',
+  `paid_price` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '付费面板价格',
+  `paid_content` text COMMENT '付费面板内容',
   `anonymous` tinyint(1) NOT NULL DEFAULT 0,
   `views` int NOT NULL DEFAULT 0,
   `replies` int NOT NULL DEFAULT 0,
@@ -866,4 +868,19 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__blog_categories` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- ----------------------------
+-- 帖子付费面板购买记录
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `__PREFIX__thread_purchases` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL DEFAULT 0,
+  `thread_id` int unsigned NOT NULL DEFAULT 0,
+  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_thread` (`user_id`,`thread_id`),
+  KEY `idx_thread` (`thread_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

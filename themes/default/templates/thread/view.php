@@ -173,6 +173,26 @@ $show_toc = true;
   <?php endif; ?>
 </div>
 
+<?php if (!empty($paid_show)): ?>
+<div class="cb-card cb-paid-panel mt-16" id="paid-panel">
+  <div class="cb-card__header"><?= L('下载面板') ?></div>
+  <div class="cb-card__body">
+    <?php if ($paid_unlocked): ?>
+      <div class="cb-paid-content"><?= nl2br(h((string)$paid_content)) ?></div>
+    <?php else: ?>
+      <div class="cb-paid-lock">
+        <p><?= L('该内容需要付费后查看') ?></p>
+        <div class="cb-paid-price"><?= money((float)$paid_price) ?></div>
+        <form method="post" action="<?= h(url('thread/' . (int)$thread['id'] . '/buy')) ?>" style="margin:10px 0 0">
+          <?= csrf_field() ?>
+          <button class="cb-btn cb-btn-newthread" type="submit"><?= L('购买并查看') ?></button>
+        </form>
+      </div>
+    <?php endif; ?>
+  </div>
+</div>
+<?php endif; ?>
+
 <div class="cb-card cb-thread-actions-card mt-16">
   <div class="cb-card__body">
     <div class="flex gap-12 cb-thread-actions" style="flex-wrap:wrap;align-items:center">

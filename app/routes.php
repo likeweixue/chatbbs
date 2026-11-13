@@ -65,6 +65,7 @@ Router::get('/forum/{id}/{slug}', \App\Controllers\ForumController::class . '@vi
 Router::get('/thread/{id}', \App\Controllers\ThreadController::class . '@view');
 Router::get('/thread/create', \App\Controllers\ThreadController::class . '@createForm', ['auth']);
 Router::post('/thread/create', \App\Controllers\ThreadController::class . '@store', ['auth', 'csrf']);
+Router::post('/thread/{id}/buy', \App\Controllers\ThreadController::class . '@buyPaid', ['auth', 'csrf']);
 // 回收站（前台）
 Router::get('/trash', \App\Controllers\ThreadController::class . '@trash', ['auth']);
 Router::post('/trash/restore/{id}', \App\Controllers\ThreadController::class . '@trashRestore', ['auth', 'csrf']);
@@ -142,6 +143,7 @@ Router::get('/user/threads', \App\Controllers\UserController::class . '@threads'
 Router::get('/user/drafts', \App\Controllers\UserController::class . '@drafts', ['auth']);
 Router::post('/user/draft/{id}/delete', \App\Controllers\UserController::class . '@deleteDraft', ['auth', 'csrf']);
 Router::get('/user/friends', \App\Controllers\UserController::class . '@friends', ['auth']);
+Router::get('/user/purchases', \App\Controllers\UserController::class . '@purchases', ['auth']);
 Router::get('/user/attachments', \App\Controllers\UserController::class . '@attachments', ['auth']);
 Router::post('/user/attachments/upload', \App\Controllers\UserController::class . '@uploadAttachment', ['auth', 'csrf']);
 Router::post('/user/attachments/{id}/delete', \App\Controllers\UserController::class . '@deleteAttachment', ['auth', 'csrf']);

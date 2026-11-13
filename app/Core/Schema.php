@@ -417,6 +417,15 @@ class Schema
                   PRIMARY KEY (`id`),
                   UNIQUE KEY `uk_circle_user` (`circle_id`,`user_id`),
                   KEY `idx_user` (`user_id`)',
+            // 帖子付费面板购买记录
+            'thread_purchases' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
+                  `user_id` int unsigned NOT NULL DEFAULT 0,
+                  `thread_id` int unsigned NOT NULL DEFAULT 0,
+                  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+                  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `uk_user_thread` (`user_id`,`thread_id`),
+                  KEY `idx_thread` (`thread_id`)',
             // 博客：用户文章 + 分类
             'blog_posts' => '`id` int unsigned NOT NULL AUTO_INCREMENT,
                   `user_id` int unsigned NOT NULL DEFAULT 0,
@@ -511,6 +520,8 @@ class Schema
             ['posts', 'reply_to', 'int NOT NULL DEFAULT 0 COMMENT \'楼中楼：回复的目标楼层 ID\''],
             // 帖子版权许可证（license_options() 预设 key；custom 时内容存 license_custom）
             ['threads', 'is_announce', 'tinyint(1) NOT NULL DEFAULT 0 COMMENT \'板块公告\''],
+            ['threads', 'paid_price', 'decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT \'付费面板价格\''],
+            ['threads', 'paid_content', 'text COMMENT \'付费面板内容\''],
             ['threads', 'license', 'varchar(20) NOT NULL DEFAULT \'\' COMMENT \'版权许可证 key，空为未声明\''],
             ['threads', 'license_custom', 'varchar(500) NOT NULL DEFAULT \'\' COMMENT \'自定义版权说明\''],
         ];

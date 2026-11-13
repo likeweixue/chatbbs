@@ -2712,3 +2712,36 @@ html[data-palette="blackgold"] .cb-forum-block__head {
   color: #f0d48a !important;
 }
 html[data-palette="blackgold"] .cb-forum-block__head .cb-forum-block__title { color: #f0d48a !important; }
+
+/* 双栏目录：滚动时固定在顶栏下方 */
+#cb-toc-card { position: sticky; top: calc(var(--header-height) + 12px); z-index: 3; }
+
+/* 暗色模式：顶栏 / 页脚跟随主题，避免自定义白色背景刷白 */
+html[data-theme="dark"] .cb-header { background: var(--color-surface) !important; }
+html[data-theme="dark"] .cb-footer { background: var(--color-surface) !important; }
+html[data-palette="blackgold"] .cb-header { background: #211d14 !important; }
+html[data-palette="blackgold"] .cb-footer { background: #211d14 !important; }
+
+/* 标题内的字号 span 继承标题字号，避免 h1/h2 看起来一样大 */
+.cb-content-html h1 span, .cb-content-html h2 span, .cb-content-html h3 span,
+.cb-content-html h4 span, .cb-content-html h5 span, .cb-content-html h6 span,
+.cb-editor__area h1 span, .cb-editor__area h2 span, .cb-editor__area h3 span,
+.cb-editor__area h4 span, .cb-editor__area h5 span, .cb-editor__area h6 span { font-size: inherit !important; }
+
+/* 底栏高度收紧 */
+.cb-footer { padding: 14px 0; }
+
+/* 标题颜色选择器：圆形 */
+input[type="color"]#f-title-color-pick {
+  width: 28px; height: 28px; padding: 0; border-radius: 50%;
+  overflow: hidden; border: 1px solid var(--color-border); cursor: pointer;
+}
+input[type="color"]#f-title-color-pick::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]#f-title-color-pick::-webkit-color-swatch { border: 0; border-radius: 50%; }
+
+/* 付费下载面板 */
+.cb-paid-panel { border: 1px solid var(--color-border); }
+.cb-paid-lock { text-align: center; padding: 14px 0; }
+.cb-paid-lock p { margin: 0 0 6px; color: var(--color-text-muted); }
+.cb-paid-price { font-size: 22px; font-weight: 700; color: var(--color-danger); }
+.cb-paid-content { line-height: 1.8; word-break: break-word; }

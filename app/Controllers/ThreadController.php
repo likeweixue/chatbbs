@@ -110,8 +110,23 @@ class ThreadController extends BaseController
             $likedPosts = [];
         }
 
+        $paidPrice = (float)($thread['paid_price'] ?? 0);
+        $paidContent = trim((string)($thread['paid_content'] ?? ''));
+        $paidShow = $paidPrice > 0 || $paidContent !== '';
+        $paidUnlocked = $paidPrice <= 0 || $isThreadOwner || $isStaff;
+        if (!$paidUnlocked && $user) {
+            $paidUnlocked = (bool)Database::value(
+                'SELECT id FROM ' . Database::table('thread_purchases') . ' WHERE user_id = ? AND thread_id = ?',
+                [(int)$user['id'], $id]
+            );
+        }
+
         return $this->render('thread/view', [
             'title' => (string)$thread['title'],
+            'paid_show' => $paidShow,
+            'paid_unlocked' => $paidUnlocked,
+            'paid_price' => $paidPrice,
+            'paid_content' => $paidContent,
             'thread' => $thread,
             'posts' => $result['items'],
             'subposts' => $subposts,
@@ -335,7 +350,8 @@ class ThreadController extends BaseController
             'status' => $status,
             'is_announce' => $isAnnounce,
             'anonymous' => ((int)($forum['force_anonymous'] ?? 0) === 1 || Request::bool('anonymous')) ? 1 : 0,
-            'attachment_fee' => (float)Request::post('attachment_fee', 0),
+            'paid_price' => max(0, (float)Request::post('paid_price', 0)),
+            'paid_content' => trim((string)Request::post('paid_content', '')),
             'last_reply_user' => (string)$user['username'],
             'last_reply_user_id' => (int)$user['id'],
         ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads') + self::titleFields('threads'));
@@ -422,6 +438,8 @@ class ThreadController extends BaseController
             'content' => Content::renderMentions(Content::highlight(Content::lazyImages($html))),
             'content_text' => $text,
             'forum_id' => $forumId,
+            'paid_price' => max(0, (float)Request::post('paid_price', 0)),
+            'paid_content' => trim((string)Request::post('paid_content', '')),
         ] + self::mdFields('threads', $md, $format) + self::licenseFields('threads') + self::titleFields('threads');
         try {
             // 记录编辑痕迹（前台帖子正文上方显示"XX 编辑于 …"）
@@ -663,6 +681,58 @@ class ThreadController extends BaseController
             \redirect('trash');
         }
         $this->success(null, '已恢复');
+    }
+
+    /** 购买帖子付费面板 */
+    public function buyPaid(int $id): void
+    {
+        $this->requireLogin();
+        $thread = Thread::find($id);
+        if (!$thread) {
+            $this->back('帖子不存在');
+        }
+        $price = (float)($thread['paid_price'] ?? 0);
+        $content = trim((string)($thread['paid_content'] ?? ''));
+        if ($price <= 0 || $content === '') {
+            $this->back('该帖子没有付费内容');
+        }
+        $user = $this->user();
+        if ((int)$thread['user_id'] === (int)$user['id'] || \App\Core\Auth::isModerator()) {
+            \redirect('thread/' . $id);
+        }
+        $already = (bool)Database::value(
+            'SELECT id FROM ' . Database::table('thread_purchases') . ' WHERE user_id = ? AND thread_id = ?',
+            [(int)$user['id'], $id]
+        );
+        if ($already) {
+            $this->back('你已经购买过了');
+        }
+        if ((float)$user['money'] < $price) {
+            $this->back('余额不足');
+        }
+        $pdo = Database::pdo();
+        $pdo->beginTransaction();
+        try {
+            $dec = Database::query(
+                'UPDATE ' . Database::table('users') . ' SET money = money - ? WHERE id = ? AND money >= ?',
+                [$price, (int)$user['id'], $price]
+            );
+            if ($dec->rowCount() < 1) {
+                throw new \RuntimeException('余额不足');
+            }
+            Database::insert('thread_purchases', [
+                'user_id' => (int)$user['id'],
+                'thread_id' => $id,
+                'amount' => $price,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            $this->back($e->getMessage() ?: '购买失败');
+        }
+        \App\Core\Session::flash('success', '购买成功');
+        \redirect('thread/' . $id . '#paid-panel');
     }
 
     public function deletePost(int $id): void
