@@ -18,10 +18,32 @@ class BlogController extends BaseController
     public function index(): string
     {
         $categoryId = Request::int('category', 0);
+        $latest = Blog::posts(5);
+        $categories = Blog::categories();
+        $counts = [];
+        foreach (\App\Core\Database::fetchAll(
+            'SELECT category_id, COUNT(*) AS c FROM ' . \App\Core\Database::table('blog_posts')
+            . ' WHERE status = 1 GROUP BY category_id'
+        ) as $r) {
+            $counts[(int)$r['category_id']] = (int)$r['c'];
+        }
+        foreach ($categories as &$c) {
+            $c['count'] = $counts[(int)$c['id']] ?? 0;
+        }
+        unset($c);
+        $tags = [];
+        foreach (Blog::posts(500) as $p) {
+            foreach (array_filter(array_map('trim', explode(',', (string)$p['tags']))) as $t) {
+                $tags[$t] = ($tags[$t] ?? 0) + 1;
+            }
+        }
+        arsort($tags);
         return $this->render('blog/index', [
             'title' => L('博客'),
-            'posts' => Blog::posts(100, $categoryId),
-            'categories' => Blog::categories(),
+            'latest' => $latest,
+            'categories' => $categories,
+            'tags' => $tags,
+            'intro' => (string)Settings::get('blog_intro', ''),
             'category_id' => $categoryId,
         ]);
     }

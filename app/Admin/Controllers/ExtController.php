@@ -160,30 +160,7 @@ class ExtController extends BaseAdmin
 
     public function global(): string
     {
-        $html = '<div class="adm-panel"><div class="adm-panel-head">外观微调（圆角 / 主色）</div><div class="adm-panel-body">'
-            . AdminUI::form([
-                'action' => admin_url('themes/appearance'),
-                'data' => [
-                    'theme_radius' => (string)Settings::get('theme_radius', '4'),
-                    'theme_primary' => (string)Settings::get('theme_primary', '#4D698E'),
-                ],
-                'submit' => '保存外观设置',
-                'fields' => [
-                    ['name' => 'theme_radius', 'label' => '圆角大小', 'type' => 'select', 'options' => [
-                        '0' => '0 px（完全直角）', '2' => '2 px', '4' => '4 px（偏方正）', '6' => '6 px',
-                        '8' => '8 px（默认）', '10' => '10 px', '12' => '12 px', '16' => '16 px（偏圆润）', '20' => '20 px',
-                    ], 'tip' => '控制卡片、按钮、输入框等所有元素的圆角；设为 0 即为方方正正的直角风格'],
-                    ['name' => 'theme_primary', 'label' => '主题主色', 'type' => 'color', 'tip' => '影响链接、按钮、标签等主色调'],
-                    ['name' => 'avatar_shape', 'label' => '头像形状', 'type' => 'select', 'options' => ['circle' => '圆形（默认）', 'square' => '圆角方形'], 'tip' => '影响前台所有用户头像'],
-                    ['name' => 'admin_radius', 'label' => '后台圆角', 'type' => 'select', 'options' => [
-                        '0' => '0 px（直角，默认）', '2' => '2 px', '4' => '4 px', '6' => '6 px', '8' => '8 px',
-                    ], 'tip' => '只影响管理后台；前台圆角使用上面的「圆角大小」'],
-                    ['name' => 'links_in_footer', 'label' => '页脚上方友情链接', 'type' => 'switch',
-                        'tip' => '双栏布局在页脚上方显示「论坛统计 / 友情链接」面板；关闭则不显示友链面板'],
-                ],
-            ])
-            . '<div class="adm-form-tip">提示：外观设置保存后前台立即生效；若浏览器有缓存，请强制刷新（Ctrl+F5）。</div>'
-            . '</div></div>';
+        $html = '';
 
         // 默认布局设置（经典两栏）
         $html .= '<div class="adm-panel js-default-layout"><div class="adm-panel-head">默认布局设置</div><div class="adm-panel-body">'
@@ -257,27 +234,6 @@ class ExtController extends BaseAdmin
                         'tip' => '0 - 300 px；图片与内容交接处的渐变宽度，默认 60'],
                 ],
             ]) . '</div></div>';
-
-        $html .= '<div class="adm-panel"><div class="adm-panel-head">全局颜色</div><div class="adm-panel-body">'
-            . AdminUI::form([
-                'action' => admin_url('themes/colors'),
-                'data' => Settings::all(),
-                'submit' => '保存颜色设置',
-                'fields' => [
-                    ['name' => 'theme_header_bg', 'label' => '顶栏背景', 'type' => 'color'],
-                    ['name' => 'theme_header_text', 'label' => '顶栏文字', 'type' => 'color'],
-                    ['name' => 'theme_header_opacity', 'label' => '顶栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
-                    ['name' => 'theme_island_bg', 'label' => '侧栏背景', 'type' => 'color', 'tip' => '三栏侧栏'],
-                    ['name' => 'theme_island_text', 'label' => '侧栏文字', 'type' => 'color'],
-                    ['name' => 'theme_island_opacity', 'label' => '侧栏透明度', 'type' => 'number', 'tip' => '0 - 100'],
-                    ['name' => 'theme_footer_bg', 'label' => '页脚背景', 'type' => 'color'],
-                    ['name' => 'theme_forum_header_bg', 'label' => '分区标题背景', 'type' => 'color', 'tip' => '板块页每个分区标题栏的背景色'],
-                    ['name' => 'theme_footer_text', 'label' => '页脚文字', 'type' => 'color'],
-                    ['name' => 'theme_footer_opacity', 'label' => '页脚透明度', 'type' => 'number', 'tip' => '0 - 100'],
-                ],
-            ])
-            . '<div class="adm-form-tip">透明度为 0 时完全透明；页脚使用 DIY 底部图片时，文字会使用白色以适配图片。</div>'
-            . '</div></div>';
 
         // 全局布局设置
         $html .= '<div class="adm-panel"><div class="adm-panel-head">全局布局设置</div><div class="adm-panel-body">'
@@ -424,7 +380,6 @@ class ExtController extends BaseAdmin
             'theme_primary' => $primary,
             'admin_radius' => (string)$adminRadius,
             'avatar_shape' => $avatarShape,
-            'links_in_footer' => Request::bool('links_in_footer') ? 1 : 0,
         ]);
         \App\Core\Cache::forget('settings');
         $this->log('修改主题外观', '圆角:' . $radius . ' 主色:' . $primary);

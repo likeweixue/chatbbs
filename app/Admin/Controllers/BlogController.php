@@ -34,7 +34,25 @@ class BlogController extends BaseAdmin
                 ['label' => '删除', 'url' => admin_url('blog/delete/{id}'), 'type' => 'post', 'class' => 'danger', 'confirm' => '确定删除该文章？'],
             ],
         ]);
+        $html .= '<div class="adm-panel"><div class="adm-panel-head">博客设置</div><div class="adm-panel-body">'
+            . AdminUI::form([
+                'action' => admin_url('blog/settings'),
+                'data' => \App\Core\Settings::all(),
+                'submit' => '保存博客设置',
+                'fields' => [
+                    ['name' => 'blog_intro', 'label' => '博客介绍 / 公告', 'type' => 'textarea', 'rows' => 4,
+                        'tip' => '显示在博客首页的「公告 / 介绍」面板里'],
+                ],
+            ]) . '</div></div>';
         return $this->pageView('博客管理', 'blog', $html);
+    }
+
+    public function settings(): void
+    {
+        \App\Core\Settings::set('blog_intro', $this->pure('blog_intro', 2000));
+        \App\Core\Cache::forget('settings');
+        $this->log('修改博客设置');
+        $this->back('博客设置已保存');
     }
 
     public function toggle(int $id): void

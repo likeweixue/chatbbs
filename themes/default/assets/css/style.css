@@ -2745,3 +2745,12 @@ input[type="color"]#f-title-color-pick::-webkit-color-swatch { border: 0; border
 .cb-paid-lock p { margin: 0 0 6px; color: var(--color-text-muted); }
 .cb-paid-price { font-size: 22px; font-weight: 700; color: var(--color-danger); }
 .cb-paid-content { line-height: 1.8; word-break: break-word; }
+
+/* 博客首页四面板 */
+.cb-blog-cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.cb-blog-cat { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); color: var(--color-text-sub); }
+.cb-blog-cat:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.cb-blog-cat em { font-style: normal; font-size: 11px; color: var(--color-text-muted); }
+.cb-blog-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.cb-blog-tags .cb-tag em { font-style: normal; margin-left: 3px; opacity: .7; }
+.cb-blog-intro { line-height: 1.8; color: var(--color-text-sub); }

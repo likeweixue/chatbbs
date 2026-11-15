@@ -100,6 +100,7 @@ Router::post('/tags/settings', $C . 'ContentMoreController@tagSettings', ['csrf'
     Router::get('/blog', $C . 'BlogController@index');
     Router::post('/blog/toggle/{id}', $C . 'BlogController@toggle', ['csrf']);
     Router::post('/blog/delete/{id}', $C . 'BlogController@delete', ['csrf']);
+    Router::post('/blog/settings', $C . 'BlogController@settings', ['csrf']);
 
     Router::get('/friend-links', $C . 'FriendLinkController@index');
     Router::post('/friend-links/save', $C . 'FriendLinkController@save', ['csrf']);
