@@ -1,3 +1,5 @@
+![](https://1842161929.cdn.123clouddisk.com/1842161929/yk6baz03t0n000dlnm5ssxv0uh4a3xp6DIYxDqezDIrvBGx2AqYy.png) 
+
 # ChatBBS 论坛系统 v1.0.0-RC37
 
 > 修改记录见本目录下的 `CHANGELOG.md`。
