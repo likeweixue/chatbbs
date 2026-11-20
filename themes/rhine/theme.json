@@ -1,0 +1,8 @@
+{
+    "name": "莱因",
+    "slug": "rhine",
+    "version": "1.0.0",
+    "author": "Rhine Theme",
+    "description": "工程蓝图 × 复古印刷：米纸底色、墨色文字、单色安全橙、直角边框与偏移实心阴影，配合等宽字标注；支持暗色模式与移动端。",
+    "supports": ["dark-mode", "responsive", "sidebar-right", "island", "single-column"]
+}
