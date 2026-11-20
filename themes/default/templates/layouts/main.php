@@ -70,7 +70,7 @@ $favicon = (string)config('site_favicon', '');
 <title><?= h(($title ?? '') !== '' ? $title . ' - ' . $siteName : $siteName) ?></title>
 <meta name="description" content="<?= h(config('site_description', '')) ?>">
 <meta name="keywords" content="<?= h(config('site_keywords', '')) ?>">
-<link rel="icon" href="<?= h($favicon !== '' ? $favicon : asset('images/retro/favicon.svg')) ?>">
+<link rel="icon" type="image/svg+xml" href="<?= h(($favicon !== '' ? $favicon : asset('images/logo.svg')) . '?v=' . CB_VERSION) ?>">
 <?php if ((int)config('rss_enable', 1) === 1): ?>
 <link rel="alternate" type="application/rss+xml" title="<?= h($siteName) ?> RSS" href="<?= h(url('rss')) ?>">
 <?php endif; ?>

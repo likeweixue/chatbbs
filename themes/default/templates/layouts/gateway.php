@@ -17,7 +17,7 @@ $favicon = (string)config('site_favicon', '');
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= h(($title ?? '') !== '' ? $title . ' - ' . $siteName : $siteName) ?></title>
 <meta name="theme-color" content="#4D698E">
-<link rel="icon" href="<?= h($favicon !== '' ? $favicon : asset('images/retro/favicon.svg')) ?>">
+<link rel="icon" type="image/svg+xml" href="<?= h(($favicon !== '' ? $favicon : asset('images/logo.svg')) . '?v=' . CB_VERSION) ?>">
 <link rel="stylesheet" href="<?= h(theme_asset('css/style.css') . '?v=' . CB_VERSION) ?>">
 <link rel="stylesheet" href="<?= h(theme_asset('css/auth-flarum.css') . '?v=' . CB_VERSION) ?>">
 <script>
